@@ -7,7 +7,9 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Simon</title>
+<title>Simon: Tu Amigo Virtual</title>
+<meta name="application-name" content="Simon">
+<meta name="apple-mobile-web-app-title" content="Simon">
 <style>
   @font-face { font-family: 'PS2P'; src: url('PressStart2P.woff2') format('woff2'); font-display: swap; }
   :root { --noche:#0f1230; --panel:#232b63; --panel2:#3a47a8; --linea:#e8ecff; --tinta:#1a1f4a; --rojo:#e8353f; --rojo2:#a8202c; }
@@ -3184,7 +3186,7 @@
   }
   function renderAj() {
     const aud = `<div style="display:flex;gap:8px;margin-bottom:10px"><button class="bt ${e.mudo ? '' : 'ok'}" style="flex:1;padding:12px 0" data-a="r_snd">SONIDO ${e.mudo ? 'OFF' : 'ON'}</button><button class="bt ${e.musica && !e.mudo ? 'ok' : ''}" style="flex:1;padding:12px 0" data-a="r_mus">MÚSICA ${e.musica && !e.mudo ? 'ON' : 'OFF'}</button></div>`;
-    return aud + renderAj0() + `<div class="centro" style="font-size:7px;color:#aab4ff;margin-top:14px">SIMON · VERSIÓN ${VERSION_JUEGO}</div>`;
+    return aud + renderAj0() + `<div class="centro" style="font-size:7px;color:#aab4ff;margin-top:14px">SIMON: TU AMIGO VIRTUAL · VERSIÓN ${VERSION_JUEGO}</div>`;
   }
   function renderAj0() {
     $('m-titulo').textContent = 'AJUSTES';
