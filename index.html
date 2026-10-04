@@ -824,7 +824,7 @@
   }
 
   /* ===================== HABITACIONES Y LUGARES ===================== */
-  const HABS = [{ id: 'estudio', n: 'ESTUDIO', nv: 1 }, { id: 'juegos', n: 'SALA DE JUEGOS', nv: 2 }, { id: 'sala', n: 'RECÁMARA', nv: 1 }, { id: 'cocina', n: 'COCINA', nv: 4 }, { id: 'entrada', n: 'ENTRADA', nv: 7 }];
+  const HABS = [{ id: 'estudio', n: 'ESTUDIO', nv: 2 }, { id: 'juegos', n: 'SALA DE JUEGOS', nv: 2 }, { id: 'sala', n: 'RECÁMARA', nv: 1 }, { id: 'cocina', n: 'COCINA', nv: 4 }, { id: 'entrada', n: 'ENTRADA', nv: 7 }];
   const LUGARES = [{ id: 'parque', n: 'PARQUE', nv: 10 }];
   const escenaId = () => lugar || e.hab;
   /* ---- SALA DE JUEGOS: máquina arcade (acceso a los minijuegos). Va a la izquierda: Cortex llega por la derecha y no la tapa ---- */
@@ -2445,7 +2445,7 @@
     const bono = Math.round(ECO.bono(n)) + (n <= 5 ? 12 : 0); e.monedas += bono; e.total += bono;
     toast('¡CARIÑO NIVEL ' + n + '! +' + bono + ' monedas'); sfx.nivel();
     const g = GESTOS.find(g => g.nv === n); if (g) toast('Nuevo gesto: ' + g.n);
-    const hb = HABS.find(h => h.nv === n && n > 1); if (hb) toast(hb.id === 'entrada' ? '¡Nueva zona: ENTRADA! Toca la puerta para salir' : '¡Nueva habitación: ' + hb.n + '! Usa las flechas');
+    HABS.filter(h => h.nv === n && n > 1).forEach(hb => toast(hb.id === 'entrada' ? '¡Nueva zona: ENTRADA! Toca la puerta para salir' : '¡Nueva habitación: ' + hb.n + '! Usa las flechas'));
     const lg = LUGARES.find(l => l.nv === n); if (lg) toast('¡Nuevo lugar en el mapa: ' + lg.n + '!');
     const nuevos = Object.keys(ITEMS).filter(k => ITEMS[k].nv === n && !ITEMS[k].regalo && !ITEMS[k].mercader && ITEMS[k].p > 0).map(k => ITEMS[k].n);
     if (nuevos.length) toast('En la tienda: ' + nuevos.join(', '));
@@ -3529,6 +3529,7 @@
   /* ===================== TIENDA ===================== */
   function equipar(k) { const it = ITEMS[k]; if (esMueble(k)) { if (colocar(k)) toast('Colocado. Muévelo con el botón de la casita'); return; } (it.tipo === 'ropa' ? e.ropa : e.cuarto)[it.slot] = k; if (it.tipo === 'ropa' && ROPA_COM[k]) ropaPend = k; }
   function puesto(k) { const it = ITEMS[k]; if (esMueble(k)) return e.deco.some(d => d.k === k); return (it.tipo === 'ropa' ? e.ropa : e.cuarto)[it.slot] === k; }
+  const habBloq0 = id => { const h = HABS.find(x => x.id === id); return h && nivel() < h.nv ? h : null; };
   const habBloq = k => { const t = ITEMS[k] && ITEMS[k].tema, h = HABS.find(x => x.id === t); return h && nivel() < h.nv ? h : null; };
   function comprar(k) {
     const it = ITEMS[k]; if (e.tiene[k] || it.regalo) return;
@@ -4828,9 +4829,9 @@
       $('m-titulo').textContent = 'TIENDA';
       h = `<div class="tabs t5"><button class="tab ${tab === 'ropa' ? 'on' : ''}" data-a="tab" data-k="ropa">ROPA</button><button class="tab ${tab === 'cuarto' ? 'on' : ''}" data-a="tab" data-k="cuarto">MUEBLES</button><button class="tab ${tab === 'comida' ? 'on' : ''}" data-a="tab" data-k="comida">COMIDA</button><button class="tab ${tab === 'juguetes' ? 'on' : ''}" data-a="tab" data-k="juguetes">JUGUETES</button><button class="tab ${tab === 'extras' ? 'on' : ''}" data-a="tab" data-k="extras">EXTRAS</button></div>` +
         `<div class="saldo"><span>MONEDAS: ${e.monedas}</span><span>CARIÑO NV${nivel()}</span></div>` +
-        (tab === 'cuarto' ? `<div class="tabs fh">${[['todo', 'TODO'], ['estudio', 'ESTUDIO'], ['juegos', 'JUEGOS'], ['sala', 'RECÁMARA'], ['cocina', 'COCINA'], ['entrada', 'ENTRADA']].map(([f, t]) => `<button class="tab ${fHab === f ? 'on' : ''}" data-a="fh" data-k="${f}">${t}</button>`).join('')}</div>` : '') +
+        (tab === 'cuarto' ? `<div class="tabs fh">${[['todo', 'TODO'], ['estudio', 'ESTUDIO'], ['juegos', 'JUEGOS'], ['sala', 'RECÁMARA'], ['cocina', 'COCINA'], ['entrada', 'ENTRADA']].filter(([f]) => f === 'todo' || !habBloq0(f)).map(([f, t]) => `<button class="tab ${fHab === f ? 'on' : ''}" data-a="fh" data-k="${f}">${t}</button>`).join('')}</div>` : '') +
         `<div class="centro" style="margin-bottom:10px;color:#aab4ff;font-size:7px">${tab === 'juguetes' ? 'Solo uno a la vez. Es el que Simon usa al JUGAR. Colócalo donde quieras desde la casita.' : tab === 'extras' ? 'Bombas para cuando Cortex se quede a descansar, y jarabe por si Simon se resfría.' : tab === 'comida' ? 'La comida especial da energía. ¡Algunas son una sorpresa!' : tab === 'cuarto' ? 'Los muebles se colocan donde quieras: toca la casita. Toca el cuadro de la pared para ver tus fotos.' : 'La corona siempre se queda puesta.'}</div><div class="cuadricula">` +
-        ORDEN[tab].filter(k => (tab !== 'cuarto' || fHab === 'todo' || (esMueble(k) && (temaDe(k) === fHab || (temaDe(k) === 'todas' && fHab !== 'estudio')))) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k])).map(k => {
+        ORDEN[tab].filter(k => (tab !== 'cuarto' || !habBloq(k)) && (tab !== 'cuarto' || fHab === 'todo' || (esMueble(k) && (temaDe(k) === fHab || (temaDe(k) === 'todas' && fHab !== 'estudio')))) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k])).map(k => {
           if (tab === 'comida') return cardComida(k);
           if (k === 'bomba') return cardBomba();
           if (k === 'jarabe') return cardMed();
@@ -5122,6 +5123,7 @@
   }
   let estC = 0, estSure = 0;
   function estPintar() {
+    $('b-est').style.display = nivel() < HABS[0].nv ? 'none' : '';
     const on = estEstudiando(), b = $('t-estudio');
     document.body.classList.toggle('enfoque', on);
     if (!on) { estWake(false); if (modal === 'enfoque') modal = null; }
@@ -5145,7 +5147,7 @@
     if (e.est && Date.now() >= e.est.fin) { estFin(); return; }
     if (estEstudiando()) {
       if (!modal && !dlg) modal = 'enfoque';
-      if (escenaId() !== 'estudio') { lugar = null; llegada = null; e.hab = 'estudio'; pintarNav(); }
+      if (escenaId() !== 'estudio' && nivel() >= 2) { lugar = null; llegada = null; e.hab = 'estudio'; pintarNav(); }
       if (!document.hidden) estWake(true);
       if (estC % 10 === 0) lluviaCheck();
     } else if (e.est && !document.hidden && !dlg && !modal && !e.dormido && escenaId() === 'estudio' && estC % 24 === 0) gesto('salto');
@@ -5153,7 +5155,7 @@
     if (modal === 'estudio' && e.est && $('est-rest')) $('est-rest').textContent = estFmt(e.est.fin - Date.now());
   }
   try { $('ic-est2').getContext('2d').drawImage(gridCanvas(ESTIC()), 0, 0); } catch (_) {}
-  $('b-est').onclick = () => { if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('estudio'); };
+  $('b-est').onclick = () => { if (nivel() < 2) { toast('ESTUDIO se desbloquea en cariño NV2'); sfx.no(); return; } if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('estudio'); };
   function estSlider(ev) {
     const t = ev.target, a = t && t.dataset && t.dataset.a; if (a !== 'est_vol' && a !== 'est_mus') return;
     if (a === 'est_vol') { e.estVol = +t.value; const v = $('est-vv'); if (v) v.textContent = t.value + '%'; estSndApply(); }
@@ -5180,6 +5182,7 @@
     resumenAusencia(); prepararSaludo(); setTimeout(saludar, 1600); setTimeout(checkVisita, 4500);
     if (!e.avisoMerc) { e.avisoMerc = true; guardar(); setTimeout(() => notificar('Cortex vendrá a venderte cosas una vez al día y te avisará antes de llegar.'), 3000); }
   }
+  if (!admin && nivel() < HABS[0].nv) { if (e.hab === 'estudio') e.hab = 'sala'; e.est = null; }
   checkHallazgo(); actualizarTareas(); pintarIconos();
   if (e.intro) {
     if (!e.ultResp) { e.ultResp = Date.now(); guardar(); }

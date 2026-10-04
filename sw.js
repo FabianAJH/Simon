@@ -1,4 +1,4 @@
-const CACHE = 'simon-v137';
+const CACHE = 'simon-v138';
 const ARCHIVOS = ['./', './index.html', './manifest.json', './icon.svg', './si.mp3', './PressStart2P.woff2', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', ev => {
