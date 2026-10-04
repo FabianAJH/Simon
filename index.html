@@ -450,11 +450,11 @@
       const d = JSON.parse(localStorage.getItem(CLAVE));
       if (d && typeof d.hambre === 'number') {
         const horas = Math.max(0, (Date.now() - d.t) / 3600000), b = BASE();
-        const sigue = d.dormido && clamp(d.energia + 20 * horas) < 100;
+        const sigue = d.dormido && clamp(d.energia + 50 * horas) < 100;
         despertoOffline = !!d.dormido && !sigue; ausenciaH = horas;
         e = Object.assign(b, d, {
           hambre: clamp(d.hambre - BAJA.hambre * horas),
-          energia: clamp(d.dormido ? d.energia + 20 * horas : d.energia - BAJA.energia * horas),
+          energia: clamp(d.dormido ? d.energia + 50 * horas : d.energia - BAJA.energia * horas),
           feliz: clamp(d.feliz - BAJA.feliz * horas),
           dormido: !!sigue, mudo: !!d.mudo, t: Date.now()
         });
@@ -2030,6 +2030,8 @@
   const cortex = { p: 0, dir: 0, cb: null };
   const cxb = () => SX + 26;   // borde izquierdo de Cortex: siempre pegado a Simon, sea cual sea el ancho de la pantalla
   let dlg = null, introActiva = false;
+  let avEn = false;
+  function avisoSueno() { toast('SIMON TIENE POCA ENERGÍA: DÉJALO DORMIR EN SU RECÁMARA O DALE DE COMER ALGO QUE LA RECUPERE'); }
   function noEst(msg) { if (escenaId() !== 'estudio') return false; decir('Sí... (' + (msg || 'estoy en el estudio') + ')'); sfx.no(); return true; }
   const GLEN = { baile: 14, giro: 10, robot: 16, twist: 12 };
   const GESTOS = [
@@ -4021,7 +4023,7 @@
   }
 
   /* ===================== MINIJUEGO: ATRAPA EL KEKE ===================== */
-  const MJ_COSTO = 10, MJH = 176, MJ_TOPE = () => Math.floor(ECO.topeMj(nivel()));
+  const MJ_COSTO = 2, MJH = 176, MJ_TOPE = () => Math.floor(ECO.topeMj(nivel()));
   function iconoMj() {
     const g = Grid(11, 11), m = ['...........', '..kkkkkkk..', '.kwwwwwwwk.', 'kwwkwwwrwwk', 'kwkkkwwwrwk', 'kwwkwwgwwwk', 'kwwwwwwwwwk', '.kwwwwwwwk.', '..kk...kk..', '...........', '...........'];
     m.forEach((f, y) => [...f].forEach((ch, x) => { if (ch === 'w') g.set(x, y, '#e8ecff'); else if (ch === 'k') g.set(x, y, '#232b63'); else if (ch === 'r') g.set(x, y, '#ff4a5c'); else if (ch === 'g') g.set(x, y, '#58d048'); }));
@@ -4036,14 +4038,14 @@
       `<div class="card"><div class="pv"><canvas data-prev="mj_run"></canvas></div><div class="cn">CORRE, SIMON</div>${nivel() >= RUN_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.run.rec}<br>MONEDAS HOY: ${runHoy()}/${RUN_TOPE()}</div><button class="bt ok" data-a="run_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RUN_NV}</div>`}</div>` +
       `<div class="card"><div class="pv"><canvas data-prev="mj_mem"></canvas></div><div class="cn">MEMORIA CON CORTEX</div>${nivel() >= MEM_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.mem.rec}<br>MONEDAS HOY: ${memHoy()}/${MEM_TOPE()}</div><button class="bt ok" data-a="mem_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${MEM_NV}</div>`}</div>` +
       `<div class="card"><div class="pv"><canvas data-prev="mj_rt"></canvas></div><div class="cn">BAILA CON SIMON</div>${nivel() >= RT_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.rt.rec}<br>MONEDAS HOY: ${rtHoy()}/${RT_TOPE()}</div><button class="bt ok" data-a="rt_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RT_NV}</div>`}</div></div>` +
-      `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff;margin-top:12px">Cada juego gasta de ${RUN_COSTO} a ${MJ_COSTO} de energía y sube la felicidad.</div>`;
+      `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff;margin-top:12px">Cada juego gasta ${MJ_COSTO} de energía (el baile, 5) y sube la felicidad.</div>`;
   }
   let mj = null;
   const mjCv = $('mj-cv'), mjX = mjCv.getContext('2d'); mjCv.height = MJH;
   mjX.imageSmoothingEnabled = false;
   function mjIniciar() {
     if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
-    if (e.energia < MJ_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    if (e.energia < MJ_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
     cerrar();
     e.energia = clamp(e.energia - MJ_COSTO); pintar();
@@ -4131,7 +4133,7 @@
   document.addEventListener('keydown', ev => { if (!mj || mj.fin) return; if (ev.key === 'ArrowLeft') mj.objetivo = Math.max(14, mj.objetivo - 10); if (ev.key === 'ArrowRight') mj.objetivo = Math.min(82, mj.objetivo + 10); });
 
   /* ===================== MINIJUEGO DE RITMO: BAILA CON SIMON ===================== */
-  const RT_COSTO = 10, RT_NV = 5, RT_DIV = 12, RT_TOPE = () => Math.floor(ECO.topeRt(nivel()));
+  const RT_COSTO = 5, RT_NV = 5, RT_DIV = 12, RT_TOPE = () => Math.floor(ECO.topeRt(nivel()));
   const RT_STEP = .25, RT_PASOS = 144, RT_LEAD = 1.2, RT_V = 100, RT_Y = 150, RT_FIN = RT_LEAD + RT_PASOS * RT_STEP + .8;
   const RT_ROOTS = [48, 45, 41, 43], RT_COL = ['#ff4a5c', '#ffd84a', '#4ac8ff'], RT_X = [16, 48, 80];
   let rt = null;
@@ -4155,7 +4157,7 @@
     if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
     if (nivel() < RT_NV) { toast('Se desbloquea en cariño NV' + RT_NV); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo bailar.' : null, 3000); sfx.no(); return; }
-    if (e.energia < RT_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    if (e.energia < RT_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
     cerrar(); e.energia = clamp(e.energia - RT_COSTO); pintar(); musicaOff(); lluviaOff();
     const a = !e.mudo && audio();
     rt = { notas: rtNotas(), pts: 0, combo: 0, mejor: 0, per: 0, bien: 0, fall: 0, t: 0, t0: 0, fin: false, raf: 0, aud: !!a, sig: 0, timer: 0, pad: [0, 0, 0], lado: 1, bail: 0, boca: 0 };
@@ -4274,7 +4276,7 @@
 
 
   /* ===================== MINIJUEGO: CORRE, SIMON (estilo dinosaurio de Chrome) ===================== */
-  const RUN_COSTO = 8, RUN_NV = 2, RUN_DIV = 25, RUN_TOPE = () => Math.floor(ECO.topeRun(nivel()));
+  const RUN_COSTO = 2, RUN_NV = 2, RUN_DIV = 25, RUN_TOPE = () => Math.floor(ECO.topeRun(nivel()));
   const RUN_GY = 132, RUN_GRAV = 520, RUN_SALTO = 190, RUN_SX = 22;
   let run = null;
   const runCv = $('run-cv'), runX = runCv.getContext('2d'); runX.imageSmoothingEnabled = false;
@@ -4284,7 +4286,7 @@
     if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
     if (nivel() < RUN_NV) { toast('Se desbloquea en cariño NV' + RUN_NV); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
-    if (e.energia < RUN_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    if (e.energia < RUN_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
     cerrar(); modal = 'run'; e.energia = clamp(e.energia - RUN_COSTO); pintar();
     run = { t: 0, dist: 0, kekes: 0, y: 0, vy: 0, suelo: true, obs: [], items: [], sig: 70, fx: [], fin: false, muerto: 0, ult: performance.now(), raf: 0, saltos: 0 };
     $('run-fin').classList.remove('on'); $('run-tip').style.display = ''; $('run').classList.add('on'); runHud();
@@ -4369,7 +4371,7 @@
   $('run-otra').onclick = () => { if (e.energia < RUN_COSTO || e.enf) { sfx.no(); return; } sfx.click(); cancelAnimationFrame(run.raf); run = null; $('run').classList.remove('on'); $('run-fin').classList.remove('on'); modal = null; runIniciar(); };
 
   /* ===================== MINIJUEGO: MEMORIA CON CORTEX ===================== */
-  const MEM_COSTO = 8, MEM_NV = 3, MEM_DIV = 28, MEM_TOPE = () => Math.floor(ECO.topeMem(nivel()));
+  const MEM_COSTO = 2, MEM_NV = 3, MEM_DIV = 28, MEM_TOPE = () => Math.floor(ECO.topeMem(nivel()));
   const MEM_RONDAS = [{ p: 6, c: 3, prev: 2600, par: 28, max: 5 }, { p: 8, c: 4, prev: 2400, par: 42, max: 7 }, { p: 10, c: 4, prev: 2200, par: 60, max: 9 }];
   let mem = null;
   function memHoy() { const h = hoy(); if (e.mem.dia !== h) { e.mem.dia = h; e.mem.monHoy = 0; } return e.mem.monHoy; }
@@ -4383,7 +4385,7 @@
     if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
     if (nivel() < MEM_NV) { toast('Se desbloquea en cariño NV' + MEM_NV); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
-    if (e.energia < MEM_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    if (e.energia < MEM_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
     cerrar(); modal = 'mem'; e.energia = clamp(e.energia - MEM_COSTO); pintar();
     mem = { ronda: 0, pts: 0, fallos: 0, combo: 0, mejorCombo: 0, rondasOk: 0, fin: false, to: [], cartas: [], a: null, lock: true, consec: 0, rf: 0, pistas: 0, t0: 0, perdio: false };
     $('mem-fin').classList.remove('on'); $('mem').classList.add('on'); memRetrato(); memRonda();
@@ -4897,9 +4899,9 @@
   }
   function jugar() {
     const enParque = lugar === 'parque';
-    if (e.energia < 10) { decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    if (e.energia < 3) { decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
     if (e.enf) { decir('Sí... ¡achú!', e.traductor ? 'No me siento bien para jugar.' : null, 3000); sfx.no(); return; }
-    e.feliz = clamp(e.feliz + 20); e.energia = clamp(e.energia - 10); e.hambre = clamp(e.hambre - 5);
+    e.feliz = clamp(e.feliz + 20); e.energia = clamp(e.energia - 3); e.hambre = clamp(e.hambre - 5);
     e.st.jugar++; ganar(3, 4); mision('jugar'); if (enParque) { e.feliz = clamp(e.feliz + 10); e.st.parque++; ganar(2, 2); } sfx.jugar(); corazones(3); responder(null, 'jugar');
     act = { tipo: 'pelota', t: 0, len: 42 }; proxAct = tk + 42 + 90;
   }
@@ -4984,8 +4986,9 @@
     const h = 5 / 3600;
     e.hambre = clamp(e.hambre - BAJA.hambre * h);
     e.feliz = clamp(e.feliz - BAJA.feliz * h);
-    e.energia = clamp(e.dormido ? e.energia + 20 * h : e.energia - BAJA.energia * h);
+    e.energia = clamp(e.dormido ? e.energia + 50 * h : e.energia - BAJA.energia * h);
     if (e.dormido && e.energia >= 100) { e.dormido = false; sfx.despertar(); despertarPremio(); responder(); }
+    if (e.energia < 20 && !e.dormido && !avEn) { avEn = true; if (!modal && !dlg) avisoSueno(); } if (e.energia >= 40) avEn = false;
     checkHallazgo(); checkVisita(); checkKeke(); checkMimos(); checkRopa(); checkSiesta(); checkTutorial(); checkCaja(); checkMem(); checkEnf(); diaTick(); ambiente(); checkNotis(); lluviaCheck(); if (!e.mudo && (!ac || ac.state !== 'running')) armarAudio(); pintarAudioHint(); pintar(); guardar();
   }, 5000);
 
