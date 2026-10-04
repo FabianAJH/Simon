@@ -17,7 +17,7 @@
   html, body { margin:0; height:100%; overflow:hidden; background:var(--noche); color:var(--tinta);
     font-family:'PS2P', ui-monospace, monospace; -webkit-font-smoothing:none; font-smooth:never;
     touch-action:manipulation; -webkit-user-select:none; user-select:none; }
-  #gb { position:relative; margin:0 auto; max-width:440px; height:100vh; height:100dvh; display:flex; flex-direction:column;
+  #gb { position:relative; margin:0 auto; max-width:440px; height:100vh; height:100dvh; height:var(--app-h, 100dvh); display:flex; flex-direction:column;
     background:var(--noche); border-left:4px solid var(--linea); border-right:4px solid var(--linea); }
 
   /* ---- panel superior ---- */
@@ -370,6 +370,10 @@
 
 <script>
 (() => {
+  // altura real visible: en algunos celulares 100vh/100dvh incluye la barra del navegador y los botones de abajo quedaban fuera de pantalla
+  const fijaAlto = () => { const h = Math.round((window.visualViewport && window.visualViewport.height) || window.innerHeight); if (h > 200) document.documentElement.style.setProperty('--app-h', h + 'px'); };
+  fijaAlto(); window.addEventListener('resize', fijaAlto); window.addEventListener('orientationchange', () => setTimeout(fijaAlto, 250));
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', fijaAlto);
   const CLAVE = 'simon-v1';
   const VERSION_JUEGO = '1.1';
   const MAX = 100;
