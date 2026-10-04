@@ -34,7 +34,7 @@
   .et { font-size:8px; color:#fff; text-shadow:1px 1px 0 var(--noche); margin-bottom:6px; }
   .hp { height:14px; background:var(--noche); border:3px solid var(--linea); padding:1px; }
   .hpf { height:100%; transition:width .6s steps(12); box-shadow:inset 0 3px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(0,0,0,.25); }
-  .hpf.ok { background:#4cd964; } .hpf.med { background:#ffcc33; }
+  .hpf.ok { background:#4cd964; } .hpf.medio { background:#ffcc33; }
   .hpf.bajo { background:#ff4b4b; animation:parp .5s steps(1) infinite; }
   @keyframes parp { 50% { opacity:.45; } }
 
@@ -54,6 +54,7 @@
   /* ---- botones ---- */
   .botones { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px 14px; background:linear-gradient(var(--panel), var(--panel2));
     border-top:4px solid var(--linea); padding:14px 14px calc(16px + env(safe-area-inset-bottom)); position:relative; z-index:2; }
+  .botones { grid-template-columns:repeat(6, 1fr); } .botones .btn { grid-column:span 2; } .botones .btn:nth-child(n+4) { grid-column:span 3; }
   .btn { --c1:#ffffff; --c2:#dbe1ff; --c3:#8a94d8; --tx:var(--tinta); font:inherit; font-size:8px; padding:9px 0 8px; border:0; color:var(--tx); text-transform:uppercase;
     display:flex; flex-direction:column; align-items:center; gap:6px; position:relative;
     background:linear-gradient(var(--c1) 0 50%, var(--c2) 50% 100%);
@@ -146,6 +147,8 @@
   .tr { display:flex; align-items:center; gap:8px; margin-top:8px; padding:6px 8px; font-size:7px; line-height:1.6; color:#14522a; background:#d8f5de; border:2px solid #2f9a4a; text-align:left; }
   .tr canvas { display:block !important; margin:0 !important; width:16px; height:17px; flex:none; image-rendering:pixelated; }
   #dlg-t.trd { color:#14522a; }
+  .resalta { outline:3px solid #ffd84a; outline-offset:2px; animation:parp .5s steps(1) infinite; }
+  body.tut #dlg-box { bottom:auto; top:96px; }
   .galeria { display:flex; justify-content:center; gap:6px; margin-top:12px; }
   .galeria canvas { image-rendering:pixelated; }
   .galeria.rej { flex-wrap:wrap; gap:10px 8px; }
@@ -159,21 +162,34 @@
   @keyframes pop2 { from { transform:scale(.6); } to { transform:scale(1); } }
 
   /* ---- ventanas (regalo, tienda, logros) ---- */
-  #mj, #rt { display:none; position:fixed; inset:0; z-index:60; background:#141a3c; flex-direction:column; align-items:center; justify-content:center; }
-  #mj.on, #rt.on { display:flex; }
-  #mj-box, #rt-box { position:relative; width:min(100vw, calc((100vh - 24px) * 96 / 176)); aspect-ratio:96/176; }
-  #mj-cv, #rt-cv { display:block; width:100%; height:100%; image-rendering:pixelated; border:4px solid var(--linea); background:#8ad0ff; touch-action:none; box-sizing:border-box; }
-  #mj-x, #rt-x { position:absolute; top:14px; right:14px; z-index:3; padding:6px 7px; font-size:7px; margin:0; }
-  #mj-hud, #rt-hud { position:absolute; top:16px; left:16px; z-index:3; display:flex; gap:12px; align-items:center; font-size:16px; color:#fff; text-shadow:2px 2px 0 #232b63; }
+  #mj, #rt, #run { display:none; position:fixed; inset:0; z-index:60; background:#141a3c; flex-direction:column; align-items:center; justify-content:center; }
+  #mj.on, #rt.on, #run.on { display:flex; }
+  #mj-box, #rt-box, #run-box { position:relative; width:min(100vw, calc((100vh - 24px) * 96 / 176)); aspect-ratio:96/176; }
+  #mj-cv, #rt-cv, #run-cv { display:block; width:100%; height:100%; image-rendering:pixelated; border:4px solid var(--linea); background:#8ad0ff; touch-action:none; box-sizing:border-box; }
+  #mj-x, #rt-x, #run-x { position:absolute; top:14px; right:14px; z-index:3; padding:6px 7px; font-size:7px; margin:0; }
+  #mj-hud, #rt-hud, #run-hud { position:absolute; top:16px; left:16px; z-index:3; display:flex; gap:12px; align-items:center; font-size:16px; color:#fff; text-shadow:2px 2px 0 #232b63; }
   #mj-mon { color:#ffd84a; }
+  #run-cv { background:#2a1850; } #run-mon { color:#ffd84a; } #run-tip { position:absolute; left:0; right:0; top:34%; text-align:center; z-index:3; font-size:9px; line-height:2; color:#fff; text-shadow:2px 2px 0 #232b63; pointer-events:none; }
   #rt-cv { background:#2a1850; } #rt-combo { color:#ffd84a; } #rt-prog { position:absolute; left:4px; top:4px; height:4px; background:#ffd84a; z-index:3; width:0; }
   #rt-juez { position:absolute; left:0; right:0; top:46%; text-align:center; z-index:3; font-size:13px; color:#fff; text-shadow:2px 2px 0 #232b63; pointer-events:none; opacity:0; }
   #rt-juez.on { animation:pop2 .35s steps(4) forwards; opacity:1; }
   .diario { background:#fff3cf; color:#4a3a20; border:3px solid #c8a860; padding:12px; line-height:1.9; font-size:8px; margin-bottom:10px; box-shadow:0 0 0 3px var(--noche); }
   .diario p { margin:0 0 9px; } .diario .dcal { color:#b8741a; margin-top:4px; } .diario .dfirma { text-align:right; font-size:7px; color:#8a7a50; margin-top:6px; }
   #mj-vid { color:#ff4a5c; letter-spacing:3px; font-size:18px; }
-  #mj-fin, #rt-fin { display:none; position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); width:min(86vw,320px); background:var(--panel); border:4px solid var(--linea); padding:16px; text-align:center; font-size:9px; line-height:2; color:#fff; box-shadow:0 0 0 4px var(--noche); }
-  #mj-fin.on, #rt-fin.on { display:block; } .mj-t { font-size:14px; color:#ffd84a; margin-bottom:8px; } .mj-bt { display:flex; gap:8px; margin-top:12px; } .mj-bt .bt { flex:1; padding:12px 0; }
+  #mj-fin, #rt-fin, #run-fin { display:none; position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); width:min(86vw,320px); background:var(--panel); border:4px solid var(--linea); padding:16px; text-align:center; font-size:9px; line-height:2; color:#fff; box-shadow:0 0 0 4px var(--noche); }
+  #mj-fin.on, #rt-fin.on, #run-fin.on { display:block; } .mj-t { font-size:14px; color:#ffd84a; margin-bottom:8px; } .mj-bt { display:flex; gap:8px; margin-top:12px; } .mj-bt .bt { flex:1; padding:12px 0; }
+  #mem { display:none; position:fixed; inset:0; z-index:60; background:#141a3c; justify-content:center; } #mem.on { display:flex; }
+  #mem-box { position:relative; width:min(100vw, 440px); height:100%; display:flex; flex-direction:column; gap:8px; padding:10px 10px calc(10px + env(safe-area-inset-bottom)); border-left:4px solid var(--linea); border-right:4px solid var(--linea); background:linear-gradient(#232b63,#141a3c); }
+  #mem-top { display:flex; align-items:center; gap:10px; flex:none; }
+  #mem-p { width:57px; height:60px; image-rendering:pixelated; background:#2a3070; box-shadow:0 0 0 3px var(--linea); flex:none; }
+  #mem-cx { flex:1; min-height:46px; background:#fff; color:var(--tinta); font-size:8px; line-height:1.7; padding:8px 10px; box-shadow:0 0 0 3px var(--tinta); display:flex; align-items:center; }
+  #mem-hud { display:flex; justify-content:space-between; align-items:center; font-size:8px; color:#fff; text-shadow:1px 1px 0 var(--noche); flex:none; } #mem-hud .mini-btn { margin:0; }
+  #mem-grid { flex:1; min-height:0; display:grid; gap:6px; grid-template-columns:repeat(var(--c, 3), 1fr); grid-auto-rows:1fr; }
+  .mc { position:relative; border:0; padding:0; font:inherit; font-size:20px; color:#aab4ff; background:#3a47a8; box-shadow:inset 0 0 0 3px #6a7ad8, 0 0 0 2px #0f1230; display:flex; align-items:center; justify-content:center; min-height:0; }
+  .mc canvas { display:none; width:72%; height:72%; object-fit:contain; image-rendering:pixelated; } .mc.up canvas { display:block; } .mc.up .q { display:none; }
+  .mc.up { background:#fff2d0; box-shadow:inset 0 0 0 3px #e8c04a, 0 0 0 2px #0f1230; } .mc.ok { background:#bff0c8; box-shadow:inset 0 0 0 3px #3fb55a, 0 0 0 2px #0f1230; }
+  .mc.pista { animation:parp .3s steps(1) infinite; } .mc:active { filter:brightness(1.15); }
+  #mem-fin { display:none; position:absolute; z-index:4; left:50%; top:50%; transform:translate(-50%,-50%); width:min(86vw,320px); background:var(--panel); border:4px solid var(--linea); padding:16px; text-align:center; font-size:9px; line-height:2; color:#fff; box-shadow:0 0 0 4px var(--noche); } #mem-fin.on { display:block; }
   .modal { display:none; position:absolute; inset:0; z-index:20; background:rgba(10,12,40,.88); align-items:center; justify-content:center; padding:14px; }
   .modal.on { display:flex; }
   .modal.sheet { background:transparent; align-items:flex-end; padding:0; pointer-events:none; }
@@ -262,6 +278,23 @@
   .izq { flex:1; } .stats { flex:1; min-width:0; } .stat { flex:1; min-width:0; } .stat .hp { width:100%; height:12px; flex:none; } .stat .sic { width:16px; height:16px; }
   .fila-top .der2 { gap:7px; }
   .der2 .chip { height:38px; }
+
+  /* ---- DOCK FLOTANTE: los botones de abajo sobre la escena ---- */
+  #sc { touch-action:none; }
+  .botones { display:flex; position:absolute; left:8px; right:8px; bottom:calc(8px + env(safe-area-inset-bottom)); gap:2px; padding:4px; background:rgba(15,20,55,.88); border:3px solid var(--linea); z-index:3; }
+  .botones .btn { grid-column:auto; flex:1; min-width:0; padding:5px 0 4px; gap:3px; font-size:6px; letter-spacing:0; white-space:nowrap; background:transparent; box-shadow:inset 0 -3px 0 var(--c2); --tx:#dbe1ff; text-shadow:none; }
+  .botones .btn canvas { width:24px; height:24px; filter:none; }
+  .botones .btn:active { transform:none; background:rgba(255,255,255,.12); box-shadow:inset 0 -3px 0 var(--c2); }
+  .botones .btn:nth-child(n+4) { grid-column:auto; }
+  .botones .hb { display:flex; flex-direction:column; justify-content:center; gap:3px; width:24px; height:24px; align-items:center; }
+  .botones #b-menu i { display:block; width:16px; height:3px; background:#dbe1ff; }
+  .botones #b-menu .nbadge { top:0; right:4px; }
+  .lateral { flex-direction:row; right:8px; bottom:calc(72px + env(safe-area-inset-bottom)); }
+  .tareas { bottom:calc(72px + env(safe-area-inset-bottom)); }
+  #t-bomba { bottom:calc(114px + env(safe-area-inset-bottom)); }
+  #panel-menu { right:8px; bottom:calc(72px + env(safe-area-inset-bottom)); }
+  #dlg-box { bottom:calc(80px + env(safe-area-inset-bottom)); } body.tut #dlg-box { bottom:auto; }
+  #toasts { bottom:calc(132px + env(safe-area-inset-bottom)); }
 </style></style>
 </head>
 <body>
@@ -293,7 +326,6 @@
     <div class="lateral">
       <button class="ibtn" id="b-foto"><canvas id="ic-cam" width="13" height="11"></canvas></button>
       <button class="ibtn" id="b-editar"><canvas id="ic-edi" width="11" height="11"></canvas></button>
-      <button class="ibtn" id="b-menu" aria-label="Menú"><i></i><i></i><i></i><span class="nbadge oculto" id="nb-menu">!</span></button>
     </div>
     <div id="panel-menu">
       <button class="mitem" id="b-inv"><canvas id="ic-inv" width="11" height="11"></canvas><span>Inventario</span></button>
@@ -314,7 +346,7 @@
     <button class="btn c-ve" id="btn-jugar"><canvas id="ib-jugar" width="12" height="12"></canvas><span id="l-jugar">Jugar</span></button>
     <button class="btn c-am" id="btn-tienda"><canvas id="ib-tienda" width="12" height="12"></canvas><span id="l-tienda">Tienda</span></button>
     <button class="btn c-ro" id="btn-dice"><canvas id="ib-dice" width="12" height="12"></canvas><span id="l-dice">Simon dice</span></button>
-    <button class="btn c-ci" id="b-mj"><canvas id="ic-mj" width="11" height="11"></canvas><span>Minijuegos</span></button>
+    <button class="btn c-ci" id="b-menu" aria-label="Menú"><span class="hb"><i></i><i></i><i></i></span><span>Menú</span><span class="nbadge oculto" id="nb-menu">!</span></button>
   </nav>
   <div id="edicion"><div id="ed-t">ARRASTRA LOS MUEBLES PARA MOVERLOS</div><div id="ed-tabs"></div><div id="ed-bd"></div>
     <div id="ed-bt"><button class="bt" id="ed-vol">VOLTEAR</button><button class="bt" id="ed-del">QUITAR</button><button class="bt ok" id="ed-ok">LISTO</button></div></div>
@@ -323,8 +355,13 @@
   <div id="dlg"><div id="dlg-box"><div id="dlg-n"></div><canvas id="dlg-p" width="76" height="80"></canvas><div id="dlg-t"></div><div id="dlg-f"></div></div></div>
   <div id="mj"><div id="mj-box"><button id="mj-x" class="mini-btn">SALIR</button><div id="mj-hud"><span id="mj-pts">0</span><span id="mj-mon">$0</span><span id="mj-vid"></span></div><canvas id="mj-cv" width="96" height="176"></canvas>
     <div id="mj-fin"><div class="mj-t">¡FIN!</div><div id="mj-res"></div><div class="mj-bt"><button class="bt ok" id="mj-otra">OTRA VEZ</button><button class="bt" id="mj-sal">SALIR</button></div></div></div></div>
+  <div id="run"><div id="run-box"><button id="run-x" class="mini-btn">SALIR</button><div id="run-hud"><span id="run-pts">0</span><span id="run-mon">$0</span></div><canvas id="run-cv" width="96" height="176"></canvas><div id="run-tip">TOCA PARA SALTAR<br>¡ESQUIVA LA BASURA!</div>
+    <div id="run-fin"><div class="mj-t">¡TROPEZÓ!</div><div id="run-res"></div><div class="mj-bt"><button class="bt ok" id="run-otra">OTRA VEZ</button><button class="bt" id="run-sal">SALIR</button></div></div></div></div>
   <div id="rt"><div id="rt-box"><div id="rt-prog"></div><button id="rt-x" class="mini-btn">SALIR</button><div id="rt-hud"><span id="rt-pts">0</span><span id="rt-combo"></span></div><canvas id="rt-cv" width="96" height="176"></canvas><div id="rt-juez"></div>
     <div id="rt-fin"><div class="mj-t">¡FIN DEL BAILE!</div><div id="rt-res"></div><div class="mj-bt"><button class="bt ok" id="rt-otra">OTRA VEZ</button><button class="bt" id="rt-sal">SALIR</button></div></div></div></div>
+  <div id="mem"><div id="mem-box"><div id="mem-top"><canvas id="mem-p" width="76" height="80"></canvas><div id="mem-cx"></div></div>
+    <div id="mem-hud"><span id="mem-r"></span><span id="mem-pts"></span><span id="mem-f"></span><button id="mem-x" class="mini-btn">SALIR</button></div><div id="mem-grid"></div>
+    <div id="mem-fin"><div class="mj-t">¡FIN DE LA PARTIDA!</div><div id="mem-res"></div><div class="mj-bt"><button class="bt ok" id="mem-otra">OTRA VEZ</button><button class="bt" id="mem-sal">SALIR</button></div></div></div></div>
   <div class="modal" id="modal"><div class="ventana">
     <div class="vt"><span id="m-titulo"></span><button class="x" id="m-x">X</button></div>
     <div class="vc" id="m-cuerpo"></div>
@@ -334,7 +371,7 @@
 <script>
 (() => {
   const CLAVE = 'simon-v1';
-  const VERSION_JUEGO = '1.0';
+  const VERSION_JUEGO = '1.1';
   const MAX = 100;
   let LW = 120, LH = 184;                 // resolución "real" de la pantalla: se adapta al espacio disponible
   const SW = 56, SH = 78;                 // tamaño del sprite de Simon
@@ -371,7 +408,7 @@
     musica: true, ultResp: 0, avisoResp: '', sec: {}, pens: {}, preg: null, mis: null, adv: { f: '', n: 0 }, cod: {}, deco: [{ k: 'puf_azul', x: -45, y: 90, f: 0, h: 'sala' }, { k: 'juguete_pelota', x: 43, y: 92, f: 0, h: 'sala' }], mig2: 1, comida: {}, probo: {}, mimos: { n: 0, t: 0, harto: false }, mimosDia: { f: '', xp: 0, coins: 0, av: 0 }, bombas: 0, memPend: [], notis: [], nHam: 0, nFel: 0, nRegalo: '', nClima: '', enf: 0, enfAb: 0, malS: 0, meds: 0, dia: null, diarios: [], diaLeido: '', rt: { rec: 0, dia: '', monHoy: 0 }, proxSiesta: 0, ultBomba: -1, ultBombaT: 0,
     cuarto: { pared: 'pared_azul', alfombra: 'alf_roja', izq: null, der: null, cuadro: 'marco_corona' }, album: [], cuadroFoto: '', hab: 'sala',
     tiene: { sud_azul: 1, pared_azul: 1, alf_roja: 1, marco_corona: 1, marco_foto: 1, puf_azul: 1, juguete_pelota: 1 },
-    st: { si: 0, comer: 0, jugar: 0, dice: 0, toques: 0, dormir: 0, compras: 0, pizzas: 0, plantas: 0, visitas: 0, tratos: 0, fotos: 0, adiv: 0, misiones: 0, bombas: 0, parque: 0, mj: 0, rt: 0 }, mj: { rec: 0, dia: '', monHoy: 0, rompio: 0 }, eco: { f: '', c: 0, x: 0, fr: 0, av: 0 },
+    st: { si: 0, comer: 0, jugar: 0, dice: 0, toques: 0, dormir: 0, compras: 0, pizzas: 0, plantas: 0, visitas: 0, tratos: 0, fotos: 0, adiv: 0, misiones: 0, bombas: 0, parque: 0, mj: 0, rt: 0, mem: 0, run: 0 }, run: { rec: 0, dia: '', monHoy: 0 }, mj: { rec: 0, dia: '', monHoy: 0, rompio: 0 }, mem: { rec: 0, dia: '', monHoy: 0 }, eco: { f: '', c: 0, x: 0, fr: 0, av: 0 },
     intro: false, traductor: false, proxVisita: 0, ultTip: -1, logros: {}, merc: null, avisoMerc: false, planta: null, hallazgo: null, proxHallazgo: Date.now() + 180000, dibujos: {}
   });
   function cargar() {
@@ -392,7 +429,7 @@
         e.cuarto = Object.assign(BASE().cuarto, d.cuarto);
         e.tiene = Object.assign(BASE().tiene, d.tiene);
         e.st = Object.assign(BASE().st, d.st); e.album = Array.isArray(d.album) ? d.album.filter(f => f && f.p && f.i) : [];
-        e.mj = Object.assign(BASE().mj, d.mj); e.rt = Object.assign(BASE().rt, d.rt); e.notis = Array.isArray(d.notis) ? d.notis.slice(0, 40) : []; e.diarios = Array.isArray(d.diarios) ? d.diarios.slice(0, 7) : []; e.dia = d.dia && d.dia.f ? d.dia : null; e.eco = Object.assign(BASE().eco, d.eco);
+        e.mj = Object.assign(BASE().mj, d.mj); e.rt = Object.assign(BASE().rt, d.rt); e.mem = Object.assign(BASE().mem, d.mem); e.run = Object.assign(BASE().run, d.run); e.notis = Array.isArray(d.notis) ? d.notis.slice(0, 40) : []; e.diarios = Array.isArray(d.diarios) ? d.diarios.slice(0, 7) : []; e.dia = d.dia && d.dia.f ? d.dia : null; e.eco = Object.assign(BASE().eco, d.eco);
         e.sec = Object.assign({}, d.sec); e.pens = Object.assign({}, d.pens); e.cod = Object.assign({}, d.cod);
         e.deco = Array.isArray(d.deco) ? d.deco.map(o => Object.assign({}, o)) : []; e.comida = Object.assign({}, d.comida); e.probo = Object.assign({}, d.probo); e.mimos = Object.assign(BASE().mimos, d.mimos); e.mimosDia = Object.assign(BASE().mimosDia, d.mimosDia);
         ['izq', 'der'].forEach(l => { const k = e.cuarto[l]; if (k) { if (!e.deco.some(o => o.k === k)) e.deco.push({ k, x: l === 'izq' ? -50 : 50, y: 55, f: 0 }); e.cuarto[l] = null; } });   // muebles antiguos -> colocación libre e.adv = Object.assign(BASE().adv, d.adv); e.logros = Object.assign({}, d.logros); e.dibujos = Object.assign({}, d.dibujos);
@@ -403,7 +440,7 @@
           e.mig2 = 1;
         }
         if (!e.deco.some(x => ITEMS[x.k] && ITEMS[x.k].slot === 'juguete')) e.deco.push({ k: 'juguete_pelota', x: 43, y: 92, f: 0 });
-        if (!['sala', 'cocina', 'entrada'].includes(e.hab)) e.hab = 'sala';
+        if (!['sala', 'juegos', 'cocina', 'entrada'].includes(e.hab)) e.hab = 'sala';
         e.deco.forEach(x => { if (!x.h) x.h = 'sala'; });
         if (!e.proxHallazgo) e.proxHallazgo = Date.now() + 180000;
         return;
@@ -749,9 +786,57 @@
   }
 
   /* ===================== HABITACIONES Y LUGARES ===================== */
-  const HABS = [{ id: 'sala', n: 'RECÁMARA', nv: 1 }, { id: 'cocina', n: 'COCINA', nv: 4 }, { id: 'entrada', n: 'ENTRADA', nv: 7 }];
+  const HABS = [{ id: 'juegos', n: 'SALA DE JUEGOS', nv: 2 }, { id: 'sala', n: 'RECÁMARA', nv: 1 }, { id: 'cocina', n: 'COCINA', nv: 4 }, { id: 'entrada', n: 'ENTRADA', nv: 7 }];
   const LUGARES = [{ id: 'parque', n: 'PARQUE', nv: 10 }];
   const escenaId = () => lugar || e.hab;
+  /* ---- SALA DE JUEGOS: máquina arcade (acceso a los minijuegos). Va a la izquierda: Cortex llega por la derecha y no la tapa ---- */
+  const arcPos = () => ({ x: OX + 2, y: RY + 35 - 72, w: 32, h: 72 });
+  function juegosGrid(W, H, RY, OX) {
+    const g = Grid(W, H), FY = RY + 35;
+    for (let y = 0; y < FY; y++) for (let x = 0; x < W; x++) g.set(x, y, (x % 14 < 7) ? '#3a2a6e' : '#34265f');
+    for (let y = 0; y < FY; y += 12) g.rect(0, y, W, 1, '#2a1e52');
+    g.rect(0, 0, W, 3, '#1e1640'); g.rect(0, 3, W, 1, '#6a4ad8');
+    [[44, 20], [66, 11], [74, 40], [118, 14], [58, 70], [100, 30], [44, 60]].forEach(([x, y]) => { g.set(OX + x, y, '#8a7ae8'); g.set(OX + x - 1, y, '#5a4aa8'); g.set(OX + x + 1, y, '#5a4aa8'); g.set(OX + x, y - 1, '#5a4aa8'); g.set(OX + x, y + 1, '#5a4aa8'); });
+    // rótulo neón GAME (a la derecha)
+    const L = { G: ['.rrr', 'r...', 'r.rr', 'r..r', '.rrr'], A: ['.rr.', 'r..r', 'rrrr', 'r..r', 'r..r'], M: ['r...r', 'rr.rr', 'r.r.r', 'r...r', 'r...r'], E: ['rrrr', 'r...', 'rrr.', 'r...', 'rrrr'] };
+    let nx = OX + 80; g.rect(nx - 4, RY - 54, 40, 15, '#1a1236'); g.rect(nx - 4, RY - 54, 40, 1, '#ff5ac8'); g.rect(nx - 4, RY - 40, 40, 1, '#ff5ac8'); g.rect(nx - 4, RY - 54, 1, 15, '#ff5ac8'); g.rect(nx + 35, RY - 54, 1, 15, '#ff5ac8');
+    'GAME'.split('').forEach(ch => { g.art(nx, RY - 49, L[ch], { r: '#7af0ff' }); nx += L[ch][0].length + 2; });
+    // póster cohete
+    g.rect(OX + 44, RY - 40, 22, 28, '#14163a'); g.rect(OX + 45, RY - 39, 20, 26, '#1e2a6a');
+    g.art(OX + 51, RY - 36, ['..r..', '.rrr.', '.rwr.', '.rrr.', 'rrrrr', 'r.r.r', '..y..', '.yyy.'], { r: '#e8e8f8', w: '#6ac0f0', y: '#ffa23a' });
+    g.set(OX + 48, RY - 18, '#ffd84a'); g.set(OX + 60, RY - 28, '#ffd84a'); g.set(OX + 49, RY - 31, '#ffffff');
+    // repisa con trofeos (derecha)
+    g.rect(OX + 78, RY - 6, 40, 2, '#6a4a2a'); g.rect(OX + 78, RY - 6, 40, 1, '#8a6a3a');
+    [[82, 0], [94, 1], [106, 0]].forEach(([dx, up]) => { const x = OX + dx, y = RY - 18 - up; g.rect(x, y, 8, 5, '#ffd84a'); g.rect(x + 1, y + 5, 6, 2, '#e0a820'); g.rect(x + 3, y + 7, 2, 3, '#e0a820'); g.rect(x + 1, y + 9, 6, 1, '#8a5a1a'); g.set(x - 1, y + 1, '#ffd84a'); g.set(x + 8, y + 1, '#ffd84a'); g.rect(x + 1, y, 1, 3, '#fff6b0'); });
+    // piso
+    for (let y = FY; y < H; y++) for (let x = 0; x < W; x++) g.set(x, y, (((x / 8) | 0) + ((y - FY) / 8 | 0)) % 2 ? '#2a2058' : '#3a2c78');
+    g.rect(0, FY, W, 2, '#ff5ac8'); g.rect(0, FY + 2, W, 1, '#7a2a78');
+    // puf rosa (derecha)
+    g.rect(OX + 92, FY + 5, 22, 4, '#a82a78'); g.rect(OX + 90, FY - 2, 26, 8, '#e84aa8'); g.rect(OX + 92, FY - 4, 22, 3, '#ff7ac8'); g.rect(OX + 96, FY - 3, 8, 1, '#ffb0e0');
+    // máquina arcade grande
+    const a = arcPos(), x = a.x, y = a.y, K = '#14163a';
+    g.rect(x, y, 32, 72, K); g.rect(x + 1, y + 1, 30, 70, '#3a3ac0'); g.rect(x + 1, y + 1, 3, 70, '#5a5ae8'); g.rect(x + 28, y + 1, 3, 70, '#2a2a8a');
+    g.rect(x + 3, y + 2, 26, 9, '#ff3a8a'); g.rect(x + 3, y + 2, 26, 1, '#ff8ac0'); g.rect(x + 3, y + 10, 26, 1, '#a0185a');
+    for (let i = 0; i < 7; i++) g.rect(x + 5 + i * 3 + (i % 2), y + 5, 2, 2, '#ffe45a');
+    g.rect(x + 3, y + 13, 26, 34, '#6a6ad8'); g.rect(x + 4, y + 14, 24, 32, '#04041a');
+    g.rect(x + 3, y + 49, 26, 10, '#2a2a70'); g.rect(x + 3, y + 49, 26, 1, '#4a4aa8'); g.rect(x + 3, y + 58, 26, 1, '#14143c');
+    g.rect(x + 8, y + 53, 2, 5, '#9aa4b8'); g.rect(x + 6, y + 50, 6, 4, '#ff3a3a'); g.rect(x + 7, y + 50, 2, 1, '#ff9a9a');
+    g.rect(x + 17, y + 52, 4, 4, '#ffd84a'); g.rect(x + 23, y + 52, 4, 4, '#4adfff');
+    g.rect(x + 3, y + 61, 26, 9, '#2c2c9c'); g.rect(x + 11, y + 63, 10, 6, '#14143c'); g.rect(x + 15, y + 64, 2, 4, '#ffd84a');
+    g.rect(x + 2, y + 70, 28, 2, K);
+    return g;
+  }
+  function arcadeVivo() {   // pantalla animada y flechita parpadeante
+    const a = arcPos(), t = tk >> 2, ax = a.x + 4, ay = a.y + 14;
+    ctx.fillStyle = '#04041a'; ctx.fillRect(ax, ay, 24, 32);
+    ctx.fillStyle = '#ffffff'; [[3, 4], [18, 9], [10, 20], [20, 27], [5, 15]].forEach(([x, y], i) => { if ((t + i) % 3) ctx.fillRect(ax + x, ay + y, 1, 1); });
+    const nx = Math.round(8 + Math.sin(t / 2) * 8), inv = (t >> 1) % 2;
+    ctx.fillStyle = '#5aff7a'; [[1, 0], [5, 0], [2, 1], [4, 1], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [0, 3], [1, 3], [3, 3], [5, 3], [6, 3], [1, 4 + inv], [5, 4 + inv]].forEach(([dx, dy]) => ctx.fillRect(ax + nx + dx, ay + 4 + dy, 1, 1));
+    ctx.fillStyle = '#ff9a3a'; const nx2 = Math.round(8 + Math.sin(t / 2 + 2) * 8); [[1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [3, 2]].forEach(([dx, dy]) => ctx.fillRect(ax + nx2 + dx, ay + 14 + dy, 1, 1));
+    ctx.fillStyle = '#ffe45a'; const nave = Math.round(10 + Math.sin(t / 3 + 1) * 8); ctx.fillRect(ax + nave + 2, ay + 28, 3, 1); ctx.fillRect(ax + nave + 3, ay + 27, 1, 1);
+    if (t % 5 < 3) { ctx.fillStyle = '#ff5a5a'; ctx.fillRect(ax + nave + 3, ay + 23 - (t % 5) * 3, 1, 2); }
+    if ((tk >> 3) % 2 && !dlg && !modal) { ctx.fillStyle = '#ffe45a'; ctx.fillRect(a.x + 11, a.y - 7, 10, 1); ctx.fillRect(a.x + 12, a.y - 6, 8, 1); ctx.fillRect(a.x + 13, a.y - 5, 6, 1); ctx.fillRect(a.x + 14, a.y - 4, 4, 1); ctx.fillRect(a.x + 15, a.y - 3, 2, 1); }
+  }
   function cocinaGrid(W, H, RY, OX) {
     const g = Grid(W, H), dy = RY - 59, FY = RY + 35;
     for (let y = 0; y < RY + 5; y++) for (let x = 0; x < W; x++) g.set(x, y, x % 12 < 6 ? '#f8e9b0' : '#f2dfa0');
@@ -898,6 +983,7 @@
     const cl = clima();
     if (esc === 'sala' || esc === 'cocina') { ctx.drawImage(cieloDe(n, cl), OX, dy); climaFX(cl, n, dy); }
     if (esc === 'sala') ctx.drawImage(sprite('cuarto' + LW + 'x' + LH + e.cuarto.pared + e.cuarto.alfombra + cuadroClave(), () => cuartoGrid(LW, LH, RY, SY + SH - 11, OX, paleta()), n ? .55 : 0), 0, 0);
+    else if (esc === 'juegos') { ctx.drawImage(sprite('juegos' + LW + 'x' + LH, () => juegosGrid(LW, LH, RY, OX), n ? .55 : 0), 0, 0); arcadeVivo(); }
     else if (esc === 'cocina') ctx.drawImage(sprite('cocina' + LW + 'x' + LH, () => cocinaGrid(LW, LH, RY, OX), n ? .55 : 0), 0, 0);
     else if (esc === 'entrada') {
       ctx.drawImage(sprite('entrada' + LW + 'x' + LH, () => entradaGrid(LW, LH, RY, OX), n ? .55 : 0), 0, 0);
@@ -915,7 +1001,7 @@
     tag.textContent = lugar ? LUGARES.find(x => x.id === lugar).n : HABS[idx].n;
     const flecha = (b, d, txt, bloq) => { b.classList.remove('oculto'); b.classList.toggle('bloq', !!bloq); $('tx-' + b.id).textContent = txt || ''; dibIcono($('ic-' + b.id), 'ic_' + b.id, () => flechaGrid(d)); };
     if (lugar) { flecha(l, -1, 'CASA', false); r.classList.add('oculto'); return; }
-    if (idx > 0) flecha(l, -1, '', false); else l.classList.add('oculto');
+    if (idx > 0) flecha(l, -1, '', nivel() < HABS[idx - 1].nv); else l.classList.add('oculto');
     if (idx < HABS.length - 1) flecha(r, 1, '', nivel() < HABS[idx + 1].nv); else r.classList.add('oculto');
   }
   function puedeMoverse() {
@@ -931,7 +1017,7 @@
     if (!puedeMoverse()) return;
     const h = HABS[i]; if (!h) return;
     if (nivel() < h.nv) { toast(h.n + ' se desbloquea en cariño NV' + h.nv); sfx.no(); return; }
-    sfx.click(); irA(() => { e.hab = h.id; guardar(); });
+    sfx.click(); irA(() => { e.hab = h.id; guardar(); }); if (h.id === 'juegos' && !e.arcVisto) { e.arcVisto = 1; setTimeout(() => toast('Toca la máquina arcade para jugar'), 900); }
   }
   function irLugar(id) {
     const l = LUGARES.find(x => x.id === id); if (!l || nivel() < l.nv) return;
@@ -1511,6 +1597,23 @@
     if (k.startsWith('lg_')) return lugarMini(k.slice(3));
     if (k.startsWith('pen_')) { g = OBJ.find(o => 'pen_' + o.id === k).g(); return g; }
     if (k.startsWith('fd_')) { g = FGRID[k.slice(3)](); return g; }
+    if (k.startsWith('mj_')) {   // iconos de los minijuegos
+      g = Grid(18, 14); const M = { w: '#f4f4ff', k: '#1a1a2e', r: '#e8353f', b: '#4b6ae8', y: '#ffd84a', g: '#aab4c8', G: '#6a7490', p: '#ff5ac8', c: '#7af0ff', n: '#3a4ac0', N: '#14163a', s: '#ffffff' };
+      if (k === 'mj_run') {
+        g.rect(0, 13, 18, 1, '#8a6ac0');
+        g.art(1, 6, ['.rrrrr.', 'wwwwwww', 'wkkwkkw', 'wkkwkkw', 'wwwwwww', '.wbbbw.', '.b...b.'], M);
+        g.art(12, 7, ['.gggg.', 'gggggg', 'gGgGgg', 'gGgGgg', 'gGgGgg', 'gGgGgg'], M); g.rect(12, 6, 6, 1, '#d0d8e8');
+        g.art(9, 2, ['.rr.', 'rrrr', '.rr.'], { r: '#ffd84a' }); g.set(0, 8, '#aab4c8'); g.set(1, 8, '#aab4c8'); g.set(0, 10, '#aab4c8');
+      } else if (k === 'mj_mem') {
+        g.rect(0, 0, 8, 13, M.N); g.rect(1, 1, 6, 11, M.n); g.art(2, 3, ['.yyy.', 'y...y', '...y.', '..y..', '.....', '..y..'], M);
+        g.rect(10, 1, 8, 13, M.N); g.rect(11, 2, 6, 11, M.w); g.art(12, 4, ['r.r', 'rrr', '.r.'], M); g.art(12, 8, ['.y.', 'yyy', '.y.'], M);
+      } else {
+        g.rect(1, 12, 4, 2, M.p); g.rect(7, 12, 4, 2, M.c); g.rect(13, 12, 4, 2, M.y);
+        g.rect(5, 1, 1, 8, M.s); g.rect(12, 1, 1, 8, M.s); g.rect(5, 1, 8, 2, M.s); g.rect(2, 7, 4, 3, M.y); g.rect(9, 7, 4, 3, M.y); g.rect(3, 6, 2, 1, M.y); g.rect(10, 6, 2, 1, M.y);
+        g.set(15, 3, M.c); g.set(14, 4, M.c); g.set(16, 4, M.c); g.set(15, 5, M.c); g.set(1, 3, M.p); g.set(0, 4, M.p); g.set(2, 4, M.p); g.set(1, 5, M.p);
+      }
+      return g;
+    }
     if (k.startsWith('dib_')) g = dibujoGrid(k.slice(4));
     else if (k === 'caja') g = cajaGrid();
     else if (it.tipo === 'ropa') g = recorte(simonGrid('a', 's', { [it.slot]: k }), ...it.crop);
@@ -1530,15 +1633,16 @@
     return g;
   }
   const DIG = ['111101101101111', '010110010010111', '111001111100111', '111001111001111', '101101111001001', '111100111001111', '111100111101111', '111001001001001', '111101111101111', '111101111001111'];
+  const LLAMITA = [['...o...', '..oro..', '.orrro.', '.orryro', 'orryyro', 'orrywro', 'orryyro', '.orrro.', '..ooo..'], ['....o..', '..oro..', '.orrro.', '.orryro', 'orryyro', 'orrywro', 'orryyro', '.orrro.', '..ooo..']];
   function rachaGrid(r, f) {
-    const g = Grid(25, 15), c = r ? '#ffd84a' : '#8a90b8';
-    g.rect(0, 0, 25, 15, '#3a2410'); g.rect(1, 1, 23, 13, '#e8c04a'); g.rect(2, 2, 21, 11, '#1a1f4a');
-    g.art(2, 2, LLAMA[f], r ? { o: '#8a2008', r: '#ff4a1c', y: '#ffb020', w: '#fff2a0' } : { o: '#3a3e5c', r: '#6a6f94', y: '#8a90b8', w: '#b0b6d8' });
-    const t = String(Math.min(999, r)), w = t.length * 4 - 1, x0 = 12 + Math.floor((11 - w) / 2);
-    [...t].forEach((ch, i) => { const m = DIG[+ch]; for (let k = 0; k < 15; k++) if (m[k] === '1') g.set(x0 + i * 4 + (k % 3), 5 + Math.floor(k / 3), c); });
+    const g = Grid(23, 13), c = r ? '#ffd84a' : '#8a90b8';
+    g.rect(0, 0, 23, 13, '#3a2410'); g.rect(1, 1, 21, 11, '#e8c04a'); g.rect(2, 2, 19, 9, '#1a1f4a');
+    g.art(2, 2, LLAMITA[f ? 1 : 0], r ? { o: '#8a2008', r: '#ff4a1c', y: '#ffb020', w: '#fff2a0' } : { o: '#3a3e5c', r: '#6a6f94', y: '#8a90b8', w: '#b0b6d8' });
+    const t = String(Math.min(999, r)), w = t.length * 4 - 1, x0 = 11 + Math.floor((11 - w) / 2);
+    [...t].forEach((ch, i) => { const m = DIG[+ch]; for (let k = 0; k < 15; k++) if (m[k] === '1') g.set(x0 + i * 4 + (k % 3), 4 + Math.floor(k / 3), c); });
     return g;
   }
-  function racha() { return (e.racha > 0 && e.ultimoRegalo && difDias(e.ultimoRegalo, hoy()) <= 1) ? e.racha : 0; }
+  function racha() { return e.racha > 0 ? e.racha : 0; }
   function dibujarLlama() {
     const r = racha(), c = $('ic-fue').getContext('2d');
     c.clearRect(0, 0, 9, 11);
@@ -1683,6 +1787,8 @@
     z: zGrid,
     moneda: () => { const g = Grid(6, 6); g.art(0, 0, [".OOOO.", "OyhyyO", "OyyyyO", "OyyyyO", "OyyyyO", ".OOOO."], { O: '#8a5a08', y: '#ffd84a', h: '#fff6b0' }); return g; }
   };
+  ['#ff4a5c', '#ffe45a', '#58d048', '#4ab8ff', '#ff7ab8', '#ffffff'].forEach((c, i) => { FX['cf' + i] = () => { const g = Grid(3, 3); g.rect(0, 0, 3, 3, c); return g; }; });
+  FX.crema = () => { const g = Grid(4, 4); g.art(0, 0, ['.ww.', 'wwww', 'wwpw', '.ww.'], { w: '#fff6ea', p: '#ffc8d8' }); return g; };
   FX.humo = () => { const g = Grid(8, 7); g.art(0, 0, ['..oooo..', '.oGGGGo.', 'oGGgGGGo', 'oGGGGgGo', '.oGGGGo.', '..oooo..'], { o: '#3a3644', G: '#6a6676', g: '#9a96a8' }); return g; };
   FGRID.keke = pizzaGrid; Object.keys(FGRID).forEach(k => { FX['c_' + k] = FGRID[k]; });
   ORDEN.comida = Object.keys(COMIDAS); ORDEN.extras = ['bomba', 'jarabe']; ORDEN.juguetes = Object.keys(ITEMS).filter(k => ITEMS[k].slot === 'juguete'); ORDEN.cuarto.push(...Object.keys(nuevosItems), 'puf_azul', 'puf_rojo', 'puf_verde', 'puf_rosa', 'puf_morado', 'puf_dorado');
@@ -1741,6 +1847,7 @@
   const cv = $('sc'), ctx = cv.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   const SALTO = [-6, -12, -16, -12, -6, 0];
+  let acar = null, acarT = 0;   // caricias: dedo moviéndose sobre Simon
   let tk = 0, saltoT = -1, bocaT = 0, parpadeoT = 0, gT = -1, gTipo = '';
   let act = null, proxAct = 60;
   const cortex = { p: 0, dir: 0, cb: null };
@@ -1831,11 +1938,12 @@
       if (et === 4 && (tk >> 2) % 2) { ctx.fillStyle = '#ffffff'; const px = OX + 90 + [13, 7, 19][(tk >> 3) % 3], py = dy0 + 50 + [2, 7, 7][(tk >> 3) % 3]; ctx.fillRect(px, py - 2, 1, 5); ctx.fillRect(px - 2, py, 5, 1); } }
     dibujarMuebles(n, 'atras');
     if (n && (esc === 'sala' || esc === 'cocina')) { const s = ESTRELLAS[(tk >> 2) % ESTRELLAS.length], sy = s[1] + dy, sx = s[0] + OX; ctx.fillStyle = '#ffffff'; ctx.fillRect(sx, sy, 1, 1); ctx.fillRect(sx - 1, sy, 3, 1); ctx.fillRect(sx, sy - 1, 1, 3); }
-    const ojos = (e.dormido || parpadeoT > 0) ? 'c' : 'a';
-    const boca = e.dormido ? 'n' : bocaT > 10 ? 't' : bocaT > 0 ? 's' : 'n';
+    const ojos = (e.dormido || parpadeoT > 0 || acarT > 0) ? 'c' : 'a';
+    const boca = e.dormido ? 'n' : bocaT > 10 ? 't' : (bocaT > 0 || acarT > 0) ? 's' : 'n';
     let oy = (saltoT >= 0 ? SALTO[saltoT] : 0) + (!e.dormido && saltoT < 0 && gT < 0 && (tk >> 2) % 2 ? 1 : 0);
     let gx = 0, esx = 1;
     gx += Math.round(-24 * cortex.p);
+    if (acarT > 0 && acar) { gx += Math.max(-3, Math.min(3, Math.round((acar.x - (SX + SW / 2)) / 8))); if ((tk >> 1) % 2) oy -= 0; }
     if (tk < sustoHasta) gx += (tk & 1) ? 2 : -2;
     if (llegada) { gx -= Math.round((1 - Math.min(1, llegada.t / 16)) * 110); oy -= Math.abs(Math.round(Math.sin(llegada.t * .9) * 4)); }
     if (act && act.tipo === 'ventana') { const p = Math.max(0, Math.min(1, act.t / 10, (act.len - act.t) / 10)); gx = Math.round(-14 * p); if (p > 0 && p < 1 && (tk >> 1) % 2) oy -= 2; }
@@ -1875,7 +1983,7 @@
   function tick() {
     tk++;
     if (tk % 4 === 0) dibujarLlama();
-    if (tk % 10 === 0) { actualizarTareas(); mercTick(); bombaTick(); }
+    if (tk % 10 === 0) { actualizarTareas(); mercTick(); bombaTick(); if (modal === 'misiones' && misEspera() > 0) render(); }
     if (cortex.dir) {
       cortex.p = Math.max(0, Math.min(1, cortex.p + cortex.dir * .1));
       if (cortex.dir > 0 && tk % 2 === 0) lanzar('estrella', LW - 58 + Math.random() * 54, SY + 6 + Math.random() * 56, 0, -.5, 7);
@@ -1896,12 +2004,12 @@
     } else if (tk >= proxAct && !modal && !dlg && !cortex.p && !introActiva && !e.dormido && saltoT < 0 && gT < 0 && bocaT === 0) iniciarAct();
     if (saltoT >= 0 && ++saltoT >= SALTO.length) saltoT = -1;
     if (gT >= 0 && ++gT >= GLEN[gTipo]) { gT = -1; gTipo = ''; }
-    if (bocaT > 0) bocaT--;
+    if (bocaT > 0) bocaT--; if (acarT > 0) acarT--;
     if (parpadeoT > 0) parpadeoT--; else if (!e.dormido && Math.random() < .03) parpadeoT = 2;
     if (e.dormido && tk % 14 === 0) lanzar('z', SX + 46, SY + 14, .7, -1.2, 18);
     for (let i = fx.length - 1; i >= 0; i--) {
       const f = fx[i];
-      f.t++; f.x += f.vx; f.y += f.vy;
+      f.t++; f.x += f.vx; f.y += f.vy; if (f.g) f.vy += f.g;
       if (f.t >= f.vida) fx.splice(i, 1);
     }
     if (llegada && ++llegada.t >= 18) { llegada = null; decir('Sí.', e.traductor ? '¡Qué lindo parque!' : null, 3000); hablar(); gesto('salto'); corazones(2); }
@@ -1971,6 +2079,7 @@
     dormir:    () => seq([784, 659, 523, 392, 330], .13, 'triangle', .12),
     despertar: () => seq([330, 392, 523, 659, 784], .07),
     toque:     () => seq([988, 1319], .05, 'square', .05),
+    ronr:      () => seq([330, 392], .07, 'sine', .04),
     trueno:    () => seq([90, 70, 55, 45], .22, 'sawtooth', .09),
     pregunta:  () => seq([1319, 988, 1319, 1568], .07, 'square', .05),
     respuesta: () => seq([523, 523, 523, 659, 784, 1047], .08),
@@ -1982,7 +2091,11 @@
     logro:     () => seq([784, 988, 1175, 1568], .1),
     regalo:    () => seq([523, 659, 784, 659, 784, 1047, 1319, 1568], .08),
     tic:       () => seq([2200], .02, 'square', .03),
-    boom:      () => { crunch(); setTimeout(crunch, 90); seq([160, 120, 90, 62, 45], .1, 'sawtooth', .12); }
+    boom:      () => { crunch(); setTimeout(crunch, 90); seq([160, 120, 90, 62, 45], .1, 'sawtooth', .12); },
+    pop:       () => seq([784, 1047, 1319, 1568, 2093], .05, 'square', .05),
+    splat:     () => seq([260, 190, 140, 100], .06, 'sawtooth', .07),
+    cohete:    () => { seq([500, 700, 900, 1200, 1500], .05, 'sine', .04); setTimeout(() => seq([1800, 1300, 2200, 900], .03, 'square', .03), 280); },
+    gigante:   () => { crunch(); setTimeout(crunch, 90); setTimeout(crunch, 200); seq([120, 90, 70, 50, 38, 30], .14, 'sawtooth', .16); }
   };
 
   /* ===================== INTERFAZ ===================== */
@@ -2006,13 +2119,13 @@
     const st = e.feliz > 70 ? 'feliz' : e.feliz > 45 ? 'normal' : e.feliz > 20 ? 'triste' : 'llora';
     if (pintarCara.s !== st) { pintarCara.s = st; dibMini('si-f', MINI[st]); }
   }
-  function asegurarRacha() { if (!e || !Array.isArray(e.deco)) return; const r = e.deco.find(d => d.k === 'racha'); if (!r) e.deco.push({ k: 'racha', x: 70, y: -48, f: 0, h: 'sala' }); else if (r.x === -60 && r.y === -52) { r.x = 70; r.y = -48; } }
+  function asegurarRacha() { if (!e || !Array.isArray(e.deco)) return; const r = e.deco.find(d => d.k === 'racha'); if (!r) e.deco.push({ k: 'racha', x: 23, y: -8, f: 0, h: 'sala' }); else if ((r.x === -60 && r.y === -52) || (r.x === 70 && r.y === -48) || (r.x === 21 && r.y === -5) || (r.x === 23 && r.y === -5)) { r.x = 23; r.y = -8; } }
   function pintar() {
     asegurarRacha(); revisar(); pintarNav(); pintarCara();
     ['hambre', 'energia', 'feliz'].forEach(k => {
       const s = $('s-' + k);
       s.style.width = Math.max(4, e[k]) + '%';
-      s.className = 'hpf ' + (e[k] > 50 ? 'ok' : e[k] > 25 ? 'med' : 'bajo');
+      s.className = 'hpf ' + (e[k] > 50 ? 'ok' : e[k] > 25 ? 'medio' : 'bajo');
     });
     $('l-dormir').textContent = e.dormido ? 'Despertar' : 'Dormir'; if (e.dormido !== pintarIconosBtn.d) { pintarIconosBtn(); }
     const n = nivel();
@@ -2075,11 +2188,14 @@
      Catálogo actual completo: ~160 días (regular) · ~145 (intenso) · más de un año (casual). Los topes diarios evitan "granjear" en una tarde.
      Para agregar contenido nuevo: ponle nv (nivel de cariño) y precio con ECON_P(nv) como guía, y sube NMAX si hacen falta más niveles. */
   const NMAX = 25;
-  const xpDe = n => n <= 1 ? 0 : Math.round(40 * Math.pow(n - 1, 1.95));
+  const XP_F = [0, 0, .5, .36, .4, .45, .5, .6, .7, .8, .9];   // los primeros niveles piden menos cariño: suben en pocos minutos
+  const xpDe = n => n <= 1 ? 0 : Math.round(40 * Math.pow(n - 1, 1.95) * (XP_F[n] === undefined ? 1 : XP_F[n]));
   const ECO = {
     topeMon: n => 30 + 1.5 * n,          // monedas diarias máximas por acciones repetibles (comer, jugar, dormir, Simon dice...)
     topeXp: n => 55 + 3 * n,             // cariño diario a ritmo completo; lo que sobra rinde 25%
     topeMj: n => 15 + 1.5 * n,           // monedas diarias del minijuego
+    topeRun: n => 8 + n,                 // monedas diarias del juego de correr
+    topeMem: n => 6 + n,                 // monedas diarias del juego de memoria
     topeRt: n => 8 + n,                  // monedas diarias del minijuego de ritmo
     bono: n => 10 + 4 * n,               // monedas al subir de nivel
     premios: [6, 8, 10, 12, 15, 20, 50]  // regalo diario (día 7 = monito dorado)
@@ -2096,7 +2212,7 @@
     const c = $('toasts'); c.appendChild(d);
     // si hay un diálogo abierto, los avisos van justo encima de su cuadro
     const bx = $('dlg').classList.contains('on') ? $('dlg-box').getBoundingClientRect() : null, pr = c.parentElement.getBoundingClientRect();
-    c.style.bottom = bx && bx.height ? Math.max(178, Math.round(pr.bottom - bx.top + 6)) + 'px' : '';
+    c.style.bottom = bx && bx.height ? Math.max(132, Math.round(pr.bottom - bx.top + 6)) + 'px' : '';
     while (c.children.length > 1) c.firstChild.remove();
     setTimeout(() => d.remove(), 2400);
     setTimeout(() => { if (toastQ.length) toastMuestra(toastQ.shift()); else toastOn = false; }, 2500);
@@ -2107,7 +2223,7 @@
     for (let n = antes + 1; n <= ahora; n++) subirNivel(n);
   }
   function subirNivel(n) {
-    const bono = Math.round(ECO.bono(n)); e.monedas += bono; e.total += bono;
+    const bono = Math.round(ECO.bono(n)) + (n <= 5 ? 12 : 0); e.monedas += bono; e.total += bono;
     toast('¡CARIÑO NIVEL ' + n + '! +' + bono + ' monedas'); sfx.nivel();
     const g = GESTOS.find(g => g.nv === n); if (g) toast('Nuevo gesto: ' + g.n);
     const hb = HABS.find(h => h.nv === n && n > 1); if (hb) toast(hb.id === 'entrada' ? '¡Nueva zona: ENTRADA! Toca la puerta para salir' : '¡Nueva habitación: ' + hb.n + '! Usa las flechas');
@@ -2147,7 +2263,7 @@
     { id: 'dice20', n: 'Escucha 20 "Simon dice"',    d: 'Sus ideas locas',         meta: 20,  r: 40,  val: () => e.st.dice },
     { id: 'toca100',n: 'Acaricialo 100 veces',       d: 'Toca a Simon',            meta: 100, r: 50,  val: () => e.st.toques },
     { id: 'dormir10',n:'Duérmelo 10 veces',          d: 'Duerme bien, Simon',      meta: 10,  r: 30,  val: () => e.st.dormir },
-    { id: 'racha7', n: 'Regalo diario 7 días seguidos', d: 'Visítalo cada día',     meta: 7,   r: 100, val: () => e.mejorRacha },
+    { id: 'racha7', n: 'Reclama 7 regalos diarios', d: 'Un regalo por día',     meta: 7,   r: 100, val: () => e.mejorRacha },
     { id: 'nivel5', n: 'Llega al cariño nivel 5',    d: 'Simon te quiere mucho',   meta: 5,   r: 40, val: () => nivel() },
     { id: 'nivel10', n: 'Llega al cariño nivel 10', d: 'Ya son mejores amigos',   meta: 10,  r: 100, val: () => nivel() },
     { id: 'nivel15', n: 'Llega al cariño nivel 15', d: 'Familia de otro planeta', meta: 15,  r: 150, val: () => nivel() },
@@ -2437,8 +2553,18 @@
     const cg = Grid(SW, SH); dibujarCorona(cg);
     for (let y = 0; y < 12; y++) for (let x = 17; x < 39; x++) { const a = (y * SW + x) * 4; if (cg.d[a + 3]) g.set(x - 2, y + 2, [cg.d[a], cg.d[a + 1], cg.d[a + 2], 255]); }
     const out = Grid(60, 76); out.paste(al); out.paste(g, 4, 0);
-    if (hol) hollinar(out);
+    if (hol === 'crema') cremar(out); else if (hol) hollinar(out);
     return out;
+  }
+  // crema: manchones de betún sobre Cortex (bomba pastel)
+  function cremar(o) {
+    [[18, 26, 4], [38, 22, 5], [30, 13, 3], [24, 40, 4], [44, 35, 3], [30, 52, 5], [14, 47, 3], [48, 49, 4], [10, 31, 3], [34, 30, 3]].forEach(([cx, cy, r]) => {
+      for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) {
+        if (x < 0 || y < 0 || x >= o.w || y >= o.h) continue; const i = (y * o.w + x) * 4; if (!o.d[i + 3]) continue;
+        const d2 = (x - cx) ** 2 + (y - cy) ** 2; if (d2 <= r * r) o.set(x, y, d2 > (r - 1) * (r - 1) ? '#ffc8d8' : '#fff6ea');
+      }
+      for (let k = 0; k < r + 2; k++) { const i = ((cy + r + k) * o.w + cx) * 4; if (cy + r + k < o.h && o.d[i + 3]) o.set(cx, cy + r + k, '#fff6ea'); }
+    });
   }
   // hollín: cara y ropa ennegrecidas (los ojos quedan blancos) y pelo parado
   function hollinar(o) {
@@ -2464,8 +2590,8 @@
   ];
   const TIPS = [
     'La planta de la repisa tarda un día en crecer. ¡Tócala para sembrarla!',
-    'Cortex comerciante llega una vez al día. Te avisa una hora antes y se queda 15 minutos.',
-    'Si abres tu regalo diario 7 días seguidos, hay premio especial.',
+    'Yo vendré a venderte cosas una vez al día. Te avisaré una hora antes de llegar y me quedaré 15 minutos.',
+    'Cada 7 regalos diarios que abres, hay un premio especial.',
     'Cada nivel de cariño le enseña un gesto nuevo a Simon.',
     'Toca a Simon: con el traductor sabrás qué necesita.',
     'Lo que Simon encuentra por su cuenta se recoge tocándolo.',
@@ -2611,16 +2737,29 @@
   const TRAD_BOMBA = ['¡Otra! ¡Otra!', 'Fue hermoso.', 'Me encanta cuando explota.', 'Lo hice con cariño.', 'Se ve muy bien chamuscado.', 'Cortex hace un ruido muy gracioso.', 'Más bombas, por favor.', 'Fue el mejor BOOM del día.'];
   const HITOS_BOMBA = { 1: 'Es la primera vez que me explotas. Vamos a fingir que fue un accidente.', 5: 'Van cinco explosiones. ¿Sabías que estoy llevando la cuenta?', 10: '¡Diez veces! Tengo un récord que nadie quiere tener.', 25: 'Veinticinco explosiones. Mi lavandera ya me pidió aumento. Nuevo récord personal.',
     50: 'Cincuenta veces. Debería cobrar entrada. Récord personal... y no el que quería.', 100: '¡CIEN! Soy el humano más explotado del planeta. Y del universo.', 200: 'Doscientas. Ya hasta le tomo cariño al olor a chamuscado.' };
+  const FR_TIPO = {
+    confeti: ['¡Confeti! Me cayó en el pelo y en la boca.', 'Qué bonito... y ahora tengo papelitos hasta en los calcetines.', 'Una fiesta sorpresa y ni siquiera es mi cumpleaños.', '¡Wow! ¿De dónde sacaste una bomba de fiesta?', 'Cof... pfft... me tragué un papelito rojo.', 'Esta me gustó más que las explosiones normales. Pero no se lo digas a nadie.'],
+    fuegos: ['¡Fuegos artificiales! Oooh... aaah...', 'Qué bonito. Casi me hace llorar. Casi.', '¡Mira esos colores, Simon! Esta sí me gustó.', 'Esta bomba no me quemó. ¡Gracias!', 'Ojalá todas fueran así de lindas.', 'El azul fue mi favorito. ¿Cuál fue el tuyo?'],
+    pastel: ['¡Crema! ¡Tengo crema en todo el pelo!', 'Mmm... sabe a vainilla. Esto es una bomba de keke.', 'Simon, ¿explotaste un keke encima de mí?', 'Me cayó crema en la nariz. Me la voy a comer.', 'Quedé hecho un pastel. Literalmente.', 'Al menos huele delicioso.'],
+    monedas: ['¡Monedas! ¡Llovieron monedas!', 'Esa sí fue una buena explosión. Me llovió dinero.', 'Mira, Simon: es tu premio por ser tan travieso.', '¿Una bomba que explota en monedas? Quiero una.', 'Ay, me cayó una en la cabeza. Pero valió la pena.'],
+    gigante: ['¡¡SIMON!! ¿Qué le pusiste a esa bomba?', 'Eso... eso fue... demasiado.', 'Siento las orejas zumbando. Y no es de música.', 'Los vecinos se van a quejar. Otra vez.', 'Creo que vi a mi bisabuelo en la luz. Me hizo señas.', 'Bomba gigante: nivel dios del caos.']
+  };
+  const TR_TIPO = {
+    confeti: ['¡Fiesta! ¡Fiesta!', 'Me gusta el confeti.', 'Esto es para celebrar.'], fuegos: ['¡Bonito!', 'Fue para ti, Cortex.', 'Los colores me hacen feliz.'], pastel: ['Pensé que tenía hambre.', 'Keke para Cortex.', 'Está rico, ¿verdad?'],
+    monedas: ['Es un regalo.', 'Brilla mucho.', 'Para ti, con cariño.'], gigante: ['¡LA MÁS GRANDE!', 'Me encantó el ruido.', 'Otra más grande, por favor.']
+  };
   function lineasBomba() {
-    const n = e.st.bombas; let i; do { i = Math.floor(Math.random() * FRASES_BOMBA.length); } while (i === e.ultBomba);
-    e.ultBomba = i; e.ultBombaT = ahora();
+    const n = e.st.bombas, tipo = (bm && bm.tipo) || 'clasica'; let i = 0, fr;
+    if (FR_TIPO[tipo]) fr = elige(FR_TIPO[tipo]);
+    else { do { i = Math.floor(Math.random() * FRASES_BOMBA.length); } while (i === e.ultBomba); e.ultBomba = i; fr = FRASES_BOMBA[i]; }
+    e.ultBombaT = ahora();
     const sies = desc && desc.siesta && desc.dormiaAlBoom;
     const l = [];
     if (sies) l.push(C('¡¡AAAAH!! ¡¡Estaba durmiendo!!'));
-    l.push(C(FRASES_BOMBA[i]), S(), T(elige(TRAD_BOMBA)));
+    l.push(C(fr), S(), T(elige(TR_TIPO[tipo] || TRAD_BOMBA)));
     if (HITOS_BOMBA[n]) l.push(C(HITOS_BOMBA[n]));
     else if (Math.random() < .3) l.push(C('Van ' + n + ' veces que me explotas. Llevo la cuenta, ¿eh?'));
-    l.push(C('...Ay, Simon. Ven acá, bobo.'),
+    l.push(C('...Ay, Simon. Ven acá, cabezón.'),
       { q: 'CORTEX', t: '*le revuelve el pelo con cariño*', fn: () => { corazones(4); gesto('besos'); sfx.regalo(); } },
       C('Nos vemos pronto. Guarda las bombas un ratito, ¿sí?'));
     return l;
@@ -2649,25 +2788,42 @@
     sfx.click();
     if (e.dormido) { decir('Zzz...'); sfx.no(); return; }
     if (!(e.bombas > 0)) { toast('NO TIENES BOMBAS: TIENDA > EXTRAS'); sfx.no(); return; }
-    e.bombas--; act = null; bm = { fase: 'vuelo', t: 0 };
+    e.bombas--; act = null; bm = { fase: 'vuelo', t: 0, tipo: elegirBomba() };
     decir('Sí.', e.traductor ? '¡Esto va a ser divertido!' : null, 2600); hablar(); gesto('salto'); guardar(); bombaTick();
   }
+  const BOMBAS_T = [['clasica', 38, 'CLÁSICA'], ['confeti', 18, 'CONFETI'], ['fuegos', 16, 'FUEGOS ARTIFICIALES'], ['pastel', 14, 'PASTEL'], ['monedas', 8, 'MONEDAS'], ['gigante', 6, 'GIGANTE']];
+  function elegirBomba() {
+    const tira = () => { let r = Math.random() * 100; for (const [id, w] of BOMBAS_T) { if ((r -= w) < 0) return id; } return 'clasica'; };
+    let t = tira(); if (t === e.ultBombaTipo) t = tira();
+    e.ultBombaTipo = t; return t;
+  }
+  function chispas(x, y, n, vel, g, vida, tipos) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.28, v = vel * (.4 + Math.random() * .6); fx.push({ tipo: tipos ? tipos[Math.floor(Math.random() * tipos.length)] : 'cf' + Math.floor(Math.random() * 6), x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .5, vida: vida + Math.floor(Math.random() * 8), t: 0, g }); } }
   function explotar() {
-    bm.fase = 'boom'; bm.t = 0; hollin = true; if (desc) { desc.dormiaAlBoom = !!desc.zzz; desc.zzz = false; }
+    const tipo = bm.tipo || 'clasica';
+    bm.fase = 'boom'; bm.t = 0; bm.dur = tipo === 'fuegos' ? 32 : tipo === 'gigante' ? 20 : 16; hollin = (tipo === 'clasica' || tipo === 'gigante') ? true : tipo === 'pastel' ? 'crema' : false;
+    if (!e.bombasVistas) e.bombasVistas = {};
+    if (!e.bombasVistas[tipo]) { e.bombasVistas[tipo] = 1; if (tipo !== 'clasica') notificar('¡Nuevo tipo de bomba: ' + BOMBAS_T.find(b => b[0] === tipo)[2] + '! Ya has visto ' + Object.keys(e.bombasVistas).length + ' de ' + BOMBAS_T.length + '.'); } if (desc) { desc.dormiaAlBoom = !!desc.zzz; desc.zzz = false; }
     $('flash').classList.remove('on'); void $('flash').offsetWidth; $('flash').classList.add('on');
     const es = $('escena'); es.classList.remove('sacude'); void es.offsetWidth; es.classList.add('sacude'); setTimeout(() => es.classList.remove('sacude'), 700);
-    sfx.boom();
     const tx = cxb() + 30, ty = SY + SH - 34;
-    for (let i = 0; i < 9; i++) { const a = Math.random() * 6.28, v = 1 + Math.random() * 2.2; lanzar(i % 3 ? 'estrella' : 'humo', tx + Math.cos(a) * 6, ty + Math.sin(a) * 6, Math.cos(a) * v, Math.sin(a) * v - .6, 12 + (i % 4) * 3); }
-    e.st.bombas++; ganar(8, 4, true); gesto('baile'); hablar(); decir('Sí.', e.traductor ? '¡¡BOOM!!' : null, 3000); pintar(); guardar();
+    if (tipo === 'clasica' || tipo === 'gigante') {
+      const gg = tipo === 'gigante'; gg ? sfx.gigante() : sfx.boom();
+      for (let i = 0; i < (gg ? 26 : 9); i++) { const a = Math.random() * 6.28, v = (gg ? 1.6 : 1) + Math.random() * (gg ? 3.4 : 2.2); lanzar(i % 3 ? 'estrella' : 'humo', tx + Math.cos(a) * 6, ty + Math.sin(a) * 6, Math.cos(a) * v, Math.sin(a) * v - .6, 12 + (i % 4) * 3); }
+      if (gg) { es.classList.remove('sacude'); void es.offsetWidth; es.classList.add('sacude'); setTimeout(() => es.classList.remove('sacude'), 1100); }
+    } else if (tipo === 'confeti') { sfx.pop(); chispas(tx, ty - 8, 44, 3.2, .09, 34); }
+    else if (tipo === 'fuegos') { sfx.cohete(); chispas(tx, ty - 30, 16, 2.4, .05, 24); }
+    else if (tipo === 'pastel') { sfx.splat(); chispas(tx, ty - 6, 22, 2.6, .12, 26, ['crema']); }
+    else if (tipo === 'monedas') { sfx.moneda(); setTimeout(() => sfx.moneda(), 140); setTimeout(() => sfx.moneda(), 300); chispas(tx, ty - 24, 14, 1.8, .16, 40, ['moneda']); }
+    e.st.bombas++; ganar(8 + ({ monedas: 15, gigante: 12, fuegos: 4, confeti: 4 }[tipo] || 0), 4, true); gesto('baile'); hablar(); decir('Sí.', e.traductor ? ({ confeti: '¡¡FIESTA!!', fuegos: '¡Qué bonito!', pastel: '¡¡SPLAT!!', monedas: '¡¡Dinero!!', gigante: '¡¡BOOOOOM!!' }[tipo] || '¡¡BOOM!!') : null, 3000); pintar(); guardar();
   }
   function bombaAvanza() {
     if (desc && !bm && !dlg && cortex.p >= 1 && tk % 16 === 0) lanzar('z', cxb() + 34, SY + SH - 70, .4, -1, 16);
-    if (hollin && cortex.p > 0 && tk % 9 === 0) lanzar('humo', cxb() + 26 + Math.random() * 8, SY + SH - 62, .1, -.9, 14);
+    if (hollin === true && cortex.p > 0 && tk % 9 === 0) lanzar('humo', cxb() + 26 + Math.random() * 8, SY + SH - 62, .1, -.9, 14);
     if (!bm || bm.fase === 'adios') return;
     bm.t++;
     if (bm.fase === 'vuelo') { if (bm.t % 2 === 0) sfx.tic(); if (bm.t >= VUELO) explotar(); }
-    else if (bm.fase === 'boom' && bm.t >= 16) {
+    if (bm.fase === 'boom' && bm.tipo === 'fuegos' && [3, 8, 13, 18, 23, 27].includes(bm.t)) { sfx.cohete(); const tx = cxb() + 30, ty = SY + SH - 34; chispas(tx + (Math.random() * 70 - 35), ty - 52 - Math.random() * 34, 18, 2.6, .05, 24, ['cf' + (bm.t % 6), 'cf' + ((bm.t + 2) % 6), 'cf5']); }
+    if (bm.fase === 'boom' && bm.t >= (bm.dur || 16)) {
       bm.fase = 'habla';
       dialogo(lineasBomba(), () => cortexSale(finDesc));
     }
@@ -2679,9 +2835,10 @@
       const q = bm.t / VUELO, x = SX - 24 + 46 + (tx - (SX - 24 + 46)) * q, y = SY + 22 + (ty - (SY + 22)) * q - Math.sin(Math.PI * q) * 36;
       ctx.drawImage(sprite('bomba_v', FGRID.bomba, 0), Math.round(x - 6), Math.round(y - 7));
       ctx.fillStyle = tk % 2 ? '#ffe45a' : '#ff5a28'; ctx.fillRect(Math.round(x) + 3, Math.round(y) - 8, 2, 2);
-    } else if (bm.fase === 'boom' && bm.t <= 12) {
-      const r = bm.t < 5 ? 6 + bm.t * 5 : Math.max(2, 31 - (bm.t - 5) * 4);
-      [['#ff6a28', 1], ['#ffd84a', .68], ['#ffffff', .34]].forEach(([c, k]) => {
+    } else if (bm.fase === 'boom' && bm.t <= (bm.tipo === 'gigante' ? 16 : 12) && !['confeti', 'fuegos'].includes(bm.tipo)) {
+      const gg = bm.tipo === 'gigante', cr = bm.tipo === 'pastel', mo = bm.tipo === 'monedas', M = gg ? 1.8 : cr || mo ? .7 : 1;
+      const r = (bm.t < 5 ? 6 + bm.t * 5 : Math.max(2, 31 - (bm.t - 5) * 4)) * M;
+      (cr ? [['#ffc8d8', 1], ['#fff6ea', .68], ['#ffffff', .34]] : mo ? [['#e8a820', 1], ['#ffd84a', .68], ['#fff6b0', .34]] : [['#ff6a28', 1], ['#ffd84a', .68], ['#ffffff', .34]]).forEach(([c, k]) => {
         ctx.fillStyle = c; const R2 = Math.round(r * k);
         for (let yy = -R2; yy <= R2; yy++) { const w = Math.round(Math.sqrt(R2 * R2 - yy * yy)); ctx.fillRect(tx - w, ty + yy, w * 2, 1); }
       });
@@ -2697,6 +2854,52 @@
     e.monedas -= BOMBA_PRECIO; e.bombas = (e.bombas || 0) + 1; e.st.compras++; sfx.compra(); pintar(); guardar(); render();
   }
   $('t-bomba').onclick = lanzarBomba;
+
+  /* ===================== TUTORIAL DE LA PANTALLA (Cortex explica los botones) ===================== */
+  function tutRes(sel) { document.querySelectorAll('.resalta').forEach(x => x.classList.remove('resalta')); if (sel) document.querySelectorAll(sel).forEach(x => x.classList.add('resalta')); }
+  const CT = (t, sel) => ({ q: 'CORTEX', t, pre: () => tutRes(sel) });
+  function libreParaTutorial() { return e.intro && !introActiva && !lugar && !e.dormido && !dlg && !modal && !cortex.p && !cortex.dir && !mercPres && !mercBusy && !desc && !bm && !mj && !edit && !saludoPend && mercInfo().est !== 'aqui'; }
+  function iniciarTutorial() {
+    act = null; document.body.classList.add('tut');
+    cortexEntra(() => dialogo([
+      CT('Simon, remodelamos la pantalla para que sea más tranquila. Te explico rapidito qué es cada cosa.'),
+      CT('Este círculo es el cariño de Simon. Se llena con cada mimo, y al completarlo subes de nivel. Tócalo para ver cuánto falta.', '.med'),
+      CT('Estas barras son su hambre (el keke), su energía (la luna) y su felicidad (la carita). Si una se vacía, ¡atiéndelo!', '.stats'),
+      CT('Aquí están tus monedas, la campana con los avisos (regalos, recordatorios y lo que pasó mientras no estabas) y los ajustes.', '.der2'),
+      CT('Este botón de tres rayitas abre el menú: Inventario, Diario y Logros.', '#b-menu'),
+      CT('La cámara saca fotos de Simon, y la casita te deja mover los muebles y decorar.', '#b-foto, #b-editar'),
+      CT('Este botón son mis misiones. Cada puntito que se enciende es una misión cumplida. Sin prisa: tu avance no se pierde.', '#t-mis'),
+      CT('Y cuando la planta de la repisa esté lista, le aparecerá un signo de admiración encima. ¡Tócala para sembrar o cosechar!'),
+      CT('Abajo siguen las acciones de siempre: alimentar, dormir, jugar, la tienda y Simon dice. Los minijuegos están en la máquina arcade de la sala de juegos.', '.botones'),
+      CT('¡Eso es todo! Puedes volver a ver esto en Ajustes. Cuídalo mucho.')
+    ], () => { tutRes(null); document.body.classList.remove('tut'); e.cajaT = e.caja ? 0 : ahora() + 120000; e.proxVisita = Math.max(e.proxVisita || 0, ahora() + 30 * 60000); e.proxSiesta = Math.max(e.proxSiesta || 0, ahora() + 2 * 3600000); guardar(); cortexSale(() => { pintar(); saludar && setTimeout(saludar, 600); }); }));
+  }
+  /* ===== MINI-EVENTO DE LA PRIMERA SESIÓN: la caja misteriosa de Cortex ===== */
+  function cajaFin() { e.caja = 1; guardar(); cortexSale(() => { pintar(); setTimeout(saludar, 600); }); }
+  function iniciarCaja() {
+    e.caja = 1; act = null; guardar();
+    const trae = !e.tiene.gafas;
+    cortexEntra(() => dialogo([
+      C('¡Simon! Mira lo que encontré tirado junto a la basura, justo donde te encontré a ti.'),
+      S(), T('¿Una caja? ¿Para mí?'),
+      C('Una caja misteriosa. Ábrela tú, que es tu suerte.'),
+      { q: 'CORTEX', t: '*Simon sacude la caja, la abre...*', fn: () => { sfx.regalo(); estrellas(8); gesto('salto'); corazones(3); } },
+      { q: 'CORTEX', t: trae ? '¡Unas GAFAS DE SOL, 25 monedas y mucho cariño!' : '¡25 monedas y mucho cariño!', fn: () => { if (trae) { e.tiene.gafas = 1; toast('¡Conseguiste las GAFAS DE SOL!'); } ganar(25, 12, true); sfx.nivel(); } },
+      S(), T('¡Me encanta! Lo mejor es que no explotó... todavía.'),
+      C('Jaja. Tú sigue cuidándote, que seguro encontramos más cosas. Nos vemos pronto.')
+    ], cajaFin));
+  }
+  function checkCaja() {
+    if (e.caja || !e.cajaT || !libreParaTutorial() || ahora() < e.cajaT) return;
+    iniciarCaja();
+  }
+
+  function checkTutorial() {
+    if (e.tutUI || !libreParaTutorial()) return;
+    if (!e.tutT) { e.tutT = ahora() + 8000; return; }
+    if (ahora() < e.tutT) return;
+    e.tutUI = 1; guardar(); iniciarTutorial();
+  }
 
   /* ===================== SIESTA DE CORTEX ===================== */
   function checkSiesta() {
@@ -2721,7 +2924,7 @@
       dialogo([{ q: 'CORTEX', t: '¡¿Quién me toca?! ...Ah. Eran ustedes.', pre: () => { desc.zzz = false; bm = { fase: 'adios', t: 0 }; bombaTick(); } }, C('Me quedé dormido... ¿tenía baba en la mejilla?'), S(), T('Un poquito.'), C('Jaja. Gracias por dejarme dormir. Hasta pronto.')], () => cortexSale(finDesc));
     }
   }
-  const LV_MEM = { 2: 'Nivel 2. ¿Recuerdas cuando te encontré? Estabas entre unos arbustos, diciendo «sí» a todo.', 3: 'Lo primero que te di fue un keke. Casi me muerdes la mano. Con cariño, claro.', 4: 'Intenté enseñarte a decir «no». Tardaste un día entero y dijiste «sí».',
+  const LV_MEM = { 2: 'Nivel 2. ¿Recuerdas cuando te encontré? Estabas junto a la basura, porque nadie te quería. Yo sí te quise desde tu primer «sí».', 3: 'Lo primero que te di fue un keke. Casi me muerdes la mano. Con cariño, claro.', 4: 'Intenté enseñarte a decir «no». Tardaste un día entero y dijiste «sí».',
     5: 'Llegaste con una corona sagrada y no supe qué hacer. Nunca la toqué.', 6: 'La primera noche dormiste en una caja de zapatos. Roncabas como un dragón.', 7: 'Construir el traductor me costó semanas. Valió la pena: ahora sé que me quieres.',
     8: 'Te di un volcán de juguete y lo explotaste. Ahí supe que eras especial.', 9: 'Recuerdo tu primera sonrisa. Fue en cuanto viste un keke sobre la mesa.', 10: 'Una vez te perdiste en el parque y te encontré abrazando a un pato.',
     11: 'Los vecinos creían que eras un muñeco. Cuando dijiste «sí», se cayeron de espaldas.', 12: 'Tu primer baile fue con la lavadora. Todavía me río.', 13: 'Fuimos a ver las estrellas y señalaste una: «sí, esa es mi casa».',
@@ -2740,7 +2943,7 @@
   const MERC_VENT = 15 * 60000, MERC_AVISO = 60 * 60000;
   let mercPres = false, mercBusy = false;
   const dormCx = () => !!(desc && !mercPres && (desc.zzz || (!bm && !dlg)));
-  const cortexClave = () => mercPres ? 'cortexM' : 'cortex' + (temporada() || '') + (hollin ? 'H' : '') + (dormCx() ? 'Z' : '');
+  const cortexClave = () => mercPres ? 'cortexM' : 'cortex' + (temporada() || '') + (hollin ? (hollin === 'crema' ? 'C' : 'H') : '') + (dormCx() ? 'Z' : '');
   const cortexG = () => cortexGrid(mercPres, mercPres ? null : temporada(), hollin, dormCx());
   const mmss = ms => { ms = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(ms / 60)).padStart(2, '0') + ':' + String(ms % 60).padStart(2, '0'); };
   function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -2830,6 +3033,7 @@
     parque: { ac: MUS_ACORDES, paso: .21, lead: 'square', vl: .02 },
     noche: { ac: [[48, [72, 0, 0, 0, 76, 0, 0, 0]], [45, [69, 0, 0, 0, 72, 0, 0, 0]], [41, [65, 0, 0, 0, 69, 0, 72, 0]], [43, [67, 0, 0, 0, 71, 0, 74, 0]]], paso: .4, lead: 'triangle', vl: .05 },
     cocina: { ac: [[43, [79, 81, 83, 0, 79, 0, 76, 0]], [48, [76, 0, 79, 0, 84, 0, 79, 0]], [50, [78, 0, 81, 78, 86, 0, 81, 0]], [43, [83, 0, 79, 83, 86, 0, 83, 0]]], paso: .2, lead: 'square', vl: .016 },
+    juegos: { arcade: true, ac: [[45, [88, 0, 84, 0, 81, 0, 84, 88]], [41, [84, 0, 81, 0, 77, 0, 81, 84]], [48, [91, 0, 88, 0, 84, 0, 88, 91]], [43, [86, 0, 83, 0, 79, 0, 83, 86]]], paso: .13, lead: 'square', vl: .02 },
     entrada: { ac: [[45, [81, 0, 84, 81, 88, 0, 84, 0]], [41, [77, 0, 81, 77, 84, 0, 81, 0]], [48, [79, 0, 84, 79, 88, 0, 84, 79]], [43, [83, 0, 79, 74, 79, 0, 74, 0]]], paso: .24, lead: 'sawtooth', vl: .01 },
     dormir: { ac: [[48, [76, 0, 79, 0, 81, 0, 79, 0]], [41, [77, 0, 81, 0, 84, 0, 81, 0]], [43, [79, 0, 83, 0, 86, 0, 83, 0]], [48, [84, 0, 81, 0, 79, 0, 76, 0]], [45, [81, 0, 84, 0, 81, 0, 79, 0]], [41, [77, 0, 0, 0, 81, 0, 77, 0]], [43, [79, 0, 77, 0, 76, 0, 74, 0]], [48, [72, 0, 0, 0, 0, 0, 0, 0]]], paso: .5, lead: 'sine', vl: .07 },
     tormenta: { ac: [[45, [69, 0, 0, 72, 0, 0, 76, 0]], [41, [65, 0, 0, 69, 0, 0, 72, 0]], [43, [67, 0, 0, 71, 0, 0, 74, 0]], [40, [64, 0, 0, 67, 0, 0, 71, 0]]], paso: .46, lead: 'triangle', vl: .05 }
@@ -2837,7 +3041,7 @@
   function temaMus() {
     if (e.dormido) return 'dormir';
     if (clima() === 'tormenta') return 'tormenta';
-    const sc = escenaId(); if (sc === 'cocina') return 'cocina'; if (sc === 'entrada') return 'entrada'; if (sc === 'parque') return 'parque';
+    const sc = escenaId(); if (sc === 'cocina') return 'cocina'; if (sc === 'juegos') return 'juegos'; if (sc === 'entrada') return 'entrada'; if (sc === 'parque') return 'parque';
     const h = new Date(ahora()).getHours(); return h < 6 || h >= 21 ? 'noche' : 'lofi';
   }
   /* --- lofi: acordes con séptima, piano suave, bajo, bombo flojito, platillo y crujido de vinilo --- */
@@ -2885,6 +3089,13 @@
       if (lead) notaM(hz(lead), PS * 1.7, t, T.lead, T.vl);
       const bajo = [r, 0, r + 7, 0, r + 12, 0, r + 7, 0][i];
       if (bajo) notaM(hz(bajo), PS * 1.5, t, 'triangle', .07);
+      if (T.arcade) {   // arcade: bajo saltarín, arpegio, bombo, palmada y hi-hat
+        if (i % 2) notaM(hz(r + 12), PS * .7, t, 'square', .012);
+        const tercera = ac8[0] === 45 ? 3 : 4; if (i % 2) notaM(hz(r + 24 + [0, tercera, 7, 12][(i >> 1) % 4]), PS * .6, t, 'square', .009);
+        if (i === 0 || i === 4 || (i === 6 && (p >> 3) % 2)) kickL(t, .09);
+        if (i === 2 || i === 6) percL('clap', t, .05, .08);
+        percL('hat', t, i % 2 ? .014 : .024, .035);
+      }
       if (mus.tn === 'dormir' && i === 0) notaM(hz(r + 36), PS * 3, t, 'sine', .012);   // campanita suave
       if (mus.tn !== 'noche' && mus.tn !== 'tormenta' && mus.tn !== 'dormir' && (i === 0 || i === 4)) notaM(hz(r + 24), PS * .6, t, 'square', .006);
       mus.t += PS; mus.paso++;
@@ -2953,7 +3164,7 @@
     luna: ['....yyyy....','..yyYYyy....','.yyY........','.yY.........','yyY.....z...','yyY.........','yyY.........','yyYY........','.yyYY....z..','.yyyYYYYY...','..yyyyyyy...','....yyyy....'],
     jugar: ['....kkkk....','..kkrrrrkk..','.krrwwrrrrk.','.krwrrrrrrk.','kkkkkkkkkkkk','kwwwwwwwwwwk','kwwwwwwwwwwk','kkkkkkkkkkkk','.krrrrrrrrk.','.krrrrrrrrk.','..kkrrrrkk..','....kkkk....'],
     tienda: ['....ddd.....','...dyyyd....','....ddd.....','..dyyyyyd...','.dyyYyyyyd..','dyyyYYyyyyd.','dyyyyYyyyyd.','dyyyYYyyyyd.','dyyyyYyyyyd.','.dyyyyyyyd..','..ddddddd...','............'],
-    dice: ['...r.rr.r...','...rrrrrr...','..kkkkkkkk..','.kwwwwwwwwk.','.kwqqwwqqwk.','.kwqqwwqqwk.','.kwqqwwqqwk.','.kwwwwwwwwk.','.kpwwwwwwpk.','.kwwwkkwwwk.','..kwwwwwwk..','...kkkkkk...'],
+    dice: ['....r..r....','...rrrrrr...','..kkkkkkkk..','.kwwwwwwwwk.','kwqwqwwqwqwk','kwqqqwwqqqwk','kwqqqwwqqqwk','kpwwkwwkwwpk','.kwwwkkwwwk.','..kwwwwwwk..','...kkkkkk...','............'],
     logros: ['yyyyyyyyyyyy','yYyyyyyyyyYy','yYyyyyyyyyYy','.yYyyyyyyYy.','..yYyyyyYy..','...yyyyyy...','....yYYy....','.....yy.....','.....yy.....','....yyyy....','...yYYYYy...','...yyyyyy...']
   };
   const ICPAL = { p:'#ff7aa8', o:'#c88a40', W:'#ffd0dc', h:'#ff8a92', r:'#e8333f', R:'#ff8a92', w:'#ffffff', g:'#3fb55a', D:'#8a1620', y:'#ffd23a', Y:'#c98a10', z:'#fff6b0', k:'#1b1f4a', d:'#6a3a10', q:'#0e0e18' };
@@ -2971,7 +3182,7 @@
   }
   function pintarIconos() {
     pintarIconosBtn();
-    [['ic-inv', 'invic', iconoInv, 11, 11], ['ic-not', 'notic', iconoNot, 11, 11], ['ic-dia', 'diaic', iconoDia, 11, 11], ['ic-mj', 'mjic', iconoMj, 11, 11], ['ic-cam', 'cam', iconoCam, 13, 11], ['ic-aju', 'aju', iconoAju, 11, 11], ['ic-edi', 'edi', iconoEdi, 11, 11]].forEach(([id, k, fn, w, h]) => {
+    [['ic-inv', 'invic', iconoInv, 11, 11], ['ic-not', 'notic', iconoNot, 11, 11], ['ic-dia', 'diaic', iconoDia, 11, 11], ['ic-cam', 'cam', iconoCam, 13, 11], ['ic-aju', 'aju', iconoAju, 11, 11], ['ic-edi', 'edi', iconoEdi, 11, 11]].forEach(([id, k, fn, w, h]) => {
       const c = $(id).getContext('2d'); c.clearRect(0, 0, w, h); delete gridCache[k]; delete canvasCache[k + '|0']; c.drawImage(sprite(k, fn, 0), 0, 0);
     });
   }
@@ -3016,7 +3227,7 @@
     if (e.ultimoRegalo) {
       const d = difDias(e.ultimoRegalo, h);
       if (d < 0) return null;
-      if (d === 1) nr = e.racha + 1; else perdida = e.racha > 1;
+      nr = e.racha + 1;   // la racha nunca se reinicia: si faltas, sigues con el regalo que te toca
     }
     return { nr, dia: ((nr - 1) % 7) + 1, perdida };
   }
@@ -3090,13 +3301,19 @@
     { k: 'adiv', t: 'Adivina en qué piensa Simon', n: 2, r: 6 },
     { k: 'dormir', t: 'Déjalo dormir y despertar', n: 1, r: 6 }
   ];
-  function misionesHoy() {
-    if (!e.mis || e.mis.f !== hoy()) {
-      const r = sem('mis' + hoy());
-      e.mis = { f: hoy(), ids: mezclar(MIS.map((m, i) => i), r).slice(0, 3), p: {}, ok: {}, bono: 0 };
-    }
+  const MIS_ESPERA = 24 * 3600000;   // tras terminar las tres, Cortex tarda 24 h en dar misiones nuevas
+  function misionesNuevas(previo) {
+    let ids = MIS.map((m, i) => i).filter(i => !previo || !previo.includes(i)); if (ids.length < 3) ids = MIS.map((m, i) => i);
+    e.mis = { ids: mezclar(ids, Math.random).slice(0, 3), p: {}, ok: {}, bono: 0, fin: 0 };
+  }
+  function misionesHoy() {   // las misiones no caducan: se terminan cuando se pueda; al acabarlas hay 24 h de espera
+    if (!e.mis || !Array.isArray(e.mis.ids)) misionesNuevas();
+    const M = e.mis;
+    if (M.bono && !M.fin) M.fin = ahora();
+    if (M.bono && ahora() >= M.fin + MIS_ESPERA) { misionesNuevas(M.ids); e.misAviso = 1; }
     return e.mis;
   }
+  const misEspera = () => { const M = misionesHoy(); return M.bono ? Math.max(0, M.fin + MIS_ESPERA - ahora()) : 0; };
   function mision(k, n) {
     const M = misionesHoy(); let cambio = false;
     M.ids.forEach(i => {
@@ -3104,7 +3321,7 @@
       M.p[i] = (M.p[i] || 0) + (n || 1); cambio = true;
       if (M.p[i] >= m.n) { M.ok[i] = 1; e.st.misiones++; ganar(m.r, 4, true); toast('MISIÓN LISTA: ' + m.t + ' +' + m.r); sfx.logro(); }
     });
-    if (cambio && !M.bono && M.ids.every(i => M.ok[i])) { M.bono = 1; ganar(15, 10, true); toast('CORTEX: ¡Misiones completas! +15'); }
+    if (cambio && !M.bono && M.ids.every(i => M.ok[i])) { M.bono = 1; M.fin = ahora(); ganar(15, 10, true); toast('CORTEX: ¡Misiones completas! +15'); notificar('Completaste las misiones de Cortex. Te dará nuevas dentro de 24 horas.'); }
   }
   /* preguntas del día */
   function preguntasHoy() {
@@ -3186,12 +3403,12 @@
   function renderMis() {
     $('m-titulo').textContent = 'MISIONES DE CORTEX';
     const M = misionesHoy();
-    return `<div class="centro" style="font-size:8px;line-height:1.9;margin-bottom:10px;color:#aab4ff">Cortex te pide tres cosas cada día. ¡Las tres juntas dan +30 de bono!</div>` +
+    return `<div class="centro" style="font-size:8px;line-height:1.9;margin-bottom:10px;color:#aab4ff">Cortex te pide tres cosas. Sin prisa: tu avance no se pierde, puedes terminarlas cuando quieras. ¡Las tres juntas dan +15 de bono!</div>` +
       M.ids.map(i => {
         const m = MIS[i], pr = Math.min(M.p[i] || 0, m.n), ok = !!M.ok[i];
         return `<div class="mi ${ok ? 'ok' : ''}"><span>${m.t}</span><b>${ok ? 'LISTA' : pr + '/' + m.n + ' +' + m.r}</b><i style="width:${pr / m.n * 100}%"></i></div>`;
       }).join('') +
-      `<div class="centro" style="font-size:7px;color:#aab4ff;line-height:1.8;margin-top:8px">${M.bono ? '¡Todo listo hoy! Vuelve mañana por nuevas misiones.' : 'Se renuevan cada día a medianoche.'}</div>` +
+      `<div class="centro" style="font-size:7px;color:#aab4ff;line-height:1.8;margin-top:8px">${M.bono ? 'Cortex te dará misiones nuevas en ' + fmt(misEspera()) + '.' : 'Al terminar las tres, Cortex tardará 24 horas en darte nuevas.'}</div>` +
       `<button class="bgrande" style="width:100%" data-a="cerrar">OK</button>`;
   }
   function renderDice() {
@@ -3336,7 +3553,7 @@
   }
   function renderAj() {
     const aud = `<div style="display:flex;gap:8px;margin-bottom:10px"><button class="bt ${e.mudo ? '' : 'ok'}" style="flex:1;padding:12px 0" data-a="r_snd">SONIDO ${e.mudo ? 'OFF' : 'ON'}</button><button class="bt ${e.musica && !e.mudo ? 'ok' : ''}" style="flex:1;padding:12px 0" data-a="r_mus">MÚSICA ${e.musica && !e.mudo ? 'ON' : 'OFF'}</button></div>`;
-    return aud + renderAj0() + `<div class="centro" style="font-size:7px;color:#aab4ff;margin-top:14px">SIMON: TU AMIGO VIRTUAL · VERSIÓN ${VERSION_JUEGO}</div>`;
+    return aud + renderAj0() + `<button class="bt gran" style="padding:10px 0;margin-top:10px" data-a="tut_ver">VER TUTORIAL DE LA PANTALLA</button><div class="centro" style="font-size:7px;color:#aab4ff;margin-top:14px">SIMON: TU AMIGO VIRTUAL · VERSIÓN ${VERSION_JUEGO}</div>`;
   }
   function renderAj0() {
     $('m-titulo').textContent = 'AJUSTES';
@@ -3520,8 +3737,10 @@
     const hoyM = mjHoy();
     return `<div class="centro" style="font-size:8px;line-height:1.9;color:#aab4ff;margin-bottom:10px">¡Elige un juego!</div><div class="cuadricula">` +
       `<div class="card"><div class="pv"><canvas data-prev="fd_keke"></canvas></div><div class="cn">ATRAPA EL KEKE</div><div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.mj.rec}<br>MONEDAS HOY: ${hoyM}/${MJ_TOPE()}</div><button class="bt ok" data-a="mj_jugar">JUGAR</button></div>` +
-      `<div class="card"><div class="pv" style="display:flex;align-items:center;justify-content:center;font-size:22px;color:#ffd84a">&#9835;</div><div class="cn">BAILA CON SIMON</div>${nivel() >= RT_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.rt.rec}<br>MONEDAS HOY: ${rtHoy()}/${RT_TOPE()}</div><button class="bt ok" data-a="rt_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RT_NV}</div>`}</div></div>` +
-      `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff;margin-top:12px">Jugar gasta ${MJ_COSTO} de energía y sube la felicidad.<br>Keke: mueve a Simon con el dedo y cuidado con las bombas.<br>Baile: toca el carril cuando la nota llegue a la línea.</div>`;
+      `<div class="card"><div class="pv"><canvas data-prev="mj_run"></canvas></div><div class="cn">CORRE, SIMON</div>${nivel() >= RUN_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.run.rec}<br>MONEDAS HOY: ${runHoy()}/${RUN_TOPE()}</div><button class="bt ok" data-a="run_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RUN_NV}</div>`}</div>` +
+      `<div class="card"><div class="pv"><canvas data-prev="mj_mem"></canvas></div><div class="cn">MEMORIA CON CORTEX</div>${nivel() >= MEM_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.mem.rec}<br>MONEDAS HOY: ${memHoy()}/${MEM_TOPE()}</div><button class="bt ok" data-a="mem_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${MEM_NV}</div>`}</div>` +
+      `<div class="card"><div class="pv"><canvas data-prev="mj_rt"></canvas></div><div class="cn">BAILA CON SIMON</div>${nivel() >= RT_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.rt.rec}<br>MONEDAS HOY: ${rtHoy()}/${RT_TOPE()}</div><button class="bt ok" data-a="rt_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RT_NV}</div>`}</div></div>` +
+      `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff;margin-top:12px">Cada juego gasta de ${RUN_COSTO} a ${MJ_COSTO} de energía y sube la felicidad.</div>`;
   }
   let mj = null;
   const mjCv = $('mj-cv'), mjX = mjCv.getContext('2d'); mjCv.height = MJH;
@@ -3616,7 +3835,7 @@
   document.addEventListener('keydown', ev => { if (!mj || mj.fin) return; if (ev.key === 'ArrowLeft') mj.objetivo = Math.max(14, mj.objetivo - 10); if (ev.key === 'ArrowRight') mj.objetivo = Math.min(82, mj.objetivo + 10); });
 
   /* ===================== MINIJUEGO DE RITMO: BAILA CON SIMON ===================== */
-  const RT_COSTO = 10, RT_NV = 3, RT_DIV = 12, RT_TOPE = () => Math.floor(ECO.topeRt(nivel()));
+  const RT_COSTO = 10, RT_NV = 5, RT_DIV = 12, RT_TOPE = () => Math.floor(ECO.topeRt(nivel()));
   const RT_STEP = .25, RT_PASOS = 144, RT_LEAD = 1.2, RT_V = 100, RT_Y = 150, RT_FIN = RT_LEAD + RT_PASOS * RT_STEP + .8;
   const RT_ROOTS = [48, 45, 41, 43], RT_COL = ['#ff4a5c', '#ffd84a', '#4ac8ff'], RT_X = [16, 48, 80];
   let rt = null;
@@ -3756,7 +3975,184 @@
   $('mj-x').onclick = () => { sfx.click(); mjSalir(); };
   $('mj-sal').onclick = () => { sfx.click(); mjSalir(); };
   $('mj-otra').onclick = () => { if (e.energia < MJ_COSTO) { sfx.no(); return; } sfx.click(); const ya = mj; cancelAnimationFrame(ya.raf); mj = null; $('mj').classList.remove('on'); mjIniciar(); };
-  $('b-mj').onclick = () => { if (dlg || modal) return; if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('minijuegos'); };
+
+
+  /* ===================== MINIJUEGO: CORRE, SIMON (estilo dinosaurio de Chrome) ===================== */
+  const RUN_COSTO = 8, RUN_NV = 2, RUN_DIV = 25, RUN_TOPE = () => Math.floor(ECO.topeRun(nivel()));
+  const RUN_GY = 132, RUN_GRAV = 520, RUN_SALTO = 190, RUN_SX = 22;
+  let run = null;
+  const runCv = $('run-cv'), runX = runCv.getContext('2d'); runX.imageSmoothingEnabled = false;
+  function runHoy() { const h = hoy(); if (e.run.dia !== h) { e.run.dia = h; e.run.monHoy = 0; } return e.run.monHoy; }
+  function runPts() { return Math.floor(run.dist / 20) + 5 * run.kekes; }
+  function runIniciar() {
+    if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
+    if (nivel() < RUN_NV) { toast('Se desbloquea en cariño NV' + RUN_NV); sfx.no(); return; }
+    if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
+    if (e.energia < RUN_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    cerrar(); modal = 'run'; e.energia = clamp(e.energia - RUN_COSTO); pintar();
+    run = { t: 0, dist: 0, kekes: 0, y: 0, vy: 0, suelo: true, obs: [], items: [], sig: 70, fx: [], fin: false, muerto: 0, ult: performance.now(), raf: 0, saltos: 0 };
+    $('run-fin').classList.remove('on'); $('run-tip').style.display = ''; $('run').classList.add('on'); runHud();
+    run.raf = requestAnimationFrame(runLoop);
+  }
+  function runHud() { const p = runPts(); $('run-pts').textContent = p; $('run-mon').textContent = '$' + Math.max(0, Math.min(Math.floor(p / RUN_DIV), RUN_TOPE() - runHoy())); }
+  function runSalto() { if (!run || run.fin || run.muerto) return; $('run-tip').style.display = 'none'; if (!run.suelo) return; run.vy = RUN_SALTO; run.suelo = false; run.saltos++; sfx.click(); }
+  function runLoop(now) {
+    if (!run) return;
+    const dt = Math.min(.04, (now - run.ult) / 1000); run.ult = now;
+    if (!document.hidden) runUpdate(dt);
+    runDibuja();
+    run.raf = requestAnimationFrame(runLoop);
+  }
+  function runUpdate(dt) {
+    if (run.fin) return;
+    if (run.muerto) { run.muerto += dt; run.fx.forEach(f => f.t += dt); run.fx = run.fx.filter(f => f.t < .5); if (run.muerto > .9) runFin(); return; }
+    run.t += dt; const v = Math.min(105, 58 + run.t * 1.6); run.v = v; run.dist += v * dt;
+    if (!run.suelo) { run.y += run.vy * dt; run.vy -= RUN_GRAV * dt; if (run.y <= 0) { run.y = 0; run.vy = 0; run.suelo = true; } }
+    run.sig -= v * dt;
+    if (run.sig <= 0) {
+      const r = Math.random(), tipo = r < .4 ? 'bote' : r < .65 ? 'caja' : r < .85 ? 'pila' : 'bomba', dim = { bote: [10, 15], caja: [14, 11], pila: [22, 15], bomba: [12, 12] }[tipo];
+      const o = { tipo, x: 100, w: dim[0], h: dim[1] }; run.obs.push(o);
+      if (Math.random() < .6) run.items.push({ x: o.x + o.w / 2 - 5, y: 46 + Math.random() * 8, tomado: false });
+      run.sig = v * .78 + 34 + Math.random() * 56;
+      if (Math.random() < .2) run.items.push({ x: 100 + run.sig / 2, y: 22, tomado: false });
+    }
+    const hx0 = RUN_SX - 6, hx1 = RUN_SX + 6, hy0 = run.y, hy1 = run.y + 30;   // caja de choque de Simon (altura sobre el suelo)
+    run.obs.forEach(o => { o.x -= v * dt; });
+    run.obs = run.obs.filter(o => o.x + o.w > -4);
+    for (const o of run.obs) { if (hx1 > o.x + 1 && hx0 < o.x + o.w - 1 && hy0 < o.h - 1) { runChoca(o); return; } }
+    run.items.forEach(it => { it.x -= v * dt; if (!it.tomado && it.x + 10 > hx0 && it.x < hx1 && it.y + 10 > hy0 && it.y < hy1) { it.tomado = true; run.kekes++; sfx.moneda(); runHud(); run.fx.push({ k: 'est', x: it.x, y: RUN_GY - it.y - 10, t: 0 }); } });
+    run.items = run.items.filter(it => !it.tomado && it.x > -12);
+    run.fx.forEach(f => f.t += dt); run.fx = run.fx.filter(f => f.t < .45);
+    if (((run.dist / 20) | 0) !== run.pp) { run.pp = (run.dist / 20) | 0; runHud(); }
+  }
+  function runChoca(o) { run.muerto = .001; run.fx.push({ k: 'boom', x: RUN_SX, y: RUN_GY - run.y - 14, t: 0 }); sfx.boom ? sfx.boom() : sfx.no(); }
+  function runDibuja() {
+    const c = runX, W = 96, H = 176, t = run.t, sh = run.muerto && run.muerto < .35 ? Math.round(Math.sin(run.muerto * 90) * 2) : 0;
+    c.save(); c.translate(sh, 0);
+    ['#1e1448', '#2a1a62', '#3c2078', '#582a88', '#7a3a90', '#a04a90'].forEach((col, i) => { c.fillStyle = col; c.fillRect(-4, Math.round(i * RUN_GY / 6), W + 8, Math.ceil(RUN_GY / 6) + 1); });
+    c.fillStyle = '#ffffff'; [[8, 10], [30, 30], [58, 14], [82, 40], [18, 62], [70, 74], [44, 52]].forEach(([x, y], i) => { if (((t * 2 + i) | 0) % 4) c.fillRect(x, y, 1, 1); });
+    c.fillStyle = '#ffd1f0'; c.fillRect(70, 14, 12, 12); c.fillStyle = '#f4a8e0'; c.fillRect(72, 16, 3, 3); c.fillRect(77, 21, 3, 2);   // luna
+    c.fillStyle = '#4a2a78'; const d1 = (run.dist * .12) % 140; for (let k = -1; k < 2; k++) { const bx = Math.round(k * 70 - d1 + 70); c.fillRect(bx, RUN_GY - 20, 22, 20); c.fillRect(bx + 4, RUN_GY - 28, 8, 8); c.fillRect(bx + 14, RUN_GY - 24, 6, 4); }   // montones de basura al fondo
+    c.fillStyle = '#6a4aa0'; c.fillRect(-4, RUN_GY, W + 8, H - RUN_GY); c.fillStyle = '#8a6ac0'; c.fillRect(-4, RUN_GY, W + 8, 2);
+    c.fillStyle = '#54388a'; const d2 = Math.round(run.dist % 16); for (let x = -16; x < W + 16; x += 16) { c.fillRect(x - d2, RUN_GY + 8, 6, 2); c.fillRect(x - d2 + 8, RUN_GY + 18, 3, 2); }
+    run.obs.forEach(o => {
+      const ox = Math.round(o.x), oy = RUN_GY - o.h;
+      if (o.tipo === 'bomba') { const sp = sprite('bomba_v', FGRID.bomba, 0); c.drawImage(sp, ox + o.w / 2 - sp.width / 2, RUN_GY - sp.height); c.fillStyle = (t * 12 | 0) % 2 ? '#ffe45a' : '#ff5a28'; c.fillRect(ox + o.w / 2 + 2, RUN_GY - sp.height - 2, 2, 2); }
+      else if (o.tipo === 'caja') { c.fillStyle = '#8a5a30'; c.fillRect(ox, oy, o.w, o.h); c.fillStyle = '#c08a50'; c.fillRect(ox, oy, o.w, 2); c.fillStyle = '#5a3a1a'; c.fillRect(ox + o.w / 2 - 1, oy, 2, o.h); }
+      else { const n = o.tipo === 'pila' ? 2 : 1; for (let k = 0; k < n; k++) { const bx = ox + k * 12; c.fillStyle = '#aab4c8'; c.fillRect(bx, oy + 3, 10, 12); c.fillStyle = '#6a7490'; c.fillRect(bx + 2, oy + 5, 1, 8); c.fillRect(bx + 5, oy + 5, 1, 8); c.fillRect(bx + 8, oy + 5, 1, 8); c.fillStyle = '#d0d8e8'; c.fillRect(bx - 1, oy + 1, 12, 3); c.fillRect(bx + 3, oy, 4, 2); } }
+    });
+    run.items.forEach(it => { const sp = sprite('fx_pizza', FX.pizza, 0); c.drawImage(sp, Math.round(it.x), Math.round(RUN_GY - it.y - 10), 10, 10); });
+    const boca = run.muerto ? 'n' : 's', sp = sprite('simon_a' + boca + '|' + ropaSig() + '|0000', () => simonGrid('a', boca, e.ropa, {}), 0);
+    const rebote = run.suelo && !run.muerto ? ((t * 9 | 0) % 2) : 0, sy = RUN_GY - 38 + 1 - Math.round(run.y) + (rebote ? -1 : 0);
+    if (!(run.muerto && (run.muerto * 14 | 0) % 2)) c.drawImage(sp, 0, 0, 56, 78, RUN_SX - 14, sy, 28, 39);
+    run.fx.forEach(f => {
+      if (f.k === 'boom') { const r = Math.round(4 + f.t * 36); [['#ff6a28', 1], ['#ffd84a', .66], ['#ffffff', .33]].forEach(([col, k]) => { c.fillStyle = col; const R2 = Math.round(r * k); for (let yy = -R2; yy <= R2; yy++) { const w = Math.round(Math.sqrt(R2 * R2 - yy * yy)); c.fillRect(Math.round(f.x) - w, Math.round(f.y) + yy, w * 2, 1); } }); }
+      else { const sp2 = sprite('fx_estrella', FX.estrella, 0); c.drawImage(sp2, Math.round(f.x), Math.round(f.y - 8 * f.t * 4)); }
+    });
+    c.restore();
+  }
+  function runFin() {
+    if (!run || run.fin) return; run.fin = true;
+    const pts = runPts(), antes = e.run.rec, hoyM = runHoy();
+    const gana = Math.max(0, Math.min(Math.floor(pts / RUN_DIV), RUN_TOPE() - hoyM));
+    e.run.monHoy += gana; e.st.run++;
+    e.feliz = clamp(e.feliz + Math.min(25, 6 + Math.floor(pts / 8))); e.hambre = clamp(e.hambre - 3);
+    let nuevo = false; if (pts > antes) { e.run.rec = pts; nuevo = antes > 0; }
+    if (gana) ganar(gana, 0, true); ganar(0, 3 + Math.min(8, Math.floor(pts / 30)));
+    mision('jugar'); revisar(); pintar(); guardar();
+    const tope = e.run.monHoy >= RUN_TOPE();
+    $('run-res').innerHTML = `PUNTOS: ${pts}<br>KEKES: ${run.kekes}<br>RÉCORD: ${e.run.rec}${nuevo ? '<br><span style="color:#ffd84a">¡NUEVO RÉCORD!</span>' : ''}<br>+${gana} MONEDAS` + (tope ? '<br><span style="font-size:7px;color:#aab4ff">Ya llegaste al tope de hoy</span>' : '');
+    $('run-otra').style.opacity = e.energia >= RUN_COSTO ? 1 : .4;
+    $('run-fin').classList.add('on'); if (nuevo) sfx.nivel();
+  }
+  function runSalir() { if (!run) return; if (!run.fin && (run.muerto || run.t > 1)) runFin(); cancelAnimationFrame(run.raf); run = null; $('run').classList.remove('on'); $('run-fin').classList.remove('on'); modal = null; pintar(); hablar(); corazones(2); }
+  runCv.addEventListener('pointerdown', ev => { ev.preventDefault(); runSalto(); });
+  document.addEventListener('keydown', ev => { if (!run || run.fin) return; if (ev.key === ' ' || ev.key === 'ArrowUp') { ev.preventDefault(); runSalto(); } });
+  $('run-x').onclick = () => { sfx.click(); runSalir(); };
+  $('run-sal').onclick = () => { sfx.click(); runSalir(); };
+  $('run-otra').onclick = () => { if (e.energia < RUN_COSTO || e.enf) { sfx.no(); return; } sfx.click(); cancelAnimationFrame(run.raf); run = null; $('run').classList.remove('on'); $('run-fin').classList.remove('on'); modal = null; runIniciar(); };
+
+  /* ===================== MINIJUEGO: MEMORIA CON CORTEX ===================== */
+  const MEM_COSTO = 8, MEM_NV = 3, MEM_DIV = 28, MEM_TOPE = () => Math.floor(ECO.topeMem(nivel()));
+  const MEM_RONDAS = [{ p: 6, c: 3, prev: 2600, par: 28, max: 5 }, { p: 8, c: 4, prev: 2400, par: 42, max: 7 }, { p: 10, c: 4, prev: 2200, par: 60, max: 9 }];
+  let mem = null;
+  function memHoy() { const h = hoy(); if (e.mem.dia !== h) { e.mem.dia = h; e.mem.monHoy = 0; } return e.mem.monHoy; }
+  function memDi(t, cls) { $('mem-cx').textContent = t; }
+  function memRetrato() {
+    const c = $('mem-p'), px = c.getContext('2d'); px.imageSmoothingEnabled = false; px.clearRect(0, 0, 76, 80);
+    const kc = 'cortex'; sprite(kc, () => cortexGrid(false, null, false, false), 0); px.drawImage(gridCanvas(recorte(gridCache[kc], 7, 0, 46, 49)), 0, 0, 76, 80);
+  }
+  function memT(fn, ms) { const id = setTimeout(() => { if (mem) fn(); }, ms); mem.to.push(id); }
+  function memIniciar() {
+    if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
+    if (nivel() < MEM_NV) { toast('Se desbloquea en cariño NV' + MEM_NV); sfx.no(); return; }
+    if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
+    if (e.energia < MEM_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); return; }
+    cerrar(); modal = 'mem'; e.energia = clamp(e.energia - MEM_COSTO); pintar();
+    mem = { ronda: 0, pts: 0, fallos: 0, combo: 0, mejorCombo: 0, rondasOk: 0, fin: false, to: [], cartas: [], a: null, lock: true, consec: 0, rf: 0, pistas: 0, t0: 0, perdio: false };
+    $('mem-fin').classList.remove('on'); $('mem').classList.add('on'); memRetrato(); memRonda();
+  }
+  function memHud() { $('mem-r').textContent = 'RONDA ' + (mem.ronda + 1) + '/' + MEM_RONDAS.length; $('mem-pts').textContent = 'PTS ' + mem.pts; $('mem-f').textContent = 'FALLOS ' + mem.rf + '/' + MEM_RONDAS[mem.ronda].max; }
+  function memRonda() {
+    const R = MEM_RONDAS[mem.ronda], objs = mezclar(OBJ.slice(), Math.random).slice(0, R.p);
+    mem.cartas = mezclar(objs.concat(objs), Math.random).map(o => ({ o, ok: false })); mem.a = null; mem.lock = true; mem.consec = 0; mem.rf = 0; mem.pistas = 0;
+    const g = $('mem-grid'); g.innerHTML = ''; g.style.setProperty('--c', R.c);
+    mem.cartas.forEach((c, i) => { const b = document.createElement('button'); b.className = 'mc up'; b.dataset.i = i; b.innerHTML = '<span class="q">?</span>'; b.appendChild(lienzoObj(c.o, false, 48)); g.appendChild(b); });
+    memHud(); memDi(mem.ronda === 0 ? '¡Memoriza las cartas, Simon! Después se voltean.' : '¡Más cartas! Memoriza bien.');
+    memT(() => { g.querySelectorAll('.mc').forEach(b => b.classList.remove('up')); mem.lock = false; mem.t0 = Date.now(); memDi('¡Ahora tú! Busca las parejas.'); sfx.click(); }, R.prev);
+  }
+  function memCarta(i) { return $('mem-grid').children[i]; }
+  function memClick(i) {
+    if (!mem || mem.lock || mem.fin) return; const c = mem.cartas[i]; if (!c || c.ok || mem.a === i) return;
+    memCarta(i).classList.add('up'); sfx.click();
+    if (mem.a == null) { mem.a = i; return; }
+    const j = mem.a; mem.a = null; mem.lock = true;
+    if (mem.cartas[j].o.id === c.o.id) {
+      mem.cartas[j].ok = c.ok = true; mem.combo++; mem.mejorCombo = Math.max(mem.mejorCombo, mem.combo); mem.consec = 0;
+      mem.pts += 10 + Math.min(10, (mem.combo - 1) * 2);
+      [i, j].forEach(k => { memCarta(k).classList.remove('up'); memCarta(k).classList.add('up', 'ok'); }); sfx.moneda(); memHud();
+      memDi(mem.combo >= 3 ? '¡Racha de ' + mem.combo + '! ¡Increíble!' : elige(['¡Esa es!', '¡Pareja!', '¡Qué memoria, Simon!', '¡Bien hecho!']));
+      if (mem.cartas.every(x => x.ok)) memT(memRondaFin, 700); else memT(() => { mem.lock = false; }, 250);
+    } else {
+      mem.fallos++; mem.rf++; mem.combo = 0; mem.consec++; sfx.no(); memHud(); const resta = MEM_RONDAS[mem.ronda].max - mem.rf; memDi(resta <= 0 ? '¡Ay no! Ya no quedan intentos...' : resta === 1 ? '¡Cuidado! Te queda 1 intento.' : elige(['Uy, casi.', 'Esa no era.', 'Mmm... concéntrate.', 'Casi, casi. Otra vez.']));
+      memT(() => {
+        memCarta(i).classList.remove('up'); memCarta(j).classList.remove('up');
+        if (mem.rf >= MEM_RONDAS[mem.ronda].max) { mem.perdio = true; memT(memFin, 600); return; }
+        if (mem.consec >= 3 && mem.pistas < 1) {   // Cortex ayuda: enseña una pareja un momento
+          const libres = mem.cartas.map((x, k) => k).filter(k => !mem.cartas[k].ok), k1 = libres[Math.floor(Math.random() * libres.length)];
+          mem.pistas++; mem.consec = 0; memDi('Mmm... creo que vi algo ahí.'); memCarta(k1).classList.add('up');   // pista sutil: solo destella UNA carta
+          memT(() => { memCarta(k1).classList.remove('up'); mem.lock = false; }, 650);
+        } else mem.lock = false;
+      }, 800);
+    }
+  }
+  function memRondaFin() {
+    const R = MEM_RONDAS[mem.ronda], t = (Date.now() - mem.t0) / 1000, bono = Math.max(0, 20 - mem.rf * 3) + Math.min(15, Math.max(0, Math.floor(R.par - t)));
+    mem.pts += bono; mem.rondasOk++; memHud(); sfx.nivel();
+    if (mem.ronda < MEM_RONDAS.length - 1) { memDi('¡Ronda superada! +' + bono + ' de bono. Vamos con más cartas.'); mem.ronda++; memT(memRonda, 1800); }
+    else { memDi('¡Las superaste todas! +' + bono + ' de bono. ¡Eres un crack, Simon!'); memT(memFin, 1500); }
+  }
+  function memFin() {
+    if (!mem || mem.fin) return; if (mem.perdio) memDi('Casi lo logras, Simon. ¡Otra vez!'); mem.fin = true; mem.to.forEach(clearTimeout); mem.lock = true;
+    const hoyM = memHoy(), gana = Math.max(0, Math.min(Math.floor(mem.pts / MEM_DIV), MEM_TOPE() - hoyM));
+    e.mem.monHoy += gana; e.st.mem++;
+    e.feliz = clamp(e.feliz + Math.min(25, 8 + Math.floor(mem.pts / 20))); e.hambre = clamp(e.hambre - 2);
+    const antes = e.mem.rec; let nuevo = false; if (mem.pts > antes) { e.mem.rec = mem.pts; nuevo = antes > 0; }
+    if (gana) ganar(gana, 0, true); ganar(0, 3 + Math.min(6, Math.floor(mem.pts / 40)));
+    mision('jugar'); revisar(); pintar(); guardar();
+    const tope = e.mem.monHoy >= MEM_TOPE();
+    $('mem-res').innerHTML = `${mem.perdio ? '<span style="color:#ff8a8a">SIN INTENTOS</span><br>' : ''}RONDAS: ${mem.rondasOk}/${MEM_RONDAS.length}<br>PUNTOS: ${mem.pts}<br>FALLOS: ${mem.fallos}<br>MEJOR RACHA: ${mem.mejorCombo}<br>RÉCORD: ${e.mem.rec}${nuevo ? '<br><span style="color:#ffd84a">¡NUEVO RÉCORD!</span>' : ''}<br>+${gana} MONEDAS` + (tope ? '<br><span style="font-size:7px;color:#aab4ff">Ya llegaste al tope de hoy</span>' : '');
+    $('mem-otra').style.opacity = e.energia >= MEM_COSTO ? 1 : .4;
+    $('mem-fin').classList.add('on'); if (mem.rondasOk >= 2 || nuevo) sfx.nivel();
+  }
+  function memSalir() {
+    if (!mem) return; if (!mem.fin && mem.pts > 0) memFin(); mem.to.forEach(clearTimeout); mem = null;
+    $('mem').classList.remove('on'); $('mem-fin').classList.remove('on'); modal = null; pintar(); hablar(); corazones(2); setTimeout(saludar, 500);
+  }
+  $('mem-grid').addEventListener('pointerdown', ev => { const b = ev.target.closest('.mc'); if (!b || !mem) return; ev.preventDefault(); memClick(+b.dataset.i); });
+  $('mem-x').onclick = () => { sfx.click(); memSalir(); };
+  $('mem-sal').onclick = () => { sfx.click(); memSalir(); };
+  $('mem-otra').onclick = () => { if (e.energia < MEM_COSTO || e.enf) { sfx.no(); return; } sfx.click(); mem.to.forEach(clearTimeout); mem = null; $('mem').classList.remove('on'); $('mem-fin').classList.remove('on'); modal = null; memIniciar(); };
 
   /* ===================== INVENTARIO ===================== */
   let invTab = 'ropa';
@@ -3845,6 +4241,7 @@
   function checkNotis() {
     if (!e.intro) return;
     const t = ahora();
+    misionesHoy(); if (e.misAviso) { e.misAviso = 0; notificar('Cortex tiene misiones nuevas para ti.'); pintar(); }
     if (infoRegalo() && e.nRegalo !== hoy()) { e.nRegalo = hoy(); notificar('Tienes un regalo diario por reclamar.'); }
     if (e.hambre < 25 && t - e.nHam > 6 * 3600000) { e.nHam = t; notificar('Simon tiene mucha hambre.'); }
     if (e.feliz < 25 && t - e.nFel > 6 * 3600000) { e.nFel = t; notificar('Simon está triste. Necesita mimos o jugar.'); }
@@ -4060,10 +4457,11 @@
     const m = mimosAl();
     if (m.harto && m.n < MIMO_VUELVE) { m.harto = false; if (!modal && !dlg && !e.dormido && !cortex.p) { decir('Sí.', e.traductor ? '¡Ya quiero mimos otra vez!' : null, 3500); hablar(); gesto('salto'); } }
   }
-  function mimar() {
+  function mimar(suave) {
+    const resp = (txt, causa) => { if (!suave) { responder(txt, causa); return; } decir('Sí.', e.traductor ? (txt ? txt.replace(/[()]/g, '') : traducir(causa || 'otro')) : null); e.st.si++; hablar(); };
     const m = mimosAl();
     if (m.harto && m.n >= MIMO_VUELVE) {
-      decir('Sí.', e.traductor ? HARTO[Math.floor(Math.random() * HARTO.length)] : null, 2800); sfx.no(); bocaT = 6; return;
+      decir('Sí.', e.traductor ? HARTO[Math.floor(Math.random() * HARTO.length)] : null, 2800); sfx.no(); bocaT = 6; if (suave) acar = null; return;
     }
     m.harto = false; m.n += 1;
     const D = e.mimosDia; if (D.f !== hoy()) { D.f = hoy(); D.xp = 0; D.coins = 0; D.av = 0; }
@@ -4073,13 +4471,13 @@
       if (clima() === 'tormenta' && e.st.toques % 3 === 0 && D.xp < MIMO_XP_DIA) { darXp(1); D.xp++; corazones(2); }
     }
     if (e.st.toques % 10 === 0 && D.coins < MIMO_MON_DIA) { ganar(1, 0); D.coins++; }
-    sfx.toque(); corazones(1);
-    if (m.n >= MIMO_MAX - .3) { m.harto = true; responder('(¡ya fueron muchos mimos! Déjame descansar un ratito)'); gesto('salto'); }
-    else if (Math.round(m.n) === 6 && m.n < 7) responder('(mmm... me estás dando muchos mimos)');
-    else if (D.xp >= MIMO_XP_DIA && !D.av) { D.av = 1; responder('(hoy ya me llenaste de mimos. ¡Gracias!)'); }
-    else if (clima() === 'tormenta' && Date.now() < sustoCd - 110000) { responder('(¡Gracias por abrazarme! Ya no tengo tanto miedo)'); corazones(2); }
-    else if (e.enf) responder('(achú... tengo frío, ponme una bufanda o dame jarabe)');
-    else responder(null, 'tocar');
+    if (!suave) sfx.toque(); corazones(1);
+    if (m.n >= MIMO_MAX - .3) { m.harto = true; if (suave) acar = null; responder('(¡ya fueron muchos mimos! Déjame descansar un ratito)'); gesto('salto'); }
+    else if (Math.round(m.n) === 6 && m.n < 7) resp('(mmm... me estás dando muchos mimos)');
+    else if (D.xp >= MIMO_XP_DIA && !D.av) { D.av = 1; resp('(hoy ya me llenaste de mimos. ¡Gracias!)'); }
+    else if (clima() === 'tormenta' && Date.now() < sustoCd - 110000) { resp('(¡Gracias por abrazarme! Ya no tengo tanto miedo)'); corazones(2); }
+    else if (e.enf) resp('(achú... tengo frío, ponme una bufanda o dame jarabe)');
+    else resp(null, 'tocar');
   }
   /* ===================== VENTANAS ===================== */
   let modal = null, tab = 'ropa';
@@ -4096,18 +4494,18 @@
         const u = ultimoPremio;
         h = `<div class="centro"><div class="grande">+${u.m} MONEDAS</div>` +
           (u.item ? `<div class="grande">¡${ITEMS[u.item].n}!</div><div>Regalo especial del día 7. Ya está en tu tienda.</div>` : '') +
-          `<div style="margin-top:10px">Racha: ${u.racha} ${u.racha === 1 ? 'día' : 'días'} seguidos</div>` +
+          `<div style="margin-top:10px">Racha: ${u.racha} ${u.racha === 1 ? 'día' : 'días'}</div>` +
           `<div style="margin-top:8px;color:#aab4ff">Vuelve mañana: el premio mejora cada día.</div>` +
           `<button class="bgrande" data-a="cerrar">¡GRACIAS!</button></div>`;
       } else {
         const i = infoRegalo();
         h = `<div class="centro">` +
-          (i.perdida ? `<div>CORTEX: ¡Simon te extrañó! Empezamos una racha nueva.</div>` : i.nr > 1 ? `<div>CORTEX: ¡Llevas ${i.nr - 1} ${i.nr - 1 === 1 ? 'día' : 'días'} seguidos!</div>` : `<div>CORTEX: ¡Simon te manda un regalo!</div>`) +
+          (i.nr > 1 ? `<div>CORTEX: ¡Llevas ${i.nr - 1} ${i.nr - 1 === 1 ? 'regalo' : 'regalos'} de racha!</div>` : `<div>CORTEX: ¡Simon te manda un regalo!</div>`) +
           `<div class="dias">` + PREMIOS.map((p, j) => `<div class="dia ${j + 1 < i.dia ? 'hecho' : j + 1 === i.dia ? 'hoy' : ''} ${j === 6 ? 'esp' : ''}"><b>${j + 1}</b>${j + 1 < i.dia ? 'OK' : '+' + p}</div>`).join('') + `</div>` +
           `<canvas class="caja" data-prev="caja"></canvas>` +
           `<div style="margin-top:8px">${i.dia === 7 ? 'Día 7: ¡regalo ESPECIAL!' : 'Día ' + i.dia + ' de 7'}</div>` +
           `<button class="bgrande" data-a="abrirreg">ABRIR REGALO</button>` +
-          `<div style="margin-top:12px;color:#aab4ff;font-size:7px">Si faltas un día no pasa nada: solo empieza otra racha.</div></div>`;
+          `<div style="margin-top:12px;color:#aab4ff;font-size:7px">Si faltas un día no pasa nada: tu racha nunca se reinicia. Siempre te toca el siguiente regalo.</div></div>`;
       }
     } else if (modal === 'dibujo') {
       $('m-titulo').textContent = 'SIMON TE DIBUJÓ ALGO';
@@ -4132,7 +4530,7 @@
       $('m-titulo').textContent = 'TIENDA';
       h = `<div class="tabs t5"><button class="tab ${tab === 'ropa' ? 'on' : ''}" data-a="tab" data-k="ropa">ROPA</button><button class="tab ${tab === 'cuarto' ? 'on' : ''}" data-a="tab" data-k="cuarto">MUEBLES</button><button class="tab ${tab === 'comida' ? 'on' : ''}" data-a="tab" data-k="comida">COMIDA</button><button class="tab ${tab === 'juguetes' ? 'on' : ''}" data-a="tab" data-k="juguetes">JUGUETES</button><button class="tab ${tab === 'extras' ? 'on' : ''}" data-a="tab" data-k="extras">EXTRAS</button></div>` +
         `<div class="saldo"><span>MONEDAS: ${e.monedas}</span><span>CARIÑO NV${nivel()}</span></div>` +
-        (tab === 'cuarto' ? `<div class="tabs fh">${[['todo', 'TODO'], ['sala', 'RECÁMARA'], ['cocina', 'COCINA'], ['entrada', 'ENTRADA']].map(([f, t]) => `<button class="tab ${fHab === f ? 'on' : ''}" data-a="fh" data-k="${f}">${t}</button>`).join('')}</div>` : '') +
+        (tab === 'cuarto' ? `<div class="tabs fh">${[['todo', 'TODO'], ['juegos', 'JUEGOS'], ['sala', 'RECÁMARA'], ['cocina', 'COCINA'], ['entrada', 'ENTRADA']].map(([f, t]) => `<button class="tab ${fHab === f ? 'on' : ''}" data-a="fh" data-k="${f}">${t}</button>`).join('')}</div>` : '') +
         `<div class="centro" style="margin-bottom:10px;color:#aab4ff;font-size:7px">${tab === 'juguetes' ? 'Solo uno a la vez. Es el que Simon usa al JUGAR. Colócalo donde quieras desde la casita.' : tab === 'extras' ? 'Bombas para cuando Cortex se quede a descansar, y jarabe por si Simon se resfría.' : tab === 'comida' ? 'La comida especial da energía. ¡Algunas son una sorpresa!' : tab === 'cuarto' ? 'Los muebles se colocan donde quieras: toca la casita. Toca el cuadro de la pared para ver tus fotos.' : 'La corona siempre se queda puesta.'}</div><div class="cuadricula">` +
         ORDEN[tab].filter(k => (tab !== 'cuarto' || fHab === 'todo' || (esMueble(k) && (temaDe(k) === fHab || temaDe(k) === 'todas'))) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k])).map(k => {
           if (tab === 'comida') return cardComida(k);
@@ -4170,7 +4568,7 @@
     cu.querySelectorAll('canvas[data-prev]').forEach(c => {
       const g = prevGrid(c.dataset.prev);
       c.width = g.w; c.height = g.h; c.getContext('2d').drawImage(gridCanvas(g), 0, 0);
-      const z = c.dataset.prev.startsWith('lg_') ? 3 : c.dataset.prev.startsWith('juguete_') ? 4 : c.dataset.prev.startsWith('fo_') ? 3 : c.dataset.prev.startsWith('marco_') ? 2 : c.dataset.prev.startsWith('fd_') ? Math.max(2, Math.floor((c.closest('.mini') ? 32 : 54) / Math.max(g.w, g.h))) : c.dataset.prev.startsWith('pen_') ? Math.max(1, Math.floor(30 / Math.max(g.w, g.h))) : c.dataset.prev === 'caja' ? 4 : c.dataset.prev.startsWith('dib_') ? (c.parentElement.classList.contains('galeria') ? 3 : 8) : 2;
+      const z = c.dataset.prev.startsWith('lg_') ? 3 : c.dataset.prev.startsWith('juguete_') ? 4 : c.dataset.prev.startsWith('fo_') ? 3 : c.dataset.prev.startsWith('marco_') ? 2 : (c.dataset.prev.startsWith('fd_') || c.dataset.prev.startsWith('mj_')) ? Math.max(2, Math.floor((c.closest('.mini') ? 32 : 54) / Math.max(g.w, g.h))) : c.dataset.prev.startsWith('pen_') ? Math.max(1, Math.floor(30 / Math.max(g.w, g.h))) : c.dataset.prev === 'caja' ? 4 : c.dataset.prev.startsWith('dib_') ? (c.parentElement.classList.contains('galeria') ? 3 : 8) : 2;
       c.style.width = g.w * z + 'px'; c.style.height = g.h * z + 'px';
     });
     cu.scrollTop = sc;
@@ -4180,13 +4578,13 @@
     const a = b.dataset.a, k = b.dataset.k;
     if (a === 'tab') { tab = k; render(); } else if (a === 'fh') { fHab = k; sfx.click(); render(); } else if (a === 'comprar') comprar(k); else if (a === 'poner') poner(k);
     else if (a === 'quitar') quitar(k); else if (a === 'mcomprar') comprarMerc(k); else if (a === 'compartir') compartirFoto(); else if (a === 'guardar') guardarFoto(); else if (a === 'abrirreg') abrirRegalo(); else if (a === 'cerrar') cerrar();
-    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (a === 'mj_jugar') mjIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'it_tab') { invTab = k; sfx.click(); render(); } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_comprar') comprarComida(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a);
+    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'it_tab') { invTab = k; sfx.click(); render(); } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_comprar') comprarComida(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a);
   });
   $('m-x').onclick = cerrar;
   $('btn-tienda').onclick = () => { sfx.click(); abrir('tienda'); };
   $('btn-logros').onclick = () => { sfx.click(); abrir('logros'); };
   $('chip-mon').onclick = () => { sfx.click(); abrir('tienda'); };
-  $('chip-fue').onclick = () => { const r = racha(); toast(r ? 'RACHA: ' + r + (r === 1 ? ' DÍA' : ' DÍAS') + ' SEGUIDOS. ¡VUELVE MAÑANA!' : 'SIN RACHA. ¡ABRE TU REGALO PARA EMPEZAR!'); };
+  $('chip-fue').onclick = () => { const r = racha(); toast(r ? 'RACHA: ' + r + (r === 1 ? ' DÍA' : ' DÍAS') + '. ¡VUELVE MAÑANA!' : 'SIN RACHA. ¡ABRE TU REGALO PARA EMPEZAR!'); };
   $('chip-niv').onclick = () => { const n = nivel(); toast(n >= NMAX ? 'CARIÑO AL MÁXIMO' : 'CARIÑO ' + (e.xp - xpDe(n)) + '/' + (xpDe(n + 1) - xpDe(n)) + ' PARA NV' + (n + 1)); };
 
   function despertarPremio() { e.st.dormir++; mision('dormir'); ganar(2, 2); if (e.enf) curar('sueno'); }
@@ -4236,14 +4634,36 @@
     if (desc && !bm && !dlg && cortex.p >= 1 && x >= cxb() && x <= cxb() + 62 && y >= SY + SH - 76 && y <= SY + SH) { sfx.click(); if (desc.siesta && desc.zzz) siestaToque(); else toast('CORTEX: Shhh... descansando'); return; }
     const esc = escenaId();
     if (esc === 'entrada' && !(x >= SX && x <= SX + SW && y >= SY) && x >= OX + 6 && x <= OX + 48 && y >= RY - 44 && y <= RY + 40) { sfx.click(); abrir('mapa'); return; }
+    if (esc === 'juegos' && !dlg && !modal && x >= OX && x <= OX + 38 && y >= RY - 42 && y <= RY + 38 && !(x >= SX + 6 && y >= SY)) { if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('minijuegos'); return; }
     if (esc === 'cocina' && x >= OX + 88 && x <= OX + 118 && y >= RY - 28 && y <= RY + 36) { if (e.dormido) { decir('Zzz...'); return; } sfx.click(); abrir('comida'); return; }
     if (mercPres && !dlg && cortex.p >= 1 && x >= cxb() && x <= cxb() + 62 && y >= SY + SH - 76 && y <= SY + SH) { sfx.click(); abrir('comercio'); return; }
     if (esc === 'sala' && x >= OX + 66 && x <= OX + 104 && y >= RY - 59 + 15 && y <= RY - 59 + 45 && !(x >= SX && x <= SX + SW && y >= SY)) { sfx.click(); abrir('cuadro'); return; }
     if (e.hallazgo && x >= SX + SW - 8 && x <= SX + SW + 14 && y >= SY + 14 && y <= SY + 44) { accion(function recoger() { recogerHallazgo(); }); return; }
     if (esc === 'sala' && x >= OX + 88 && x <= OX + 118 && y >= RY - 59 + 44 && y <= RY - 59 + 82 && !(x <= SX + SW && y >= SY)) { plantaTocar(); return; }
-    if (x >= SX && x <= SX + SW && y >= SY && y <= SY + SH)
-      accion(mimar);
+    if (x >= SX && x <= SX + SW && y >= SY && y <= SY + SH) {   // acariciar: mover el dedo sobre Simon
+      if (e.dormido) { decir('Zzz...'); sfx.no(); return; }
+      acar = { x, y, tot: 0, acc: 0, cor: 0, ronr: 0, id: ev.pointerId };
+      try { cv.setPointerCapture(ev.pointerId); } catch (_) {}
+    }
   });
+  function acarMueve(ev) {
+    if (!acar || ev.pointerId !== acar.id) return;
+    const r = cv.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * LW, y = (ev.clientY - r.top) / r.height * LH;
+    const d = Math.hypot(x - acar.x, y - acar.y); acar.x = x; acar.y = y;
+    if (x < SX - 4 || x > SX + SW + 4 || y < SY - 4 || y > SY + SH + 4 || d > 40) return;   // solo cuenta mientras el dedo pasa por Simon
+    acar.tot += d; acar.acc += d; acar.cor += d; if (acar.tot < 5) return;
+    act = null; acarT = 8;
+    if (tk - acar.ronr > 3) { acar.ronr = tk; sfx.ronr(); }
+    if (acar.cor >= 26) { acar.cor = 0; corazones(1); }
+    if (acar.acc >= 90) { acar.acc = 0; e.carOk = 1; mimar(true); pintar(); guardar(); }
+  }
+  function acarSuelta(ev) {
+    if (!acar || (ev && ev.pointerId !== acar.id)) return;
+    const toque = acar.tot < 5; acar = null;
+    if (toque && !e.carOk) toast('Mueve el dedo sobre Simon para acariciarlo');
+    else if (toque) bocaT = 6;
+  }
+  cv.addEventListener('pointermove', acarMueve); cv.addEventListener('pointerup', acarSuelta); cv.addEventListener('pointercancel', acarSuelta);
   // El navegador no deja sonar nada hasta que el jugador toca la pantalla. Escuchamos varios tipos de gesto
   // (en el celular 'pointerdown' no cuenta, 'touchend' y 'click' sí) hasta que el audio de verdad esté activo.
   const GESTOS_AUDIO = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
@@ -4266,7 +4686,7 @@
     e.feliz = clamp(e.feliz - BAJA.feliz * h);
     e.energia = clamp(e.dormido ? e.energia + 20 * h : e.energia - BAJA.energia * h);
     if (e.dormido && e.energia >= 100) { e.dormido = false; sfx.despertar(); despertarPremio(); responder(); }
-    checkHallazgo(); checkVisita(); checkKeke(); checkMimos(); checkRopa(); checkSiesta(); checkMem(); checkEnf(); diaTick(); ambiente(); checkNotis(); lluviaCheck(); if (!e.mudo && (!ac || ac.state !== 'running')) armarAudio(); pintarAudioHint(); pintar(); guardar();
+    checkHallazgo(); checkVisita(); checkKeke(); checkMimos(); checkRopa(); checkSiesta(); checkTutorial(); checkCaja(); checkMem(); checkEnf(); diaTick(); ambiente(); checkNotis(); lluviaCheck(); if (!e.mudo && (!ac || ac.state !== 'running')) armarAudio(); pintarAudioHint(); pintar(); guardar();
   }, 5000);
 
   function volver() {
@@ -4295,16 +4715,20 @@
   else {
     setTimeout(() => { if (!modal && infoRegalo()) abrir('regalo'); }, 900);
     resumenAusencia(); prepararSaludo(); setTimeout(saludar, 1600); setTimeout(checkVisita, 4500);
-    if (!e.avisoMerc) { e.avisoMerc = true; guardar(); setTimeout(() => notificar('Cortex viene a comerciar una vez al día.'), 3000); }
+    if (!e.avisoMerc) { e.avisoMerc = true; guardar(); setTimeout(() => notificar('Cortex vendrá a venderte cosas una vez al día y te avisará antes de llegar.'), 3000); }
   }
   checkHallazgo(); actualizarTareas(); pintarIconos();
   if (e.intro) {
     if (!e.ultResp) { e.ultResp = Date.now(); guardar(); }
-    else if (Date.now() - e.ultResp > 7 * 86400000 && e.avisoResp !== hoy()) { e.avisoResp = hoy(); guardar(); setTimeout(() => toast('Haz un respaldo: toca el engranaje'), 6500); }
+    else if (e.intro && nivel() >= 3 && Date.now() - e.ultResp > 10 * 86400000 && Date.now() - (e.recT || 0) > 10 * 86400000) {   // máximo un recordatorio cada 10 días, solo en la campana (un aviso emergente la primera vez)
+      e.recT = Date.now(); const primera = !e.recToast; e.recToast = 1; guardar();
+      notificar('Hace tiempo que no guardas un respaldo. Hazlo en Ajustes (engranaje) > Respaldo, así no pierdes a Simon si cambias de celular.');
+      if (primera) setTimeout(() => toast('Mira la campana: hay un consejo para guardar tu progreso'), 6500);
+    }
     setTimeout(() => { const cl = clima(); if (cl !== 'sol' && e.avisoClima !== hoy()) { e.avisoClima = hoy(); guardar(); toast(TXT_CLIMA[cl]); } }, 7500);
     setTimeout(() => { if (!e.avisoDice) { e.avisoDice = 1; guardar(); notificar('SIMON DICE tiene preguntas y misiones.'); } }, 4500);
   }
-  window.__simon = { get e() { return e; }, mimar, COMIDAS, darComida, entrarEdicion, colocar, get edit() { return edit; }, quiereKeke, clima, FX, mision, preguntar, nuevaRonda, adivinar, crearCodigo, leerCodigo, MIS, SEC, get ronda() { return ronda; }, accion, comer, jugar, dormir, dice, ganar, darXp, nivel, abrir, cerrar, infoRegalo, comprar, ITEMS, LOGROS, gesto, sprite, simonGrid, pintar, guardar, get act() { return act; }, mercInfo, mercTick, ofertasHoy, get mercPres() { return mercPres; }, iniciarIntro, iniciarVisita, checkVisita, get dlg() { return dlg; }, iniciarAct, checkHallazgo, recogerHallazgo, actualizarTareas, simonAsusta, comentaRopa, equipar, poner, iniciarSiesta, siestaToque, checkMem, checkSiesta, lanzarBomba, reaccionCortex, get desc() { return desc; }, get bm() { return bm; }, get cortexP() { return cortex.p; }, enfermar, curar, checkEnf, diaTick, diaTexto, rtIniciar, rtTap, get rt() { return rt; }, temaMus, ambiente, mus: () => mus, dx };   // ayuda para pruebas
+  window.__simon = { runIniciar, runSalto, get run() { return run; }, memIniciar, memClick, get mem() { return mem; }, get e() { return e; }, mimar, COMIDAS, darComida, entrarEdicion, colocar, get edit() { return edit; }, quiereKeke, clima, FX, mision, preguntar, nuevaRonda, adivinar, crearCodigo, leerCodigo, MIS, SEC, get ronda() { return ronda; }, accion, comer, jugar, dormir, dice, ganar, darXp, nivel, abrir, cerrar, infoRegalo, comprar, ITEMS, LOGROS, gesto, sprite, simonGrid, pintar, guardar, get act() { return act; }, mercInfo, mercTick, ofertasHoy, get mercPres() { return mercPres; }, iniciarIntro, iniciarVisita, checkVisita, get dlg() { return dlg; }, iniciarAct, checkHallazgo, recogerHallazgo, actualizarTareas, simonAsusta, comentaRopa, equipar, poner, iniciarSiesta, siestaToque, checkMem, checkSiesta, lanzarBomba, reaccionCortex, get desc() { return desc; }, get bm() { return bm; }, get cortexP() { return cortex.p; }, enfermar, curar, checkEnf, diaTick, diaTexto, rtIniciar, rtTap, get rt() { return rt; }, temaMus, ambiente, mus: () => mus, dx };   // ayuda para pruebas
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
 </script>
