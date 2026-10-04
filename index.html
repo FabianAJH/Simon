@@ -2030,6 +2030,7 @@
   const cortex = { p: 0, dir: 0, cb: null };
   const cxb = () => SX + 26;   // borde izquierdo de Cortex: siempre pegado a Simon, sea cual sea el ancho de la pantalla
   let dlg = null, introActiva = false;
+  function noEst(msg) { if (escenaId() !== 'estudio') return false; decir('Sí... (' + (msg || 'estoy en el estudio') + ')'); sfx.no(); return true; }
   const GLEN = { baile: 14, giro: 10, robot: 16, twist: 12 };
   const GESTOS = [
     { nv: 1, id: 'salto', n: 'SALTITO' }, { nv: 3, id: 'baile', n: 'BAILE' }, { nv: 5, id: 'giro', n: 'GIRO' },
@@ -2385,7 +2386,7 @@
   let proxKeke = Date.now() + 70000;
   function quiereKeke() { decir('¡Quiero keke!', null, 3200); hablar(); gesto('salto'); sfx.pregunta(); }
   function checkKeke() {
-    if (Date.now() < proxKeke || modal || dlg || e.dormido || cortex.p || cortex.dir || introActiva || mercPres) return;
+    if (Date.now() < proxKeke || escenaId() === 'estudio' || modal || dlg || e.dormido || cortex.p || cortex.dir || introActiva || mercPres) return;
     const hambre = e.hambre < 55;
     if (hambre || Math.random() < .5) quiereKeke();
     proxKeke = Date.now() + (hambre ? 150 + Math.random() * 200 : 480 + Math.random() * 600) * 1000;
@@ -2940,7 +2941,7 @@
     }));
   }
   function checkVisita() {
-    if (lugar || !e.intro || introActiva || dlg || cortex.dir || cortex.p || modal || e.dormido || saludoPend || mercPres || mercBusy || ahora() < e.proxVisita || mercInfo().est === 'aqui') return;
+    if (escenaId() === 'estudio' || lugar || !e.intro || introActiva || dlg || cortex.dir || cortex.p || modal || e.dormido || saludoPend || mercPres || mercBusy || ahora() < e.proxVisita || mercInfo().est === 'aqui') return;
     iniciarVisita();
   }
 
@@ -3075,7 +3076,7 @@
   /* ===================== TUTORIAL DE LA PANTALLA (Cortex explica los botones) ===================== */
   function tutRes(sel) { document.querySelectorAll('.resalta').forEach(x => x.classList.remove('resalta')); if (sel) document.querySelectorAll(sel).forEach(x => x.classList.add('resalta')); }
   const CT = (t, sel) => ({ q: 'CORTEX', t, pre: () => tutRes(sel) });
-  function libreParaTutorial() { return e.intro && !introActiva && !lugar && !e.dormido && !dlg && !modal && !cortex.p && !cortex.dir && !mercPres && !mercBusy && !desc && !bm && !mj && !edit && !saludoPend && mercInfo().est !== 'aqui'; }
+  function libreParaTutorial() { return escenaId() !== 'estudio' && e.intro && !introActiva && !lugar && !e.dormido && !dlg && !modal && !cortex.p && !cortex.dir && !mercPres && !mercBusy && !desc && !bm && !mj && !edit && !saludoPend && mercInfo().est !== 'aqui'; }
   function iniciarTutorial() {
     act = null; document.body.classList.add('tut');
     cortexEntra(() => dialogo([
@@ -3151,7 +3152,7 @@
     23: 'Nunca te lo dije, pero el día que te encontré, tú me encontraste a mí.', 24: 'Ya casi llegamos a lo más alto. Gracias por cuidarlo tan bien.', 25: 'Nivel máximo. Simon vino de otro planeta y encontró un hogar. Gracias por eso.' };
   const LV_RESP = ['Yo también me acuerdo.', 'Fue un gran día.', '¿Había keke ese día?', 'Gracias por encontrarme.'];
   function checkMem() {
-    if (!e.memPend.length || modal || dlg || introActiva || cortex.p || cortex.dir || mercPres || mj || e.dormido || edit || saludoPend) return;
+    if (!e.memPend.length || escenaId() === 'estudio' || modal || dlg || introActiva || cortex.p || cortex.dir || mercPres || mj || e.dormido || edit || saludoPend) return;
     const n = e.memPend.shift(); guardar();
     dialogo([C('¡Me llegó la noticia: Simon subió al nivel ' + n + '!'), C(LV_MEM[n] || 'Cada día que pasa, lo quiero más.'), S(), T(elige(LV_RESP))]);
   }
@@ -3203,7 +3204,7 @@
       e.merc.aviso = true; guardar(); sfx.nivel();
       toast('¡Cortex vendrá a comerciar en ' + Math.max(1, Math.round((I.llega - I.t) / 60000)) + ' min!');
     }
-    if (I.est === 'aqui' && !lugar && !mercPres && !mercBusy && !dlg && !cortex.dir && !cortex.p && !modal) {
+    if (I.est === 'aqui' && escenaId() !== 'estudio' && !lugar && !mercPres && !mercBusy && !dlg && !cortex.dir && !cortex.p && !modal) {
       mercBusy = true; act = null; mercPres = true; notificar('Cortex llegó de comerciante. Se queda 15 minutos.');
       const resto = Math.max(1, Math.round((I.fin - I.t) / 60000)), fresco = I.t - I.llega < 90000;
       cortexEntra(() => { mercBusy = false; dialogo(fresco
@@ -4616,7 +4617,7 @@
   function comentaRopa(k) { const t = ROPA_COM[k]; if (!t) return; decir('Sí.', e.traductor ? t : null, 3600); hablar(); gesto('salto'); corazones(1); }
   function checkRopa() {
     if (ropaPend) {
-      if (modal || dlg || e.dormido || cortex.p || cortex.dir || introActiva || mj) return;
+      if (escenaId() === 'estudio' || modal || dlg || e.dormido || cortex.p || cortex.dir || introActiva || mj) return;
       const k = ropaPend; ropaPend = null; comentaRopa(k); ropaProx = Date.now() + (10 + Math.random() * 10) * 60000; return;
     }
     if (Date.now() < ropaProx || modal || dlg || e.dormido || cortex.p || cortex.dir || introActiva || mercPres || mj) return;
@@ -4874,7 +4875,7 @@
     const a = b.dataset.a, k = b.dataset.k;
     if (a === 'tab') { tab = k; render(); } else if (a === 'fh') { fHab = k; sfx.click(); render(); } else if (a === 'comprar') comprar(k); else if (a === 'poner') poner(k);
     else if (a === 'quitar') quitar(k); else if (a === 'mcomprar') comprarMerc(k); else if (a === 'compartir') compartirFoto(); else if (a === 'guardar') guardarFoto(); else if (a === 'abrirreg') abrirRegalo(); else if (a === 'cerrar') cerrar();
-    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('est_')) estClick(a, k); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'it_tab') { invTab = k; sfx.click(); render(); } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_comprar') comprarComida(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a);
+    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (['mj_jugar', 'run_jugar', 'rt_jugar', 'mem_jugar'].includes(a) && noEst('ahora toca estudiar, no jugar')) { return; } else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('est_')) estClick(a, k); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'it_tab') { invTab = k; sfx.click(); render(); } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_comprar') comprarComida(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a);
   });
   $('m-x').onclick = cerrar;
   $('btn-tienda').onclick = () => { sfx.click(); abrir('tienda'); };
@@ -4918,10 +4919,10 @@
     }, 2300);
   }
 
-  $('btn-comer').onclick = () => { if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('comida'); };
-  $('btn-jugar').onclick = () => accion(jugar);
-  $('btn-dormir').onclick = () => { if (lugar) { decir('Sí. (mejor dormimos en casa)'); sfx.no(); return; } if (!e.dormido && e.hab !== 'sala') { decir('Sí... (yo duermo en mi recámara)'); sfx.no(); return; } accion(dormir); };
-  $('btn-dice').onclick = () => { if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('dice'); };
+  $('btn-comer').onclick = () => { if (noEst('ahora toca estudiar, no comer')) return; if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('comida'); };
+  $('btn-jugar').onclick = () => { if (noEst('ahora toca estudiar, no jugar')) return; accion(jugar); };
+  $('btn-dormir').onclick = () => { if (noEst('yo duermo en mi recámara')) return; if (lugar) { decir('Sí. (mejor dormimos en casa)'); sfx.no(); return; } if (!e.dormido && e.hab !== 'sala') { decir('Sí... (yo duermo en mi recámara)'); sfx.no(); return; } accion(dormir); };
+  $('btn-dice').onclick = () => { if (noEst('ahora toca estudiar, no jugar')) return; if (e.dormido) { decir('Zzz...'); sfx.no(); return; } sfx.click(); abrir('dice'); };
   function alternaSonido() { e.mudo = !e.mudo; if (!e.mudo) { sfx.click(); musicaOn(); } else musicaOff(); lluviaCheck(); pintar(); guardar(); }
   cv.addEventListener('pointerdown', ev => {
     ajustaSY();
