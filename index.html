@@ -3836,7 +3836,8 @@
   }
   function renderAj() {
     const aud = `<div style="display:flex;gap:8px;margin-bottom:10px"><button class="bt ${e.mudo ? '' : 'ok'}" style="flex:1;padding:12px 0" data-a="r_snd">SONIDO ${e.mudo ? 'OFF' : 'ON'}</button><button class="bt ${e.musica && !e.mudo ? 'ok' : ''}" style="flex:1;padding:12px 0" data-a="r_mus">MÚSICA ${e.musica && !e.mudo ? 'ON' : 'OFF'}</button></div>`;
-    return aud + renderAj0() + `<button class="bt gran" style="padding:10px 0;margin-top:10px" data-a="tut_ver">VER TUTORIAL DE LA PANTALLA</button><div class="centro" style="font-size:7px;color:#aab4ff;margin-top:14px">SIMON: TU AMIGO VIRTUAL · VERSIÓN ${VERSION_JUEGO}</div>`;
+    const ntb = `<button class="bt ${e.notifOn ? 'ok' : ''} gran" style="padding:12px 0;margin-bottom:10px" data-a="nt_tog">AVISOS AL TELÉFONO: ${e.notifOn ? 'SÍ' : 'NO'}</button>`;
+    return aud + (admin ? '' : ntb) + renderAj0() + `<button class="bt gran" style="padding:10px 0;margin-top:10px" data-a="tut_ver">VER TUTORIAL DE LA PANTALLA</button><div class="centro" style="font-size:7px;color:#aab4ff;margin-top:14px">SIMON: TU AMIGO VIRTUAL · VERSIÓN ${VERSION_JUEGO}</div>`;
   }
   function renderAj0() {
     $('m-titulo').textContent = 'AJUSTES';
@@ -4552,6 +4553,61 @@
       } }
     pintarNotis();
   }
+  /* ===================== AVISOS DEL SISTEMA (PWA hoy, APK después) ===================== */
+  // Un solo punto de salida: en la APK (Capacitor) se programan con LocalNotifications y suenan con la app cerrada;
+  // en el navegador salen solo si la app sigue viva en segundo plano (no hay servidor de push).
+  const ntNativo = () => { try { return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications || null; } catch (_) { return null; } };
+  let ntTimers = [], ntSig = '';
+  function ntPendientes() {
+    const L = [], now = Date.now(), H = 3600000;
+    const add = (id, ms, body, tag) => { if (ms > now + 20000) L.push({ id, ts: Math.round(ms), body, tag: tag || 'simon-' + id }); };
+    if (e.dormido) add(1, now + Math.max(0, (100 - e.energia) / 50) * H, 'Simon despertó. ¡Ya descansó!');
+    else {
+      if (e.hambre > 25) add(2, now + (e.hambre - 25) / BAJA.hambre * H, 'Simon tiene hambre. ¿Un keke?');
+      if (e.feliz > 25) add(3, now + (e.feliz - 25) / BAJA.feliz * H, 'Simon está triste. Necesita mimos o jugar.');
+      if (e.energia > 20) add(4, now + (e.energia - 20) / BAJA.energia * H, 'Simon tiene poca energía. Déjalo dormir o dale algo de comer.');
+    }
+    try { const I = mercInfo(); if (I.est === 'espera' || I.est === 'aviso') add(5, now + (I.llega - ahora()), 'Cortex llegó de comerciante. Se queda 15 minutos.'); } catch (_) {}
+    try { if (!infoRegalo()) { const d = new Date(ahora()); d.setDate(d.getDate() + 1); d.setHours(10, 0, 0, 0); add(6, now + (d.getTime() - ahora()), 'Tienes un regalo diario por reclamar.'); } } catch (_) {}
+    if (e.est) add(7, now + (e.est.fin - Date.now()), e.est.fase === 'estudio' ? '¡Sesión terminada! Toca descansar.' : 'Se acabó el descanso: a estudiar.', 'simon-est');
+    return L;
+  }
+  function ntMostrar(n) {
+    try {
+      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+        const o = { body: n.body, icon: 'icon-192.png', tag: n.tag };
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) navigator.serviceWorker.ready.then(r => r.showNotification('Simon', o)).catch(() => { new Notification('Simon', o); }); else new Notification('Simon', o);
+      }
+    } catch (_) {}
+  }
+  function notifSync(forzar) {
+    if (admin || reseteando) return;
+    const L = e.notifOn ? ntPendientes() : [], sig = L.map(n => n.id + ':' + Math.round(n.ts / 60000)).join('|');
+    if (!forzar && sig === ntSig) return;
+    ntSig = sig;
+    const LN = ntNativo();
+    if (LN) {
+      try {
+        LN.getPending().then(p => (p && p.notifications && p.notifications.length ? LN.cancel({ notifications: p.notifications.map(x => ({ id: x.id })) }) : null)).catch(() => {}).then(() => {
+          if (L.length) LN.schedule({ notifications: L.map(n => ({ id: n.id, title: 'Simon', body: n.body, schedule: { at: new Date(n.ts), allowWhileIdle: true } })) }).catch(() => {});
+        });
+      } catch (_) {}
+      return;
+    }
+    ntTimers.forEach(clearTimeout); ntTimers = [];
+    L.forEach(n => { if (n.ts - Date.now() < 2147000000) ntTimers.push(setTimeout(() => ntMostrar(n), n.ts - Date.now())); });
+  }
+  function notifToggle() {
+    if (e.notifOn) { e.notifOn = 0; notifSync(true); guardar(); sfx.click(); toast('Avisos al teléfono apagados'); render(); return; }
+    const ok = () => { e.notifOn = 1; notifSync(true); guardar(); sfx.compra(); toast('¡Avisos al teléfono activados!'); render(); };
+    const no = () => { sfx.no(); toast('Sin permiso: actívalo en los ajustes del ' + (ntNativo() ? 'teléfono' : 'navegador')); };
+    const LN = ntNativo();
+    if (LN) { try { LN.requestPermissions().then(r => (r && r.display === 'granted') ? ok() : no()).catch(no); } catch (_) { no(); } return; }
+    if (!('Notification' in window)) { sfx.no(); toast('Este navegador no permite avisos'); return; }
+    if (Notification.permission === 'granted') { ok(); return; }
+    if (Notification.permission === 'denied') { no(); return; }
+    try { Notification.requestPermission().then(p => p === 'granted' ? ok() : no()); } catch (_) { no(); }
+  }
   function iconoNot() {
     const g = Grid(11, 11), m = ['.....k.....', '...kkwkk...', '..kwwwwwk..', '..kwwwwwk..', '..kwwwwwk..', '.kwwwwwwwk.', '.kwwwwwwwk.', 'kkkkkkkkkkk', '....kyk....', '.....k.....', '...........'];
     m.forEach((f, y) => [...f].forEach((ch, x) => { if (ch === 'w') g.set(x, y, '#e8ecff'); else if (ch === 'k') g.set(x, y, '#232b63'); else if (ch === 'y') g.set(x, y, '#ffd84a'); }));
@@ -4878,7 +4934,7 @@
     const a = b.dataset.a, k = b.dataset.k;
     if (a === 'tab') { tab = k; render(); } else if (a === 'fh') { fHab = k; sfx.click(); render(); } else if (a === 'comprar') comprar(k); else if (a === 'poner') poner(k);
     else if (a === 'quitar') quitar(k); else if (a === 'mcomprar') comprarMerc(k); else if (a === 'compartir') compartirFoto(); else if (a === 'guardar') guardarFoto(); else if (a === 'abrirreg') abrirRegalo(); else if (a === 'cerrar') cerrar();
-    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (['mj_jugar', 'run_jugar', 'rt_jugar', 'mem_jugar'].includes(a) && noEst('ahora toca estudiar, no jugar')) { return; } else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('est_')) estClick(a, k); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'it_tab') { invTab = k; sfx.click(); render(); } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_comprar') comprarComida(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a);
+    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (['mj_jugar', 'run_jugar', 'rt_jugar', 'mem_jugar'].includes(a) && noEst('ahora toca estudiar, no jugar')) { return; } else if (a === 'nt_tog') { notifToggle(); return; } else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('est_')) estClick(a, k); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'it_tab') { invTab = k; sfx.click(); render(); } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_comprar') comprarComida(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a);
   });
   $('m-x').onclick = cerrar;
   $('btn-tienda').onclick = () => { sfx.click(); abrir('tienda'); };
@@ -4990,7 +5046,7 @@
     e.energia = clamp(e.dormido ? e.energia + 50 * h : e.energia - BAJA.energia * h);
     if (e.dormido && e.energia >= 100) { e.dormido = false; sfx.despertar(); despertarPremio(); responder(); }
     if (e.energia < 20 && !e.dormido && !avEn) { avEn = true; if (!modal && !dlg) avisoSueno(); } if (e.energia >= 40) avEn = false;
-    checkHallazgo(); checkVisita(); checkKeke(); checkMimos(); checkRopa(); checkSiesta(); checkTutorial(); checkCaja(); checkMem(); checkEnf(); diaTick(); ambiente(); checkNotis(); lluviaCheck(); if (!e.mudo && (!ac || ac.state !== 'running')) armarAudio(); pintarAudioHint(); pintar(); guardar();
+    notifSync(); checkHallazgo(); checkVisita(); checkKeke(); checkMimos(); checkRopa(); checkSiesta(); checkTutorial(); checkCaja(); checkMem(); checkEnf(); diaTick(); ambiente(); checkNotis(); lluviaCheck(); if (!e.mudo && (!ac || ac.state !== 'running')) armarAudio(); pintarAudioHint(); pintar(); guardar();
   }, 5000);
 
   function volver() {
@@ -5002,7 +5058,7 @@
     if (ausenciaH >= 1) { resumenAusencia(); prepararSaludo(); setTimeout(saludar, 900); }
     checkHallazgo(); actualizarTareas(); setTimeout(checkVisita, 3000);
   }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) { guardar(); musicaOff(); lluviaOff(); estSndOff(); } else { volver(); armarAudio(); musicaOn(); lluviaCheck(); } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { notifSync(true); guardar(); musicaOff(); lluviaOff(); estSndOff(); } else { volver(); armarAudio(); musicaOn(); lluviaCheck(); } });
   window.addEventListener('resize', ajustar);
 
   cargar(); pintar(); guardar(); try { destrabarAudio(); } catch (_) {}
