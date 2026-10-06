@@ -590,7 +590,7 @@
   const CLAVE_BK = 'simon-v1-bk';
   const ESQUEMA = 1;
   let guardaCount = 0;
-  const VERSION_JUEGO = 'Beta v.397';
+  const VERSION_JUEGO = 'Beta v.399';
 
   /* === IndexedDB helper (respaldo silencioso) === */
   const IDB_NAME = 'simon-idb', IDB_STORE = 'save';
@@ -699,7 +699,7 @@
     ropa: { cara: null, cuello: null, orejas: null, espalda: null, aura: null, sudadera: 'sud_azul' },
     fuente: 1, ing: {}, musica: true, ultResp: 0, avisoResp: '', sec: {}, pens: {}, preg: null, mis: null, adv: { f: '', n: 0 }, cod: {}, deco: [{ k: 'puf_azul', x: -45, y: 90, f: 0, h: 'sala' }, { k: 'juguete_pelota', x: 43, y: 92, f: 0, h: 'sala' }], mig2: 1, comida: {}, probo: {}, mimos: { n: 0, t: 0, harto: false }, mimosDia: { f: '', xp: 0, coins: 0, av: 0 }, bombas: 0, memPend: [], notis: [], nHam: 0, nFel: 0, nRegalo: '', nClima: '', enf: 0, enfAb: 0, malS: 0, meds: 0, rt: { rec: 0, dia: '', monHoy: 0 }, proxSiesta: 0, ultBomba: -1, ultBombaT: 0,
     cuarto: { pared: 'pared_azul', alfombra: 'alf_roja', izq: null, der: null, cuadro: 'marco_corona' }, album: [], cuadroFoto: '', hab: 'sala',
-    tiene: { sud_azul: 1, pared_azul: 1, alf_roja: 1, marco_corona: 1, marco_foto: 1, puf_azul: 1, juguete_pelota: 1 },
+    tiene: { sud_azul: 1, pared_azul: 1, alf_roja: 1, marco_corona: 1, puf_azul: 1, juguete_pelota: 1 },
     st: { si: 0, comer: 0, jugar: 0, dice: 0, toques: 0, dormir: 0, compras: 0, pizzas: 0, plantas: 0, visitas: 0, tratos: 0, fotos: 0, adiv: 0, misiones: 0, bombas: 0, parque: 0, mj: 0, rt: 0, mem: 0, run: 0 }, run: { rec: 0, dia: '', monHoy: 0 }, mj: { rec: 0, dia: '', monHoy: 0, rompio: 0 }, mem: { rec: 0, dia: '', monHoy: 0 }, eco: { f: '', c: 0, x: 0, fr: 0, av: 0 },
     intro: false, traductor: false, proxVisita: 0, ultTip: -1, logros: {}, merc: null, avisoMerc: false, planta: null, hallazgo: null, proxHallazgo: Date.now() + 180000, dibujos: {},
     jardin: { plots: [] }, semillas: {}, macetaVida: {}
@@ -2204,7 +2204,7 @@
   const cuadroArte = () => arteDe(e.cuarto.cuadro);
   const cuadroMc = () => e.cuarto.cuadro === 'marco_foto' ? MFOTO : (ITEMS[e.cuarto.cuadro] || ITEMS.marco_corona).mc;
   function marcoGrid(k) { const g = Grid(38, 30); marcoDib(g, 0, 0, arteDe(k), k === 'marco_foto' ? MFOTO : ITEMS[k].mc); return g; }
-  // foto -> pixel art de 28x20 con paleta de hasta 16 colores
+  // foto -> pixel art de 28x20 con paleta de hasta 16 colores, se cuelga sola en el cuadro
   function pixelarFoto() {
     try {
       const w = LW, h = Math.round(LW * 20 / 28), sy = Math.max(0, Math.min(LH - h, SY - 4));
@@ -2225,7 +2225,7 @@
   }
   function renderCuadro() {
     $('m-titulo').textContent = 'TU CUADRO';
-    const act = e.cuarto.cuadro, obras = Object.keys(ITEMS).filter(k => ITEMS[k].slot === 'cuadro' && k !== 'marco_foto' && e.tiene[k]);
+    const act = e.cuarto.cuadro, obras = Object.keys(ITEMS).filter(k => ITEMS[k].slot === 'cuadro' && e.tiene[k]);
     const fecha = f => f.split('-').slice(1).reverse().join('/');
     let h = `<div class="centro" style="font-size:8px;color:#ffd84a;margin-bottom:8px">MIS FOTOS ${e.album.length}/${ALBUM_MAX}</div>`;
     if (!e.album.length) h += `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff">Tus fotos quedan aquí. La última se cuelga sola.</div>`;
@@ -2242,7 +2242,6 @@
   }
   Object.assign(ITEMS, {
     marco_corona:   { tipo: 'cuarto', slot: 'cuadro', n: 'OBRA: CORONA',    p: 0,   nv: 1, grid: () => marcoGrid('marco_corona'),   arte: arteCorona,   mc: ORO },
-    marco_foto:     { tipo: 'cuarto', slot: 'cuadro', n: 'OBRA: TU FOTO',   p: 0,   nv: 1, grid: () => marcoGrid('marco_foto'),     arte: arteFotoVacia, mc: MFOTO },
     marco_keke:     { tipo: 'cuarto', slot: 'cuadro', n: 'OBRA: KEKE',      p: 60,  nv: 1, grid: () => marcoGrid('marco_keke'),     arte: arteKeke,     mc: ['#4a2a10', '#a86a30', '#d8a060', '#6a3a14'] },
     marco_cortex:   { tipo: 'cuarto', slot: 'cuadro', n: 'OBRA: CORTEX',    p: 120, nv: 3, grid: () => marcoGrid('marco_cortex'),   arte: arteCortex,   mc: ['#08060c', '#3a3548', '#6a647c', '#150f20'] },
     marco_planeta:  { tipo: 'cuarto', slot: 'cuadro', n: 'OBRA: SU PLANETA', p: 150, nv: 1, grid: () => marcoGrid('marco_planeta'), arte: artePlaneta,  mc: ['#3a3a5a', '#c8c8e0', '#f0f0ff', '#8a8aa8'], mercader: true },
@@ -2556,7 +2555,7 @@
     comida: [],
     cuarto: ['pared_azul', 'pared_rosa', 'pared_verde', 'alf_roja', 'alf_azul', 'alf_verde', 'planta', 'guitarra', 'lampara', 'pato', 'pared_noche', 'alf_dorada', 'dino', 'cohete', 'pared_halloween', 'calabaza', 'arbol', 'neon_si', 'mesita', 'maceta', 'cactus', 'baul', 'sofa', 'librero', 'tele', 'globo', 'acuario', 'telescopio', 'reloj', 'cuadro_keke', 'guirnalda', 'estante', 'neon_corazon', 'espejo']
   };
-  ORDEN.cuarto.push('marco_foto', 'marco_keke', 'marco_cortex', 'marco_planeta', 'marco_boom', 'marco_estrellas');
+  ORDEN.cuarto.push('marco_keke', 'marco_cortex', 'marco_planeta', 'marco_boom', 'marco_estrellas');
   const PORDEFECTO = { sudadera: 1, pared: 1, alfombra: 1, cuadro: 1, juguete: 1 };   // estos huecos siempre llevan algo puesto
 
   /* ===================== ESTILOS DE PARED, PISO Y REFRI ===================== */
@@ -8671,7 +8670,7 @@
     if (t === 'bano' || t === 'estudio') return t;
     return it.exclusivo ? t : null;
   };
-  const baseTienda = k => (tab !== 'cuarto' || !habBloq(k)) && (tab !== 'ropa' || fRopa === 'todo' || (fRopa === 'prem' ? ITEMS[k].prem : ITEMS[k].slot === fRopa)) && (tab !== 'cuarto' || fHab === 'todo' || ((esMueble(k) || ITEMS[k].pat || ITEMS[k].refri || ITEMS[k].util) && (fHab === 'general' ? !restriccionHab(k) : restriccionHab(k) === fHab))) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k] || ITEMS[k].prem);
+  const baseTienda = k => (tab !== 'cuarto' || !habBloq(k)) && (tab !== 'ropa' || fRopa === 'todo' || (fRopa === 'prem' ? (ITEMS[k].prem && !ITEMS[k].mascota) : ITEMS[k].slot === fRopa)) && (tab !== 'cuarto' || fHab === 'todo' || ((esMueble(k) || ITEMS[k].pat || ITEMS[k].refri || ITEMS[k].util) && (fHab === 'general' ? !restriccionHab(k) : restriccionHab(k) === fHab))) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k] || ITEMS[k].prem);
   var tv = 'hub', tvPre = false, tsel = null, tSheetH = '';
   const CATS = [['ropa', 'ROPA', 'sud_azul'], ['cuarto', 'MUEBLES', 'silla'], ['comida', 'COMIDA', 'fd_dona'], ['mkt', 'MERCADO', 'ig_jitomate'], ['juguetes', 'JUGUETES', 'juguete_azul'], ['semillas', 'SEMILLAS', 'sm_brote'], ['extras', 'EXTRAS', 'fd_bomba'], ['prem', 'PREMIUM', 'alas_angel']];
   const catDe = k => ['ropa', 'cuarto', 'juguetes'].find(t => ORDEN[t].includes(k));
@@ -8748,8 +8747,8 @@
       const nv = nivel(), top = Object.keys(ITEMS).filter(k => compraOk(k) && ITEMS[k].nv > 1 && ITEMS[k].nv <= nv && catDe(k)).sort((a, b) => ITEMS[b].nv - ITEMS[a].nv).slice(0, 4);
       let h = `<div class="th-top"><span>CARIÑO NV${nv}</span>${mon}</div>`;
       h += `<div class="th-g2">${CATS.filter(([c]) => (c !== 'mkt' || !habBloq0('cocina')) && (c !== 'semillas' || !habBloq0('jardin'))).map(([c, n, pv]) => { const nw = nuevosCat(c); let sub = '';
-        if (c === 'ropa') sub = ORDEN.ropa.filter(k => !ITEMS[k].prem && e.tiene[k]).length + '/' + ORDEN.ropa.filter(k => !ITEMS[k].prem).length;
-        else if (c === 'prem') sub = ORDEN.ropa.filter(k => ITEMS[k].prem && e.tiene[k]).length + '/' + ORDEN.ropa.filter(k => ITEMS[k].prem).length;
+        if (c === 'ropa') sub = ORDEN.ropa.filter(k => !(ITEMS[k].prem && !ITEMS[k].mascota) && e.tiene[k]).length + '/' + ORDEN.ropa.filter(k => !(ITEMS[k].prem && !ITEMS[k].mascota)).length;
+        else if (c === 'prem') sub = ORDEN.ropa.filter(k => ITEMS[k].prem && !ITEMS[k].mascota && e.tiene[k]).length + '/' + ORDEN.ropa.filter(k => ITEMS[k].prem && !ITEMS[k].mascota).length;
         else if (c === 'cuarto' || c === 'juguetes') sub = ORDEN[c].filter(k => e.tiene[k]).length + '/' + ORDEN[c].length;
         return `<button class="th-t ${c === 'prem' ? 'prem' : ''}" data-a="tv_cat" data-k="${c}">${nw ? `<span class="th-pill">${nw} NUEVO${nw > 1 ? 'S' : ''}</span>` : ''}<div class="th-pv"><canvas data-prev="${pv}"></canvas></div><b>${n}</b>${sub ? `<i>${sub} TUYOS</i>` : ''}</button>`; }).join('')}</div>`;
       if (top.length) h += `<div class="th-ban" style="margin:14px 0 0"><small>★ LO ULTIMO DESBLOQUEADO ★</small><div class="th-r">${top.map(k => `<button data-a="tv_item" data-k="${k}"><canvas data-prev="${k}"></canvas></button>`).join('')}</div></div>`;
