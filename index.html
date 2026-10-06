@@ -130,13 +130,14 @@
   #edicion { background:linear-gradient(#2c3688,#1a2150); border-top:4px solid #ffd84a; border-radius:0; padding-top:8px; }
   #ed-bd { background:#12163a; box-shadow:inset 0 0 0 2px #3a47a8; padding:7px; margin-bottom:8px; }
   #ed-bd > button { background:#e8ecff; } #ed-bd > button.sel { background:#fff6c0; transform:translateY(-2px); }
-  #ed-capa { display:flex; align-items:stretch; gap:6px; margin-bottom:8px; background:var(--noche); box-shadow:0 0 0 2px var(--linea); padding:6px; }
-  #ed-capa .ec { flex:1; display:flex; align-items:center; justify-content:center; gap:6px; font:inherit; font-size:7px; color:var(--tinta); background:#8ae0ff; border:0; padding:10px 4px; box-shadow:inset 0 -3px 0 #3a9ac8, 0 0 0 2px var(--linea); }
-  #ed-capa .ec:active { transform:translateY(2px); box-shadow:0 0 0 2px var(--linea); } #ed-capa .ec canvas { width:18px; height:18px; image-rendering:pixelated; flex:0 0 auto; }
-  #ed-capa.off .ec, #ed-capa.off #ed-cn { opacity:.4; } #ed-cn { flex:0 0 64px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; } #ed-cn small { font-size:6px; color:#aab4ff; } #ed-cn b { font-size:9px; color:#ffd84a; font-weight:normal; }
+  #ed-capa-ctrl { display:flex; align-items:center; gap:3px; position:absolute; left:50%; top:-48px; transform:translateX(-50%); z-index:26; }
+  #ed-capa-ctrl .ibtn { background:#ffd84a; border-color:#1a1f4a; color:#1a1f4a; font-size:14px; font-weight:bold; }
+  #ed-capa-ctrl .ibtn:active { background:#ffe88a; }
+  #ed-ci { font-size:7px; color:#ffd84a; min-width:26px; text-align:center; text-shadow:0 0 4px #000; }
+  #ed-capa-ctrl.off { opacity:.4; pointer-events:none; }
   #cg { display:none; position:absolute; inset:0; z-index:26; background:#2a2230; flex-direction:column; align-items:center; }
   #cg.on { display:flex; } #cg-bar { width:100%; display:flex; justify-content:space-between; align-items:center; padding:8px 12px 2px; box-sizing:border-box; } #cg-t { font-size:9px; color:#ffd84a; } #cg-x { padding:6px 10px; font-size:8px; } #cg-h { display:none; width:min(92%,360px); height:10px; background:#12102a; box-shadow:0 0 0 2px #5a4a8a; margin:4px 0 8px; } #cg-hb { height:100%; width:100%; background:#5ac870; box-shadow:inset 0 3px 0 rgba(255,255,255,.4); } #cg-h.on { display:block; }
-  #cg-cx { display:none; position:absolute; left:8px; right:8px; bottom:8px; z-index:3; background:#1a1f4a; box-shadow:0 0 0 3px #ffd84a; padding:6px 8px; align-items:center; gap:8px; } #cg-cx.on { display:flex; } #cg-cxp { width:38px; height:40px; flex:none; image-rendering:pixelated; } #cg-cxt { flex:1; font-size:8px; line-height:1.6; color:#fff; } #cg-cxb { flex:none; padding:8px 10px; font-size:8px; display:none; }
+  #cg-cx { display:none; position:absolute; inset:0; z-index:10; background:rgba(10,8,30,.78); flex-direction:column; align-items:center; justify-content:center; padding:16px; box-sizing:border-box; } #cg-cx.on { display:flex; } #cg-cx-bx { background:#1a1f4a; box-shadow:0 0 0 3px #ffd84a,0 6px 0 #12102a; padding:14px 16px 12px; max-width:320px; width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; } #cg-cx-top { display:flex; align-items:center; gap:12px; width:100%; } #cg-cxp { width:52px; height:56px; flex:none; image-rendering:pixelated; } #cg-cxt { flex:1; font-size:9px; line-height:1.7; color:#fff; } #cg-cxb { width:100%; padding:11px 10px; font-size:9px; display:none; }
   #cgc { image-rendering:pixelated; touch-action:none; display:block; margin:auto 0; }
   body.cocinando .botones, body.cocinando .lateral, body.cocinando .tareas, body.cocinando #t-bomba, body.cocinando #burbuja { visibility:hidden; }
   #ban { display:none; position:absolute; left:0; right:0; bottom:0; z-index:25; background:linear-gradient(#2c6a88,#1a3a5a); border-top:4px solid #8ad0ff; padding:10px 12px calc(12px + env(safe-area-inset-bottom)); text-align:center; }
@@ -523,7 +524,7 @@
     <button class="flecha der oculto" id="fl-der"><canvas id="ic-fl-der" width="8" height="11"></canvas><span id="tx-fl-der"></span></button>
     <div id="fundido"></div>
     <div id="hab-prev"><b id="hab-prev-nom"></b><span id="hab-prev-msg"></span></div>
-    <div id="cg"><div id="cg-bar"><div id="cg-t"></div><button class="bt" id="cg-x">SALIR</button></div><div id="cg-h"><div id="cg-hb"></div></div><canvas id="cgc"></canvas><div id="cg-cx"><canvas id="cg-cxp" width="38" height="40"></canvas><div id="cg-cxt"></div><button class="bt ok" id="cg-cxb">SIGUE</button></div></div>
+    <div id="cg"><div id="cg-bar"><div id="cg-t"></div><button class="bt" id="cg-x">SALIR</button></div><div id="cg-h"><div id="cg-hb"></div></div><canvas id="cgc"></canvas><div id="cg-cx"><div id="cg-cx-bx"><div id="cg-cx-top"><canvas id="cg-cxp" width="52" height="56"></canvas><div id="cg-cxt"></div></div><button class="bt ok" id="cg-cxb">SIGUE ▶</button></div></div></div>
     <div id="fanfare"><div class="fan-rayos"></div><div class="fan-flash"></div><div class="fan-item"><canvas id="fan-c"></canvas></div><div class="fan-t" id="fan-t"></div><div class="fan-d" id="fan-d"></div><div class="fan-ok" id="fan-ok">TOCA PARA CONTINUAR</div></div>
     <div id="nombre"><div class="nom-box"><div class="nom-t" id="nom-t">¿COMO TE LLAMAS?</div><input id="nom-i" maxlength="10" autocomplete="off" spellcheck="false" placeholder="NOMBRE"><div class="nom-s" id="nom-s">HASTA 10 LETRAS</div><button class="bt ok gran" id="nom-ok" style="padding:12px 0">LISTO</button><button class="bt gran" id="nom-x" style="padding:10px 0;margin-top:8px;display:none">CANCELAR</button></div></div>
     <div id="burbuja"></div>
@@ -551,8 +552,7 @@
     <button class="btn c-ci" id="b-inv" aria-label="Inventario"><canvas id="ib-inv" width="12" height="12"></canvas><span id="l-inv">Inventario</span></button>
   </nav>
   <div id="ban"><div id="ban-t">1/4 PIOJOS</div><div id="ban-h"></div><div id="ban-b"><div id="ban-p"></div></div><button class="bt" id="ban-x">SALIR</button></div>
-  <div id="edicion"><div id="ed-grip"><span></span></div><button class="ibtn" id="ed-eye" aria-label="Ocultar menú"><canvas id="ic-eye" width="13" height="7"></canvas></button><button class="ibtn" id="ed-trash" aria-label="Quitar todo en esta habitación">🗑️</button><button class="sv" id="ed-x" aria-label="Guardar">✓</button><div id="ed-filtros" class="th-chips"></div><input id="ed-buscar" type="text" placeholder="BUSCAR MUEBLE..." autocomplete="off"><div id="ed-bd"></div>
-    <div id="ed-capa"><button class="ec" id="ed-atras"><canvas width="9" height="9" data-ec="atras"></canvas><span>ATRÁS</span></button><div id="ed-cn"><small>CAPA</small><b id="ed-ci">-</b></div><button class="ec" id="ed-adel"><canvas width="9" height="9" data-ec="adel"></canvas><span>ADELANTE</span></button></div>
+  <div id="edicion"><div id="ed-grip"><span></span></div><button class="ibtn" id="ed-eye" aria-label="Ocultar menú"><canvas id="ic-eye" width="13" height="7"></canvas></button><div id="ed-capa-ctrl" class="off"><button class="ibtn" id="ed-atras" aria-label="Capa atrás">▼</button><span id="ed-ci">-</span><button class="ibtn" id="ed-adel" aria-label="Capa adelante">▲</button></div><button class="ibtn" id="ed-trash" aria-label="Quitar todo en esta habitación">🗑️</button><button class="sv" id="ed-x" aria-label="Guardar">✓</button><div id="ed-filtros" class="th-chips"></div><input id="ed-buscar" type="text" placeholder="BUSCAR MUEBLE..." autocomplete="off"><div id="ed-bd"></div>
     <div id="ed-confirm"><div class="ed-confirm-bx"><p>¿Quitar TODO de esta habitación?<br>Muebles, pared y piso volverán a como estaban al inicio.<br>No se puede deshacer.</p><div class="ed-confirm-bt"><button class="bt" id="ed-conf-no">CANCELAR</button><button class="bt ok" id="ed-conf-si">SÍ, QUITAR TODO</button></div></div></div>
   </div>
   <button id="ed-ov-f" class="mu-f ov">⟲</button><button id="ed-ov-x" class="mu-x ov">✕</button>
@@ -590,7 +590,7 @@
   const CLAVE_BK = 'simon-v1-bk';
   const ESQUEMA = 1;
   let guardaCount = 0;
-  const VERSION_JUEGO = '1.6';
+  const VERSION_JUEGO = '2.0';
 
   /* === IndexedDB helper (respaldo silencioso) === */
   const IDB_NAME = 'simon-idb', IDB_STORE = 'save';
@@ -1631,8 +1631,8 @@
     if (esc === 'sala') ctx.drawImage(sprite('cuarto' + LW + 'x' + LH + e.cuarto.pared + e.cuarto.alfombra + (e.cuarto.piso || '') + cuadroClave(), () => cuartoGrid(LW, LH, RY, SY + SH - 11, OX, paleta()), n ? .55 : 0), 0, 0);
     else if (esc === 'juegos') { ctx.drawImage(sprite('juegos' + LW + 'x' + LH + estSty('juegos').k, () => juegosGrid(LW, LH, RY, OX, estSty('juegos')), n ? .55 : 0), 0, 0); arcadeVivo(); trofeosVivo(); }
     else if (esc === 'estudio') estudioFondo(n);
-    else if (esc === 'cocina') ctx.drawImage(sprite('cocina' + LW + 'x' + LH + estSty('cocina').k + (e.cuarto.refri || ''), () => cocinaGrid(LW, LH, RY, OX, estSty('cocina')), n ? .55 : 0), 0, 0);
-    else if (esc === 'bano') { if (ban && !ban.pov && ban.i >= 3) ctx.drawImage(sprite('ducha' + LW + 'x' + LH + estSty('bano').k, () => duchaGrid(LW, LH, RY, OX, estSty('bano')), 0), 0, 0); else ctx.drawImage(sprite('bano' + LW + 'x' + LH + estSty('bano').k, () => banoGrid(LW, LH, RY, OX, estSty('bano')), n ? .55 : 0), 0, 0); }
+    else if (esc === 'cocina') { ctx.drawImage(sprite('cocina' + LW + 'x' + LH + estSty('cocina').k + (e.cuarto.refri || ''), () => cocinaGrid(LW, LH, RY, OX, estSty('cocina')), n ? .55 : 0), 0, 0); if (!dlg && !modal && !cg && (tk >> 3) % 2) { ctx.fillStyle = '#ffe45a'; for (let j = 0; j < 4; j++) { ctx.fillRect(OX + 12 + j, RY - 20 + j, 8 - j * 2, 1); ctx.fillRect(OX + 100 + j, RY - 38 + j, 8 - j * 2, 1); } } }
+    else if (esc === 'bano') { if (ban && !ban.pov && ban.i >= 3) ctx.drawImage(sprite('ducha' + LW + 'x' + LH + estSty('bano').k, () => duchaGrid(LW, LH, RY, OX, estSty('bano')), 0), 0, 0); else { ctx.drawImage(sprite('bano' + LW + 'x' + LH + estSty('bano').k, () => banoGrid(LW, LH, RY, OX, estSty('bano')), n ? .55 : 0), 0, 0); if (!dlg && !modal && !ban && (tk >> 3) % 2) { ctx.fillStyle = '#ffe45a'; for (let j = 0; j < 4; j++) ctx.fillRect(OX + 109 + j, RY - 52 + j, 8 - j * 2, 1); } } }
     else if (esc === 'entrada') {
       ctx.drawImage(sprite('entrada' + LW + 'x' + LH + estSty('entrada').k, () => entradaGrid(LW, LH, RY, OX, estSty('entrada')), n ? .55 : 0), 0, 0);
       if (!dlg && !modal && (tk >> 3) % 2) { ctx.fillStyle = '#ffe45a'; for (let j = 0; j < 4; j++) ctx.fillRect(OX + 25 + j, RY - 49 + j, 8 - j * 2, 1); }
@@ -2724,7 +2724,7 @@
     g.contour('#241a30'); return g;
   }
   [['cama1', 'CAMA SENCILLA', 90, 2], ['cama2', 'CAMA DE NUBES', 180, 5], ['cama3', 'CAMA COHETE', 320, 8], ['cama4', 'CAMA REAL', 600, 12]].forEach(([k, n, p, nv], i) => {
-    ITEMS[k] = { tipo: 'cuarto', slot: 'izq', n, p, nv, grid: () => camaGrid(i + 1), tema: 'sala', cama: i + 1 }; ORDEN.cuarto.push(k);
+    ITEMS[k] = { tipo: 'cuarto', slot: 'izq', n, p, nv, grid: () => camaGrid(i + 1), tema: 'sala', exclusivo: true, cama: i + 1 }; ORDEN.cuarto.push(k);
   });
   function camaDe(deco) { let t = 0; (deco || []).forEach(d => { const it = ITEMS[d.k]; if (it && it.cama && (d.h || 'sala') === 'sala') t = Math.max(t, it.cama); }); return t; }
   const macetaEnHab = (hab, especie) => (e.deco || []).some(d => (d.h || 'sala') === hab && ITEMS[d.k] && ITEMS[d.k].semilla === especie && macetaViva(d.k));
@@ -2739,7 +2739,7 @@
     R(6, 14, 1, 3, '#ffd84a'); R(11, 14, 1, 3, '#ffd84a'); R(0, 32, 3, 2, '#3a2412'); R(15, 32, 3, 2, '#3a2412'); R(2, 0, 14, 1, '#d8a070');
     g.contour('#241810'); return g;
   }
-  ITEMS.closet = { tipo: 'cuarto', slot: 'der', n: 'CLÓSET', p: 150, nv: 3, grid: closetGrid, tema: 'sala', tap: 'closet' }; ORDEN.cuarto.push('closet');
+  ITEMS.closet = { tipo: 'cuarto', slot: 'der', n: 'CLÓSET', p: 150, nv: 3, grid: closetGrid, tema: 'sala', exclusivo: true, tap: 'closet' }; ORDEN.cuarto.push('closet');
   ITEMS.buzon.tap = 'notis';
   function renderCloset() {
     $('m-titulo').textContent = 'CLÓSET';
@@ -2903,34 +2903,52 @@
   };
   ACC2.aura_viento = (g, fr) => {   // nv20: chispas celestes flotando en varios puntos
     const a = (fr || 0) / 40 * Math.PI * 2;
-    [[7, 5], [48, 5], [6, 73], [49, 73]].forEach(([x, y], i) => { const t = a + i * 1.3, dy = Math.round(Math.sin(t) * 1.6), dx = Math.round(Math.cos(t * .7) * 1.2); chispa(g, x + dx, y + dy, '#5ad0e8', '#eafcff'); });
-    [[11, 3], [44, 3], [3, 75], [52, 75]].forEach(([x, y], i) => { const t = a + i * 2.1 + 3, dy = Math.round(Math.sin(t) * 1.8); chispa(g, x, y + dy, '#2a9ab8', '#aef0ff'); });
+    [[7, 5], [48, 5], [6, 66], [49, 66]].forEach(([x, y], i) => { const t = a + i * 1.3, dy = Math.round(Math.sin(t) * 1.6), dx = Math.round(Math.cos(t * .7) * 1.2); chispa(g, x + dx, y + dy, '#5ad0e8', '#eafcff'); });
+    [[11, 3], [44, 3], [3, 68], [52, 68]].forEach(([x, y], i) => { const t = a + i * 2.1 + 3, dy = Math.round(Math.sin(t) * 1.8); chispa(g, x, y + dy, '#2a9ab8', '#aef0ff'); });
   };
   ACC2.aura_estelar = (g, fr) => {   // nv30: estrellas que titilan de tamaño + chispas moradas flotando
     const a = (fr || 0) / 40 * Math.PI * 2;
-    [[7, 5], [48, 5], [6, 73], [49, 73]].forEach(([x, y], i) => { const t = a + i * 1.9, r = 3 + Math.round(Math.sin(t * 2)); estrella4(g, x, y, Math.max(2, r), '#ffd84a', '#ffa820'); });
-    [[12, 2], [43, 2], [2, 76], [53, 76]].forEach(([x, y], i) => { const t = a + i * 1.4 + 2, dy = Math.round(Math.sin(t) * 1.5); chispa(g, x, y + dy, '#c898f0', '#f0e0ff'); });
+    [[7, 5], [48, 5], [6, 66], [49, 66]].forEach(([x, y], i) => { const t = a + i * 1.9, r = 3 + Math.round(Math.sin(t * 2)); estrella4(g, x, y, Math.max(2, r), '#ffd84a', '#ffa820'); });
+    [[12, 2], [43, 2], [2, 69], [53, 69]].forEach(([x, y], i) => { const t = a + i * 1.4 + 2, dy = Math.round(Math.sin(t) * 1.5); chispa(g, x, y + dy, '#c898f0', '#f0e0ff'); });
   };
   ACC2.aura_mistica = (g, fr) => {   // premium: arcoiris girando y flotando, la más viva de todas
     const a = (fr || 0) / 40 * Math.PI * 2, RC = ['#ff6a78', '#ffb04a', '#ffe45a', '#6ae87a', '#5ad0e8', '#b088ff'], ci = Math.floor((fr || 0) / 7);
-    [[7, 5], [48, 5], [6, 73], [49, 73]].forEach(([x, y], i) => { const t = a + i * 1.1, dx = Math.round(Math.cos(t) * 1.3), dy = Math.round(Math.sin(t) * 1.6), r = 4 + Math.round(Math.sin(t * 2)); estrella4(g, x + dx, y + dy, Math.max(3, r), RC[(i + ci) % 6], '#ffffff'); });
-    [[12, 2], [43, 2], [2, 76], [53, 76]].forEach(([x, y], i) => { const t = a + i * 1.6 + 2, dy = Math.round(Math.sin(t) * 1.4); estrella4(g, x, y + dy, 2, RC[(i + 3 + ci) % 6], '#ffffff'); });
+    [[7, 5], [48, 5], [6, 66], [49, 66]].forEach(([x, y], i) => { const t = a + i * 1.1, dx = Math.round(Math.cos(t) * 1.3), dy = Math.round(Math.sin(t) * 1.6), r = 4 + Math.round(Math.sin(t * 2)); estrella4(g, x + dx, y + dy, Math.max(3, r), RC[(i + ci) % 6], '#ffffff'); });
+    [[12, 2], [43, 2], [2, 69], [53, 69]].forEach(([x, y], i) => { const t = a + i * 1.6 + 2, dy = Math.round(Math.sin(t) * 1.4); estrella4(g, x, y + dy, 2, RC[(i + 3 + ci) % 6], '#ffffff'); });
     [[2, 15], [53, 15]].forEach(([x, y], i) => { const t = a + i * 2 + 4, dy = Math.round(Math.sin(t) * 1.3); chispa(g, x, y + dy, RC[(i + 2 + ci) % 6], '#ffffff'); });
   };
-  ACC2.aura_cortex = (g, fr) => {   // la vende Cortex, 500 monedas: un brillo tenue que respira, la más discreta
-    const a = (fr || 0) / 40 * Math.PI * 2, br = Math.sin(a) > 0;
-    [[7, 5], [49, 73]].forEach(([x, y]) => { const c1 = br ? '#eafcff' : '#c8e8f0', c2 = br ? '#8ad0e8' : '#6ab0d0'; g.set(x, y, c1); g.set(x - 1, y, c2); g.set(x + 1, y, c2); g.set(x, y - 1, c2); g.set(x, y + 1, c2); });
+  ACC2.aura_cortex = (g, fr) => {   // la vende Cortex: partículas de luz orbitando a Simon con halo pulsante
+    const f = fr || 0, a = f / 40 * Math.PI * 2;
+    // halo izquierdo y derecho que respira
+    const hb = .55 + Math.sin(a * 2) * .45;
+    const HCOLS = ['#b0e8ff', '#d0f4ff', '#e8fcff'];
+    const hpts = [[3, 20], [3, 40], [52, 20], [52, 40], [14, 8], [41, 8], [14, 60], [41, 60]];
+    hpts.forEach(([x, y], i) => { if (Math.sin(a + i * .9) > 1 - hb) { g.set(x, y, HCOLS[i % 3]); } });
+    // 5 partículas orbitando en elipse alrededor de Simon
+    const PCOLS = ['#ffffff', '#b0e8ff', '#ffd0f8', '#d0ffee', '#ffe8b0'];
+    for (let i = 0; i < 5; i++) {
+      const t = a + i * (Math.PI * 2 / 5), wobble = Math.sin(t * 3) * 1.5;
+      const px = Math.round(28 + Math.cos(t) * (22 + wobble)), py = Math.round(34 + Math.sin(t) * (30 + wobble));
+      const col = PCOLS[i], pulse = Math.sin(a * 2 + i) > 0;
+      g.set(px, py, col);
+      if (pulse) { g.set(px - 1, py, col); g.set(px + 1, py, col); g.set(px, py - 1, col); }
+    }
+    // 3 chispitas extra que flotan arriba y abajo de Simon
+    [[28, 2], [10, 14], [45, 14], [10, 54], [45, 54], [28, 68]].forEach(([x, y], i) => {
+      const t = a + i * 1.1, dy = Math.round(Math.sin(t * 1.7) * 2);
+      if (Math.sin(t * 2.3) > .2) chispa(g, x, y + dy, '#c8f0ff', '#ffffff');
+    });
   };
   ACC2.aura_trueno = (g, fr) => {   // easter egg de la tormenta: rayitos que salen y desaparecen alrededor de Simon
     const f = fr || 0;
-    [[6, 4], [49, 4], [5, 74], [50, 74], [27, 1], [27, 77]].forEach(([x, y], i) => {
+    [[6, 4], [49, 4], [5, 66], [50, 66], [27, 1], [27, 70]].forEach(([x, y], i) => {
       const ph = (f + i * 7) % 40;
       if (ph < 12) g.paste(FX.rayo(), x - 2, y - 4);
     });
   };
   ACC2.aura_eterna = (g, fr) => {   // la más legendaria: la da la Semilla Eterna — estrellitas doradas orbitando en calma
     const a = (fr || 0) / 40 * Math.PI * 2;
-    [[7, 5], [48, 5], [6, 73], [49, 73]].forEach(([x, y], i) => { const t = a + i * 1.6, dx = Math.round(Math.cos(t) * 1.4), dy = Math.round(Math.sin(t) * 1.4), r = 3 + Math.round(Math.sin(t * 2)); estrella4(g, x + dx, y + dy, Math.max(2, r), '#ffd84a', '#fff6d0'); });
+    [[7, 5], [48, 5], [6, 66], [49, 66]].forEach(([x, y], i) => { const t = a + i * 1.6, dx = Math.round(Math.cos(t) * 1.4), dy = Math.round(Math.sin(t) * 1.4), r = 3 + Math.round(Math.sin(t * 2)); estrella4(g, x + dx, y + dy, Math.max(2, r), '#ffd84a', '#fff6d0'); });
     [[12, 2], [43, 2]].forEach(([x, y], i) => { const t = a + i * 2 + 1, dy = Math.round(Math.sin(t) * 1.3); chispa(g, x, y + dy, '#ffe68a', '#ffffff'); });
   };
   // el aura legendaria se dibuja en su propio lienzo, más grande que el cuerpo (56x78), para que las llamas
@@ -2957,7 +2975,7 @@
     const pulso = .5 + Math.sin(ph * 2) * .5, ery = 7 + pulso * 3;   // anillo de poder en el piso, pulsando
     for (let y = -ery; y <= ery; y++) for (let x = -34; x <= 34; x++) {
       const d = (x * x) / (34 * 34) + (y * y) / (ery * ery);
-      if (d <= 1 && d > .55) g.set(Math.round(cx + x), Math.round(AURA_OY + 96 + y), d > .85 ? '#1a5ad0' : '#4fa8ff');
+      if (d <= 1 && d > .55) g.set(Math.round(cx + x), Math.round(AURA_OY + 82 + y), d > .85 ? '#1a5ad0' : '#4fa8ff');
     }
     return g;
   }
@@ -2988,7 +3006,9 @@
     { id: 'angel', n: 'ANGEL', items: ['sud_blanca', 'alitas_angel', 'halo', 'alas_angel'], premio: 'halo_dorado' },
     { id: 'dragon', n: 'DRAGON', items: ['sud_roja', 'cuernitos', 'alas_murcielago', 'capa_negra'], premio: 'cuernos_dragon' }
   ];
-  const ROPA_SLOTS = [['todo', 'TODO'], ['sudadera', 'SUDADERAS'], ['cara', 'CARA'], ['cuello', 'CUELLO'], ['orejas', 'CABEZA'], ['espalda', 'ESPALDA'], ['aura', 'AURA'], ['prem', 'PREMIUM']];
+  const ROPA_SLOTS = [['todo', 'TODO'], ['sudadera', 'SUDADERAS'], ['cara', 'CARA'], ['cuello', 'CUELLO'], ['orejas', 'CABEZA'], ['espalda', 'ESPALDA'], ['aura', 'AURA'], ['mascota', 'MASCOTAS'], ['prem', 'PREMIUM']];
+  // mascotas: se gestionan por separado (e.pets[]), no por slot de ropa, pero se listan como ropa para el UI
+  ITEMS.pet_sif = { tipo: 'ropa', slot: 'mascota', n: 'SIF', p: 0, nv: 1, crop: [0, 0, 30, 26], mascota: true, prem: 'ADOPTAR A SIF' };
   ORDEN.ropa.push(...Object.keys(ITEMS).filter(k => ITEMS[k].tipo === 'ropa' && !ORDEN.ropa.includes(k)));
   /* ===================== SECRETOS (huevos de pascua): objetos que no están en la tienda ===================== */
   // casco espacial: domo de cristal alrededor de la cabeza + aro metálico en el cuello
@@ -3089,7 +3109,16 @@
     }
     if (k.startsWith('dib_')) g = dibujoGrid(k.slice(4));
     else if (k === 'caja') g = cajaGrid();
-    else if (it.tipo === 'ropa') g = recorte(simonGrid('a', 's', { [it.slot]: k }), ...it.crop);
+    else if (it.tipo === 'ropa') {
+      if (k === 'aura_legend') {
+        // componer aura legendaria (96x116) + Simon encima en AURA_OX,AURA_OY
+        const aG = auraLegendGrid(20), sG = simonGrid('a', 's', {});
+        aG.paste(sG, AURA_OX, AURA_OY);
+        g = aG;
+      } else {
+        g = recorte(simonGrid('a', 's', { [it.slot]: k }), ...it.crop);
+      }
+    }
     else if (it.pat) g = swatchEst(it);
     else if (it.refri) g = refriPrev(k);
     else if (it.slot === 'pared') g = swatchPared(it.col);
@@ -3429,10 +3458,71 @@
     const plots = jardinSync(), r = jardinPlotRect(i, plots.length, LW, LH), cx = r.x + r.w / 2, cy = r.y + 4;
     for (let j = 0; j < 5; j++) lanzar(col === '#4ab8ff' ? 'gota' : 'estrella', cx - 4 + Math.random() * 8, cy, (Math.random() - .5) * .6, -1 - Math.random(), 10 + j * 2);
   }
+
+  let regandera = null;   // animación de regadera al regar: { cx, cy, t, dur, gotas[] }
+  function reganderaSprite() {
+    return sprite('regandera_v2', () => {
+      const g = Grid(32, 24);
+      // cuerpo trapezoidal: más ancho abajo, más angosto arriba
+      g.rect(4, 7, 12, 1, '#7acfff');   // borde superior claro
+      g.rect(3, 8, 14, 7, '#3a9ae8');   // cuerpo principal
+      g.rect(3, 8, 1, 7, '#6abcf0');    // borde izq claro
+      g.rect(3, 14, 14, 1, '#1a68b0');  // borde inferior oscuro
+      g.rect(16, 8, 1, 7, '#1a68b0');   // borde der oscuro
+      g.rect(4, 9, 4, 5, '#5ab0f0');    // reflejo
+      // tapa superior
+      g.rect(5, 6, 9, 2, '#2a78c8'); g.rect(6, 5, 7, 1, '#3a8fd8');
+      // asa curva arriba (arco de 3 segmentos)
+      g.rect(6, 2, 6, 2, '#1a58a8');
+      g.set(5, 3, '#1a58a8'); g.set(12, 3, '#1a58a8');
+      g.set(4, 4, '#1a58a8'); g.set(13, 4, '#1a58a8');
+      g.set(4, 5, '#1a58a8'); g.set(13, 5, '#1a58a8');
+      // pitorro largo: sale del frente (derecha), baja en diagonal
+      g.rect(17, 9, 3, 2, '#2a78c8');
+      g.rect(19, 10, 3, 2, '#2a78c8');
+      g.rect(21, 11, 3, 2, '#2a78c8');
+      g.rect(23, 12, 3, 2, '#1a68b0');
+      // alcachofa: cabeza ovalada al final del pitorro
+      g.rect(25, 10, 5, 6, '#1a58a8');
+      g.rect(26, 9, 3, 1, '#3a88d8');   // borde superior
+      g.rect(25, 15, 5, 1, '#0a3880');  // borde inferior
+      g.set(25, 10, '#3a88d8'); g.set(29, 10, '#3a88d8');
+      // agujeritos de la alcachofa
+      g.set(26, 11, '#5aacf0'); g.set(28, 11, '#5aacf0');
+      g.set(27, 13, '#5aacf0'); g.set(26, 14, '#5aacf0'); g.set(28, 14, '#5aacf0');
+      return g;
+    }, 0);
+  }
+  function reganderaDibujar() {
+    if (!regandera) return;
+    regandera.t++;
+    const { cx, cy, t, dur, gotas } = regandera;
+    if (t > dur) { regandera = null; return; }
+    // regadera aparece arriba-derecha de la maceta, inclinada hacia ella
+    const rx = cx - 34, ry = cy - 28;
+    ctx.drawImage(reganderaSprite(), rx, ry);
+    // gotas salen de la alcachofa (esquina inferior-izquierda del sprite) hacia la planta
+    const gx = rx + 25, gy = ry + 16;
+    if (t < dur - 6 && t % 2 === 0) {
+      gotas.push({ x: gx + (Math.random() - .5) * 3, y: gy, vx: -0.3 + (Math.random() - .5) * .3, vy: 0.5 + Math.random() * .4, life: 0, maxLife: 12 + Math.floor(Math.random() * 6) });
+    }
+    regandera.gotas = gotas.filter(g => g.life < g.maxLife);
+    regandera.gotas.forEach(g => {
+      g.x += g.vx; g.y += g.vy; g.vy += .12; g.life++;
+      ctx.globalAlpha = Math.max(0, 1 - g.life / g.maxLife);
+      ctx.fillStyle = '#7ad4ff'; ctx.fillRect(Math.round(g.x), Math.round(g.y), 2, 3);
+      ctx.fillStyle = '#c8eeff'; ctx.fillRect(Math.round(g.x), Math.round(g.y), 1, 1);
+      ctx.globalAlpha = 1;
+    });
+  }
   function jardinRegar(i) {
     const plots = jardinSync(), p = plots[i]; if (!p || !p.k || p.etapa === 'listo') return;
     if (p.regadoHoy) { toast('Ya la regué hoy'); return; }
     p.regadoHoy = true; sfx.click(); jardinFX(i, '#4ab8ff'); toast('¡Regada!'); guardar(); pintar();
+    sonidoAgua(1.8);   // chorro de agua inmediato al tocar
+    // calcular posición de la regadera sobre la maceta
+    const r = jardinPlotRect(i, plots.length, LW, LH);
+    regandera = { cx: r.x + r.w / 2 + 4, cy: r.y + 4, t: 0, dur: 60, gotas: [] };
   }
   function jardinCosechar(i) {
     const plots = jardinSync(), p = plots[i]; if (!p || p.etapa !== 'listo') return;
@@ -3644,7 +3734,7 @@
   /* ---- tutorial con Cortex ---- */
   function cgCxPon() {
     const b = $('cg-cx'); if (!cg || !cg.tut) { b.classList.remove('on'); return; } b.classList.add('on');
-    const pc = $('cg-cxp'), px = pc.getContext('2d'); px.imageSmoothingEnabled = false; px.clearRect(0, 0, 38, 40); const kc = cortexClave(); sprite(kc, () => cortexG(), 0); px.drawImage(gridCanvas(recorte(gridCache[kc], 7, 0, 46, 49)), 0, 0, 38, 40);
+    const pc = $('cg-cxp'), px = pc.getContext('2d'); px.imageSmoothingEnabled = false; px.clearRect(0, 0, 52, 56); const kc = cortexClave(); sprite(kc, () => cortexG(), 0); px.drawImage(gridCanvas(recorte(gridCache[kc], 7, 0, 46, 49)), 0, 0, 52, 56);
     cgCx('Mira: a la izquierda se corta, a la derecha se cocina y abajo se sirve.', () => cgCx('Cuchillo = cortar. Llama = cocinar. Sigue la mano que te mostraré.', () => { cg.tutI = 2; cgCx('', null); }));
   }
   function cgCx(t, cb) {
@@ -3980,7 +4070,7 @@
   const esMueble = k => { const it = ITEMS[k]; return !!it && it.tipo === 'cuarto' && ['izq', 'der', 'deco', 'decoP', 'juguete'].includes(it.slot); };
   const esFondo = k => { const it = ITEMS[k]; return !!it && (it.estilo === 'pared' || it.estilo === 'piso'); };   // papel tapiz / piso: se equipan directo, no se arrastran
   const DEF_FONDO = { pared: 'pared_azul' };   // al quitar un papel/piso, vuelve a esto (o a null = diseño original de la habitación)
-  const usableAqui = k => { const t = ITEMS[k].tema; if (esFondo(k)) return !t || t === e.hab; return (t !== 'estudio' && t !== 'bano') || t === e.hab; };   // ¿se puede usar/colocar en la habitación actual?
+  const usableAqui = k => { const it = ITEMS[k], t = it.tema; if (esFondo(k)) return !t || t === e.hab; if (it.exclusivo) return t === e.hab; return (t !== 'estudio' && t !== 'bano') || t === e.hab; };   // ¿se puede usar/colocar en la habitación actual?
   const esPared = k => ITEMS[k].slot === 'decoP';
   const DECO_MAX = 18;
   const juguetePuesto = () => { const d = e.deco.find(x => ITEMS[x.k] && ITEMS[x.k].slot === 'juguete'); return d ? d.k : 'juguete_pelota'; };
@@ -4134,7 +4224,10 @@
 
   /* ===================== SIF: EL PERRITO DEL PARQUE ===================== */
   const SF = () => (e.sif = e.sif || { f: 0, v: 0 });
-  const sifE = c => (SF().f ? c * .9 : c);   // con Sif de mascota, jugar cansa un 10% menos
+  const petsActivas = () => (e.pets = e.pets || (SF().f ? ['pet_sif'] : []));   // migración: si ya tenía sif adoptado, aparece en pets
+  const petActiva = k => petsActivas().includes(k);
+  const togglePet = k => { const arr = petsActivas(); const i = arr.indexOf(k); if (i >= 0) arr.splice(i, 1); else if (arr.length < 3) arr.push(k); guardar(); pintar(); render(); };
+  const sifE = c => (petActiva('pet_sif') ? c * .9 : c);   // con Sif de mascota, jugar cansa un 10% menos
   let sifP = null, sifProx = 0, sifAni = 0, sifJ = null, sifJT = 0;
   const sifToy = () => e.deco.find(d => ITEMS[d.k] && ITEMS[d.k].slot === 'juguete' && (d.h || 'sala') === 'sala');
   let sifW = null, sifCar = 0, sifAm = false;
@@ -4148,7 +4241,7 @@
   }
   function sifPaso(W, tx, ty, v) { const dx = tx - W.x, dy = ty - W.y, d = Math.hypot(dx, dy); if (d < 1.5) return true; W.x += dx / d * v; W.y += dy / d * v * .7; return false; }
   function sifJuegoTick() {
-    if (!SF().f) return;
+    if (!petActiva('pet_sif')) return;
     const esc = escenaId(), W = sifW0();
     W.x = Math.max(2, Math.min(LW - 30, W.x)); W.y = Math.max(0, Math.min(26, W.y));
     const libre = !sifP && !dlg && !modal && !e.dormido && !cortex.p && !cortex.dir && !ban && !cg && !mercPres && !introActiva && !cambiando && esc !== 'estudio' && esc !== 'calle' && (!lugar || lugar === 'parque');
@@ -4216,7 +4309,7 @@
     seq([523, 659, 784, 1047], .5, 'triangle', .08, 1.7);
     setTimeout(() => { if (typeof sfx.regalo === 'function') sfx.regalo(); }, 1900);
   }
-  const sifVisible = esc => !!SF().f && !sifP && esc !== 'estudio' && esc !== 'bano' && esc !== 'calle' && (!lugar || lugar === 'parque') && !ban && !cg && !introActiva && !(e.dormido && esc !== 'sala');
+  const sifVisible = esc => petActiva('pet_sif') && !sifP && esc !== 'estudio' && esc !== 'bano' && esc !== 'calle' && (!lugar || lugar === 'parque') && !ban && !cg && !introActiva && !(e.dormido && esc !== 'sala');
   function sifDibuja(esc, n) {
     let x, y = 0, est = 'rest';
     if (sifP && (sifP.casa ? (!lugar && esc === 'sala') : esc === 'parque')) { x = sifP.x; est = sifP.estado; }
@@ -4280,7 +4373,7 @@
       { q: 'PERRO', t: '¡GUAU!', fn: () => guau(1) },
       { q: 'SIMON', t: '¡Sí!', fn: () => { bocaT = 15; gesto('salto'); hablar(); } }, T('¡Entonces te llamaré Sif!'),
       { q: 'SIF', t: '¡GUAU, GUAU!', fn: () => { guau(2); corazones(6); } },
-      { q: 'SIF', t: '', fan: { mudo: true, g: () => sifGrid({ boca: 'b', cola: 1 }), t: 'SIF', d: 'NUEVA MASCOTA. EFECTO: JUGAR TE QUITA 10% MENOS DE ENERGÍA.' }, fn: () => { S_.f = 1; sifP = null; e.st.sifAmigo = 1; guardar(); sifJingle(); } },
+      { q: 'SIF', t: '', fan: { mudo: true, g: () => sifGrid({ boca: 'b', cola: 1 }), t: 'SIF', d: 'NUEVA MASCOTA. EFECTO: JUGAR TE QUITA 10% MENOS DE ENERGÍA.' }, fn: () => { S_.f = 1; petsActivas().push('pet_sif'); sifP = null; e.st.sifAmigo = 1; guardar(); sifJingle(); } },
       S(), T('Ahora tengo un perro. ¡Qué felicidad!'), T('Con Sif cerca, jugar me cansa un 10% menos.')], () => { introPend = 0; sifAm = false; pintar(); guardar(); }), 700);
   }
   function sifTap(x, y) {
@@ -4305,7 +4398,7 @@
     return true;
   }
   function sifComer() {
-    if (!SF().f) return; if (!(e.sifK > 0)) { toast('NO TIENES KEKES PARA PERRO: COCÍNALOS'); sfx.no(); return; }
+    if (!petActiva('pet_sif')) return; if (!(e.sifK > 0)) { toast('NO TIENES KEKES PARA PERRO: COCÍNALOS'); sfx.no(); return; }
     e.sifK--; sifAni = tk + 40; sifCar = tk + 40; cerrar(); guau(1); sfx.comer(); corazones(4); toast('SIF COMIÓ SU KEKE'); guardar(); pintar();
   }
 
@@ -4342,8 +4435,9 @@
     if (simVis && esc !== 'estudio') for (let y = -3; y <= 3; y++) { const w = Math.round(rx * Math.sqrt(1 - (y / 3.6) * (y / 3.6))); ctx.fillRect(SX + 28 + gx - w, SY + SH - 2 + y, w * 2, 1); }
     const est = estFisico();
     const auraFr = e.ropa.aura ? tk % 40 : 0;
-    const spr = (esc === 'estudio' || esc === 'jardin') ? sprite('simon_atras|' + ropaSig() + '|af' + auraFr, () => simonGrid('c', 'n', e.ropa, {}, true, auraFr), n ? .22 : 0) : sprite('simon_' + ojos + boca + '|' + ropaSig() + '|' + est.oj + est.fl + est.tri + est.en + est.l + est.ab + '|af' + auraFr, () => simonGrid(ojos, boca, e.ropa, est, false, auraFr), n ? .22 : 0);
-    const auraLSpr = (e.ropa.aura === 'aura_legend' && simVis && esc !== 'estudio') ? sprite('aura_legend|af' + auraFr, () => auraLegendGrid(auraFr), n ? .22 : 0) : null;
+    const nSim = (ban && !ban.pov && ban.i >= 3) ? 0 : n;   // dentro de la ducha Simon se ve con luz propia aunque sea de noche
+    const spr = (esc === 'estudio' || esc === 'jardin') ? sprite('simon_atras|' + ropaSig() + '|af' + auraFr, () => simonGrid('c', 'n', e.ropa, {}, true, auraFr), nSim ? .22 : 0) : sprite('simon_' + ojos + boca + '|' + ropaSig() + '|' + est.oj + est.fl + est.tri + est.en + est.l + est.ab + '|af' + auraFr, () => simonGrid(ojos, boca, e.ropa, est, false, auraFr), nSim ? .22 : 0);
+    const auraLSpr = (e.ropa.aura === 'aura_legend' && simVis && esc !== 'estudio') ? sprite('aura_legend|af' + auraFr, () => auraLegendGrid(auraFr), nSim ? .22 : 0) : null;
     if (!simVis) { /* Simon duerme en la recámara */ }
     else if (esc === 'estudio') { ctx.save(); ctx.translate(SX + 28 + gx, SY + 32 + oy); ctx.scale(EST_K * esx, EST_K); ctx.drawImage(spr, -28, -32); ctx.restore(); }
     else if (esc === 'calle') { if (auraLSpr) ctx.drawImage(auraLSpr, SX + gx - AURA_OX, SY + 6 + oy - AURA_OY); ctx.drawImage(spr, 0, 0, SW, 66, SX + gx, SY + 6 + oy, SW, 66); ctx.drawImage(spr, 0, 66, SW, SH - 66, SX + gx, SY + 72 + oy, SW, SH - 66); }
@@ -4365,6 +4459,7 @@
     }
     sifDibuja(esc, n);
     if (esc === 'parque' || esc === 'jardin') parqueFX(clima());
+    if (esc === 'jardin') reganderaDibujar();
     if (esc === 'calle') calleLluvia();
     if (esc === 'estudio') estudioViñeta();
     cajaDibuja();
@@ -6168,6 +6263,31 @@
       if (ban.foam.length <= ban.total * .04) { ban.foam = []; banAvanza(); }
     }
   }
+  function sonidoAgua(dur) {   // gotitas de agua cayendo una por una
+    if (e.mudo || !audio()) return;
+    const sr = ac.sampleRate, total = Math.floor(sr * dur);
+    // genera una gotita: tono suave que cae en pitch rápidamente (plop)
+    function gota(retardo) {
+      const gl = Math.floor(sr * .055), gb = ac.createBuffer(1, gl, sr), gx = gb.getChannelData(0);
+      const freq0 = 900 + Math.random() * 400, freq1 = 300 + Math.random() * 200;
+      for (let i = 0; i < gl; i++) {
+        const t = i / sr, env = Math.exp(-t * 38);
+        const freq = freq0 + (freq1 - freq0) * (i / gl);
+        gx[i] = Math.sin(2 * Math.PI * freq * t) * env * .28
+               + (Math.random() * 2 - 1) * env * .06;  // leve click inicial
+      }
+      const gs = ac.createBufferSource(), gg = ac.createGain();
+      gg.gain.value = .7 + Math.random() * .3;
+      gs.buffer = gb; gs.connect(gg); gg.connect(ac.destination);
+      gs.start(ac.currentTime + retardo);
+    }
+    // lanzar gotitas a intervalos irregulares durante `dur` segundos
+    let t = 0;
+    while (t < dur - .06) {
+      gota(t);
+      t += .08 + Math.random() * .09;
+    }
+  }
   function chapoteo(vol, dur) {   // ruido de agua / burbujas
     if (e.mudo || !audio()) return;
     const n = Math.floor(ac.sampleRate * dur), b = ac.createBuffer(1, n, ac.sampleRate), x = b.getChannelData(0); for (let i = 0; i < n; i++) x[i] = (Math.random() * 2 - 1) * (1 - i / n);
@@ -6887,7 +7007,7 @@
     if (!esMueble(k)) equipar(k);
     sfx.compra(); toast(esMueble(k) ? '¡COMPRASTE: ' + it.n.toUpperCase() + '! Ve a tu inventario para colocarlo' : '¡COMPRASTE: ' + it.n.toUpperCase() + '!'); if (esMueble(k) && !e.muebleVisto && e.intro) { e.muebleVisto = 1; setTimeout(() => introMueble(k), 1600); } gesto('besos'); hablar(); pintar(); guardar(); render();
   }
-  function poner(k) { if (!e.tiene[k]) return; if (ITEMS[k].slot === 'juguete') { colocar(k); sfx.click(); gesto('salto'); if (e.hab !== 'sala') toast('El juguete se coloca en la RECÁMARA'); pintar(); guardar(); render(); return; } if (esMueble(k)) { if (ITEMS[k].tema === 'bano' && e.hab !== 'bano') { lugar = null; llegada = null; e.hab = 'bano'; guardar(); pintarNav(); toast('Se coloca en el BAÑO'); } const te = ITEMS[k].tema === 'estudio'; if (te && e.hab !== 'estudio') { lugar = null; llegada = null; e.hab = 'estudio'; guardar(); pintarNav(); toast('Se coloca en el ESTUDIO'); } else if (!te && e.hab === 'estudio') { toast('El ESTUDIO solo admite objetos de estudio'); sfx.no(); return; } entrarEdicion(k); return; } equipar(k); mision('ropa'); sfx.click(); gesto('salto'); pintar(); guardar(); render(); }
+  function poner(k) { if (!e.tiene[k]) return; if (ITEMS[k].slot === 'juguete') { colocar(k); sfx.click(); gesto('salto'); if (e.hab !== 'sala') toast('El juguete se coloca en la RECÁMARA'); pintar(); guardar(); render(); return; } if (esMueble(k)) { if (ITEMS[k].tema === 'bano' && e.hab !== 'bano') { lugar = null; llegada = null; e.hab = 'bano'; guardar(); pintarNav(); toast('Se coloca en el BAÑO'); } else if (ITEMS[k].tema === 'sala' && e.hab !== 'sala') { lugar = null; llegada = null; e.hab = 'sala'; guardar(); pintarNav(); toast('Se coloca en la RECÁMARA'); } const te = ITEMS[k].tema === 'estudio'; if (te && e.hab !== 'estudio') { lugar = null; llegada = null; e.hab = 'estudio'; guardar(); pintarNav(); toast('Se coloca en el ESTUDIO'); } else if (!te && e.hab === 'estudio') { toast('El ESTUDIO solo admite objetos de estudio'); sfx.no(); return; } entrarEdicion(k); return; } equipar(k); mision('ropa'); sfx.click(); gesto('salto'); pintar(); guardar(); render(); }
   function quitar(k) { const it = ITEMS[k]; if (it.slot === 'juguete' || it.fija) return; if (esMueble(k)) { e.deco = e.deco.filter(d => d.k !== k); sfx.click(); pintar(); guardar(); render(); return; } if (PORDEFECTO[it.slot]) return; (it.tipo === 'ropa' ? e.ropa : e.cuarto)[it.slot] = null; sfx.click(); pintar(); guardar(); render(); }
 
 
@@ -7436,8 +7556,8 @@
     return `<div class="saldo"><span>HAMBRE ${Math.round(e.hambre)}</span><span>ENERGÍA ${Math.round(e.energia)}</span></div><div class="cuadricula mini" style="grid-template-columns:repeat(3,1fr);gap:8px 6px">` +
       `<div class="card"><div class="pv"><canvas data-prev="fd_keke"></canvas></div><div class="cn">KEKE</div><div style="font-size:6px;color:#4a5090">GRATIS HOY: ${introActiva ? '∞' : kekesQuedan() + '/' + KEKE_DIA}</div><button class="bt ${kekesQuedan() > 0 || introActiva || e.monedas >= KEKE_P ? 'ok' : 'no'}" data-a="f_dar" data-k="keke">${kekesQuedan() > 0 || introActiva ? 'DAR' : '🪙 DAR · ' + KEKE_P}</button></div>` +
       ((e.meds || 0) > 0 ? `<div class="card"><div class="pv"><canvas data-prev="fd_jarabe"></canvas></div><div class="cn">JARABE</div><div style="font-size:6px;color:#4a5090">${e.enf ? 'TIENES: ' + e.meds : 'SOLO SI ESTÁ RESFRIADO'}</div><button class="bt ${e.enf ? 'ok' : 'no'}" data-a="med_usar">USAR (${e.meds})</button></div>` : '') +
-      ids.map(k => card(k, COMIDAS[k].n, '', 'TIENES: ' + e.comida[k])).join('') +
-      (SF().f ? `<div class="card"><div class="pv"><canvas data-prev="fd_pl_kekeperro"></canvas></div><div class="cn">KEKE PARA PERRO</div><div style="font-size:6px;color:#4a5090">TIENES: ${e.sifK || 0}</div><button class="bt ${e.sifK > 0 ? 'ok' : 'no'}" data-a="f_sif">DAR</button></div>` : '') + `</div>` +
+      ids.map(k => { const c = COMIDAS[k], sub = 'TIENES: ' + e.comida[k] + (c.e > 0 ? ' · ⚡+' + c.e : ''); return card(k, c.n, '', sub); }).join('') +
+      (petActiva('pet_sif') ? `<div class="card"><div class="pv"><canvas data-prev="fd_pl_kekeperro"></canvas></div><div class="cn">KEKE PARA PERRO</div><div style="font-size:6px;color:#4a5090">TIENES: ${e.sifK || 0}</div><button class="bt ${e.sifK > 0 ? 'ok' : 'no'}" data-a="f_sif">DAR</button></div>` : '') + `</div>` +
       ((ids.length || (e.meds || 0) > 0) ? '' : `<div class="centro" style="font-size:7px;color:#aab4ff;margin-top:12px;line-height:1.9">Más comida en la TIENDA.</div>`);
   }
 
@@ -7480,8 +7600,8 @@
       b.appendChild(c); b.appendChild(nm);
       if (iAqui >= 0 && edit.sel === iAqui) b.classList.add('sel');
       if (iAqui >= 0) {
-        if (muProtegido(k)) b.onclick = () => { edit.sel = iAqui; sfx.click(); pintarEdicion(); };
-        else b.onclick = () => { e.deco.splice(iAqui, 1); edit.sel = null; sfx.click(); guardar(); pintarEdicion(); };   // tocar un item ya colocado aquí lo quita (como pared/piso); mover/voltear se hace tocándolo en la escena
+        if (muProtegido(k)) b.onpointerdown = ev => { ev.preventDefault(); edit.sel = iAqui; sfx.click(); pintarEdicion(); };
+        else b.onpointerdown = ev => { ev.preventDefault(); e.deco.splice(iAqui, 1); edit.sel = null; sfx.click(); guardar(); pintarEdicion(); };   // tocar un item ya colocado aquí lo quita; mover/voltear se hace tocándolo en la escena
       } else {
         const colocarEnPunto = ptEv => {
           if (!colocar(k)) return;
@@ -7492,32 +7612,7 @@
           }
           edit.sel = j; sfx.compra(); guardar(); pintarEdicion();
         };
-        b.onpointerdown = ev => {
-          const sx = ev.clientX, sy = ev.clientY; let arrastrando = false, fant = null;
-          const mover = mv => {
-            if (!arrastrando && Math.hypot(mv.clientX - sx, mv.clientY - sy) > 7) {
-              arrastrando = true;
-              fant = document.createElement('canvas'); fant.width = g.w; fant.height = g.h;
-              fant.getContext('2d').drawImage(gridCanvas(g), 0, 0);
-              fant.style.cssText = `position:fixed;z-index:999;pointer-events:none;width:${g.w * z}px;height:${g.h * z}px;image-rendering:pixelated;opacity:.9;left:0;top:0`;
-              document.body.appendChild(fant);
-            }
-            if (arrastrando && fant) {
-              fant.style.left = (mv.clientX - g.w * z / 2) + 'px'; fant.style.top = (mv.clientY - g.h * z / 2) + 'px';
-              const r = cv.getBoundingClientRect(), dentro = mv.clientX >= r.left && mv.clientX <= r.right && mv.clientY >= r.top && mv.clientY <= r.bottom;
-              fant.style.opacity = dentro ? '1' : '.35';
-            }
-          };
-          const subir = up => {
-            document.removeEventListener('pointermove', mover); document.removeEventListener('pointerup', subir);
-            if (fant) { fant.remove(); fant = null; }
-            if (arrastrando) {
-              const r = cv.getBoundingClientRect(), dentro = up.clientX >= r.left && up.clientX <= r.right && up.clientY >= r.top && up.clientY <= r.bottom;
-              if (dentro) colocarEnPunto(up);
-            } else colocarEnPunto(null);
-          };
-          document.addEventListener('pointermove', mover); document.addEventListener('pointerup', subir);
-        };
+        b.onpointerdown = ev => { ev.preventDefault(); colocarEnPunto(null); };
       }
       bd.appendChild(b);
     });
@@ -7528,7 +7623,7 @@
     }
   }
   function pintarEdicion() {
-    { const I = capaInfo(); $('ed-capa').classList.toggle('off', !I); $('ed-ci').textContent = I ? I.pos + ' / ' + I.mis.length : '-'; }
+    { const I = capaInfo(); $('ed-capa-ctrl').classList.toggle('off', !I); $('ed-ci').textContent = I ? I.pos + '/' + I.mis.length : '-'; }
     const todos = Object.keys(ITEMS).filter(k => e.tiene[k] && (esFondo(k) || (esMueble(k) && ITEMS[k].slot !== 'juguete')));   // los exclusivos de otra habitación igual se listan (con su icono); al tocarlos, avisa si no van aquí
     edit._todos = todos;
     const fi = $('ed-filtros');
@@ -7636,11 +7731,6 @@
     sfx.click(); guardar(); pintarEdicion();
   }
   $('ed-adel').onclick = () => mover(1); $('ed-atras').onclick = () => mover(-1);
-  function iconosCapa() {
-    const A = ['....w....', '...www...', '..wwwww..', '.wwwwwww.', '....w....', '....w....', '....w....', '....w....', '.........'];
-    [['atras', A.slice().reverse()], ['adel', A]].forEach(([k, m]) => { const g = Grid(9, 9); m.forEach((f, y) => [...f].forEach((ch, x) => { if (ch === 'w') g.set(x, y, '#1a1f4a'); })); const c = document.querySelector('[data-ec=' + k + ']'); c.getContext('2d').clearRect(0, 0, 9, 9); c.getContext('2d').drawImage(gridCanvas(g), 0, 0); });
-  }
-  iconosCapa();
   function editUp() { $('edicion').classList.remove('suelto'); document.body.classList.remove('sueltoUI'); if (edit && edit.drag) { edit.drag = null; guardar(); } posEdOverlay(); }
   cv.addEventListener('pointermove', ev => { if (ban) banMove(ev); }); cv.addEventListener('pointerup', banUp); cv.addEventListener('pointercancel', banUp);
   cv.addEventListener('pointermove', editMove); cv.addEventListener('pointerup', editUp); cv.addEventListener('pointercancel', editUp);
@@ -8111,7 +8201,7 @@
       `<div style="font-size:6px;color:#4a5090;margin-top:-4px">NV ${n}${n >= NMAX ? ' MAX' : ''}</div>` +
       `</div>`;
     const mascotas = [];
-    if (SF().f) mascotas.push(['pet_sif', 'SIF']);
+    if (petActiva('pet_sif')) mascotas.push(['pet_sif', 'SIF']);
     if (ojoAct()) mascotas.push(['ojo_pet', 'OJO']);
     const pets = mascotas.length ? `<div class="mini-pet-row">` + mascotas.map(([k, nm]) => `<div class="mini-pet" title="${nm}"><canvas data-prev="${k}"></canvas></div>`).join('') + `</div>` : '';
     const izq = `<div style="display:flex;flex-direction:column;gap:6px">${tarjeta}${pets}</div>`;
@@ -8124,7 +8214,7 @@
     let h = `<div style="display:flex;align-items:flex-start;gap:10px">${izq}<div style="flex:1;min-width:0">${info}</div></div>`;
     const buffs = [];
     Object.keys(SEMILLAS).forEach(k => { if (macetaGlobal(k)) buffs.push(['sm_' + k, SEMILLAS[k].n, SEMILLAS[k].efecto]); });
-    if (SF().f) buffs.push(['pet_sif', 'SIF', 'Jugar con Simon le quita 10% menos de energía.']);
+    if (petActiva('pet_sif')) buffs.push(['pet_sif', 'SIF', 'Jugar con Simon le quita 10% menos de energía.']);
     if (ojoAct()) buffs.push(['ojo_pet', 'OJO', 'Simon duerme 10% más rápido.']);
     if (simonLevita()) buffs.push(['aura_eterna', 'LEVITANDO', 'Aura puesta + Semilla Eterna viva: Simon flota.']);
     h += `<div style="margin-top:14px;font-size:7px;color:#aab4ff">BUFFOS ACTIVOS</div>`;
@@ -8137,11 +8227,18 @@
   }
   function renderVest() {
     $('m-titulo').textContent = '';
-    const ropa = Object.keys(ITEMS).filter(k => ITEMS[k].tipo === 'ropa' && e.tiene[k]).sort((a, b) => (ITEMS[a].nv || 1) - (ITEMS[b].nv || 1) || (ITEMS[a].p || 0) - (ITEMS[b].p || 0));
-    const ks = vF === 'todo' ? ropa : ropa.filter(k => ITEMS[k].slot === vF);
+    const ropa = Object.keys(ITEMS).filter(k => ITEMS[k].tipo === 'ropa' && (ITEMS[k].mascota ? SF().f : e.tiene[k])).sort((a, b) => (ITEMS[a].nv || 1) - (ITEMS[b].nv || 1) || (ITEMS[a].p || 0) - (ITEMS[b].p || 0));
+    const ks = vF === 'todo' ? ropa.filter(k => !ITEMS[k].mascota) : vF === 'mascota' ? ropa.filter(k => ITEMS[k].slot === 'mascota') : ropa.filter(k => ITEMS[k].slot === vF && !ITEMS[k].mascota);
     const cam = vsCambios();
     let h = `<div class="th-chips" style="margin:-6px 0 8px">${ROPA_SLOTS.filter(([f]) => f !== 'prem').map(([f, t]) => `<button class="${vF === f ? 'on' : ''}" data-a="vs_f" data-k="${f}">${t}</button>`).join('')}</div>`;
-    h += ks.length ? `<div class="vs-g">${ks.map(k => `<button class="vs-t ${e.ropa[ITEMS[k].slot] === k ? 'on' : ''}" data-a="vs_t" data-k="${k}"><div class="vs-pv"><canvas data-prev="${k}"></canvas></div><span>${ITEMS[k].n}</span></button>`).join('')}</div>` : `<div class="centro" style="font-size:7px;color:#aab4ff;margin:18px 0">No tienes nada de esto todavía.</div>`;
+    if (vF === 'mascota') {
+      const activas = petsActivas();
+      const hay = ropa.filter(k => ITEMS[k].slot === 'mascota');
+      h += `<div style="font-size:7px;color:#aab4ff;text-align:center;margin-bottom:8px">ACTIVAS: ${activas.length}/3 — toca para poner o quitar</div>`;
+      h += hay.length ? `<div class="vs-g">${hay.map(k => `<button class="vs-t ${petActiva(k) ? 'on' : ''}" data-a="vs_pet" data-k="${k}"><div class="vs-pv"><canvas data-prev="${k}"></canvas></div><span>${ITEMS[k].n}</span>${petActiva(k) ? '<span style="font-size:5px;color:#6adf6a">ACTIVA</span>' : (activas.length >= 3 ? '<span style="font-size:5px;color:#ff7a7a">LLENO</span>' : '')}</button>`).join('')}</div>` : `<div class="centro" style="font-size:7px;color:#aab4ff;margin:18px 0">Aún no tienes mascotas.</div>`;
+    } else {
+      h += ks.length ? `<div class="vs-g">${ks.map(k => `<button class="vs-t ${e.ropa[ITEMS[k].slot] === k ? 'on' : ''}" data-a="vs_t" data-k="${k}"><div class="vs-pv"><canvas data-prev="${k}"></canvas></div><span>${ITEMS[k].n}</span></button>`).join('')}</div>` : `<div class="centro" style="font-size:7px;color:#aab4ff;margin:18px 0">No tienes nada de esto todavía.</div>`;
+    }
     return h;
   }
   var iv = 'hub', ivCat = 'ropa', ivF = 'todo', isel = null, iSheetH = '';
@@ -8158,19 +8255,20 @@
       fon: todos.filter(k => ITEMS[k].tipo === 'cuarto' && !esMueble(k)),
       com: Object.keys(COMIDAS).filter(k => e.comida[k] > 0),
       ext: [...((e.bombas || 0) > 0 ? ['bomba'] : []), ...((e.meds || 0) > 0 ? ['jarabe'] : [])],
-      mas: e.sangFase === 2 ? ['ojo_pet'] : []
+      mas: [...(e.sangFase === 2 ? ['ojo_pet'] : []), ...(SF().f ? ['pet_sif'] : [])]
     };
     const ord = (a, b) => (puesto(b) ? 1 : 0) - (puesto(a) ? 1 : 0) || (ITEMS[a].nv || 1) - (ITEMS[b].nv || 1) || (ITEMS[a].p || 0) - (ITEMS[b].p || 0);
     ['ropa', 'mue', 'jug', 'fon'].forEach(c => L[c].sort(ord));
     return L;
   }
-  const ivPrev = k => k === 'ojo_pet' ? 'ojo_pet' : COMIDAS[k] ? 'fd_' + k : k === 'bomba' ? 'fd_bomba' : k === 'jarabe' ? 'fd_jarabe' : k;
-  const ivNom = k => k === 'ojo_pet' ? 'OJO DE CTHULHU' : COMIDAS[k] ? COMIDAS[k].n : k === 'bomba' ? 'BOMBA' : k === 'jarabe' ? 'JARABE' : ITEMS[k].n;
+  const ivPrev = k => k === 'ojo_pet' ? 'ojo_pet' : k === 'pet_sif' ? 'pet_sif' : COMIDAS[k] ? 'fd_' + k : k === 'bomba' ? 'fd_bomba' : k === 'jarabe' ? 'fd_jarabe' : k;
+  const ivNom = k => k === 'ojo_pet' ? 'OJO DE CTHULHU' : k === 'pet_sif' ? 'SIF' : COMIDAS[k] ? COMIDAS[k].n : k === 'bomba' ? 'BOMBA' : k === 'jarabe' ? 'JARABE' : ITEMS[k].n;
   function ivEstado(k) {   // etiqueta de la esquina: dónde está o si está en uso
     if (COMIDAS[k]) return ['n', 'x' + e.comida[k]];
     if (k === 'bomba') return ['n', 'x' + (e.bombas || 0)];
     if (k === 'jarabe') return ['n', 'x' + (e.meds || 0)];
     if (k === 'ojo_pet') return e.ojoOn !== 0 ? ['ok', 'CON SIMON'] : ['n', 'GUARDADO'];
+    if (k === 'pet_sif') return petActiva(k) ? ['ok', 'ACTIVA'] : ['n', 'INACTIVA'];
     if (esMueble(k)) {
       if (ITEMS[k].slot === 'juguete') return puesto(k) ? ['ok', 'EN USO'] : null;
       const d = e.deco.find(x => x.k === k); return d ? ['ok', habN(d.h || 'sala')] : ['no', 'SIN COLOCAR'];
@@ -8182,6 +8280,7 @@
     if (COMIDAS[k]) { info = (COMIDAS[k].rand ? '¡SORPRESA!' : 'ENERGIA +' + COMIDAS[k].e) + '<br>TIENES: ' + e.comida[k]; bt = `<button class="bt ok gran" data-a="f_dar" data-k="${k}">DARLE A SIMON</button>`; }
     else if (k === 'bomba') { info = 'TIENES: ' + (e.bombas || 0) + '<br>SE LANZA CON EL BOTÓN DE LA ESCENA'; bt = ''; }
     else if (k === 'ojo_pet') { info = (e.ojoOn !== 0 ? 'SIMON DUERME 10% MÁS RÁPIDO' : 'GUARDADO: NO AYUDA A DORMIR'); bt = `<button class="bt ${e.ojoOn !== 0 ? '' : 'ok'} gran" data-a="ojo_tog">${e.ojoOn !== 0 ? 'QUITAR' : 'SACAR'}</button>`; }
+    else if (k === 'pet_sif') { const act = petActiva(k); info = 'MASCOTA · EFECTO: JUGAR CANSA 10% MENOS<br>' + (act ? 'ACTIVA ✓' : 'INACTIVA · ACTIVAS: ' + petsActivas().length + '/3'); bt = `<button class="bt ${act || petsActivas().length < 3 ? 'ok' : 'no'} gran" data-a="vs_pet" data-k="${k}">${act ? 'QUITAR' : 'PONER'}</button>`; }
     else if (k === 'jarabe') { info = 'CURA EL RESFRIADO<br>TIENES: ' + (e.meds || 0); bt = `<button class="bt ${e.enf ? 'ok' : 'no'} gran" ${e.enf ? 'data-a="med_usar"' : ''}>${e.enf ? 'USAR' : 'SOLO SI ESTÁ RESFRIADO'}</button>`; }
     else if (esMueble(k)) {
       const d = e.deco.find(x => x.k === k);
@@ -8658,7 +8757,8 @@
       const pv = tab === 'comida' ? 'fd_' + k : k === 'bomba' ? 'fd_bomba' : k === 'jarabe' ? 'fd_jarabe' : k, nw = tab !== 'comida' && tab !== 'extras' && compraOk(k) && ITEMS[k].nv > vis && ITEMS[k].nv > 1, g = grupoT(k);
       const cant = tab === 'comida' && e.comida[k] > 0 ? `<span class="th-cant">x${e.comida[k]}</span>` : '';
       const ih = tab === 'cuarto' ? (esFondo(k) ? (temaDe(k) !== 'todas' ? (HAB_ICO[temaDe(k)] || '') : '') : iconoHabDe(k)) : '', hico = ih ? `<span class="mue-hab">${ih}</span>` : '';
-      return `<button class="th-c ${g === 1 ? 'lock' : ''} ${tsel === k ? 'sel' : ''}" data-a="tv_sel" data-k="${k}">${nw ? '<span class="th-nw">NUEVO</span>' : ''}${cant}${hico}<div class="th-pv"><canvas data-prev="${pv}"></canvas></div><div class="th-nm">${tab === 'comida' ? COMIDAS[k].n : k === 'bomba' ? 'BOMBA' : k === 'jarabe' ? 'JARABE' : ITEMS[k].n}</div>${pillT(k)}</button>`;
+      const eTag = tab === 'comida' && COMIDAS[k].e > 0 ? `<div style="font-size:5px;color:#ffe45a;margin-top:1px">⚡+${COMIDAS[k].e}</div>` : '';
+      return `<button class="th-c ${g === 1 ? 'lock' : ''} ${tsel === k ? 'sel' : ''}" data-a="tv_sel" data-k="${k}">${nw ? '<span class="th-nw">NUEVO</span>' : ''}${cant}${hico}<div class="th-pv"><canvas data-prev="${pv}"></canvas></div><div class="th-nm">${tab === 'comida' ? COMIDAS[k].n : k === 'bomba' ? 'BOMBA' : k === 'jarabe' ? 'JARABE' : ITEMS[k].n}</div>${eTag}${pillT(k)}</button>`;
     }).join('')}</div>`;
     if (tab === 'ropa' && fRopa === 'prem') h += `<div class="centro" style="font-size:8px;color:#ffd84a;margin:14px 0 8px">COLECCIONES</div>` + PREM_SETS.map(s => { const n = s.items.filter(k => e.tiene[k]).length; return `<div class="card" style="margin-bottom:8px;text-align:left;padding:8px"><div class="cn" style="text-align:left">SET ${s.n}: ${n}/${s.items.length}${e.tiene[s.premio] ? ' ✔' : ''}</div><div class="etq" style="margin:4px 0">${s.items.map(k => (e.tiene[k] ? '✔ ' : '· ') + ITEMS[k].n).join('<br>')}</div><div class="etq pm">PREMIO: ${ITEMS[s.premio].n}</div></div>`; }).join('');
     if (tsel && base.includes(tsel)) tSheetH = hojaTienda(tsel); else tsel = null;
@@ -8675,13 +8775,13 @@
     else if (a === 'ig_comprar') comprarIng(k); else if (a === 'rf_ir') { cerrar(); tab = 'mkt'; tv = 'cat'; tvPre = true; tsel = null; sfx.click(); abrir('tienda'); }
     else if (a === 'j_ir_tienda') { cerrar(); tab = 'semillas'; tv = 'cat'; tvPre = true; tsel = null; sfx.click(); abrir('tienda'); }
     else if (a === 'quitar') quitar(k); else if (a === 'mcomprar') comprarMerc(k); else if (a === 'compartir') compartirFoto(); else if (a === 'guardar') guardarFoto(); else if (a === 'abrirreg') abrirRegalo(); else if (a === 'cerrar') cerrar();
-    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (['mj_jugar', 'run_jugar', 'rt_jugar', 'mem_jugar'].includes(a) && noEst('ahora toca estudiar, no jugar')) { return; } else if (a === 'nt_tog') { notifToggle(); return; } else if (a === 'fs_set') { e.fuente = +k; sfx.click(); guardar(); pintar(); render(); return; } else if (a === 'nom_ed') { sfx.click(); pedirNombre(() => render(), true); return; } else if (a === 'tr_rec') { trofReclamar(); return; } else if (a.startsWith('cel_')) { celClick(a, k); return; } else if (a.startsWith('cl_')) { closetClick(a, k); return; } else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('est_')) estClick(a, k); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'vs_open') { sfx.click(); abrir('vestir'); } else if (a === 'vs_f') { sfx.click(); vF = k; render(); } else if (a === 'vs_t') { const it = ITEMS[k], sl = it.slot; if (e.ropa[sl] === k) { if (PORDEFECTO[sl]) { sfx.no(); return; } e.ropa[sl] = null; } else e.ropa[sl] = k; sfx.click(); pintar(); render(); } else if (a === 'vs_nada') { sfx.click(); Object.assign(e.ropa, BASE().ropa); pintar(); render(); } else if (a === 'vs_x') { sfx.click(); cerrar(); } else if (a === 'vs_ok') { vsGuardar(); } else if (a === 'iv_cat') { sfx.click(); ivCat = k; ivF = 'todo'; iv = 'cat'; isel = null; render(); $('m-cuerpo').scrollTop = 0; } else if (a === 'iv_back') { sfx.click(); iv = 'hub'; isel = null; render(); } else if (a === 'iv_f') { sfx.click(); ivF = k; isel = null; render(); } else if (a === 'iv_sel') { sfx.click(); isel = isel === k ? null : k; render(); } else if (a === 'iv_item') { sfx.click(); const c = ['ropa', 'mue', 'jug', 'fon'].find(c => invListas()[c].includes(k)); if (c) { ivCat = c; ivF = 'todo'; iv = 'cat'; isel = k; render(); } } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a === 'iv_vestir') { sfx.click(); abrir('vestir'); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_sif') sifComer(); else if (a === 'f_comprar') comprarComida(k); else if (a === 'j_comprar') comprarSemilla(k); else if (a === 'j_plantar') jardinPlantar(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a, k);
+    else if (a.startsWith('q_')) qClick(a, k); else if (a === 'm_ir') irLugar(k); else if (['mj_jugar', 'run_jugar', 'rt_jugar', 'mem_jugar'].includes(a) && noEst('ahora toca estudiar, no jugar')) { return; } else if (a === 'nt_tog') { notifToggle(); return; } else if (a === 'fs_set') { e.fuente = +k; sfx.click(); guardar(); pintar(); render(); return; } else if (a === 'nom_ed') { sfx.click(); pedirNombre(() => render(), true); return; } else if (a === 'tr_rec') { trofReclamar(); return; } else if (a.startsWith('cel_')) { celClick(a, k); return; } else if (a.startsWith('cl_')) { closetClick(a, k); return; } else if (a === 'mj_jugar') mjIniciar(); else if (a === 'run_jugar') runIniciar(); else if (a === 'rt_jugar') rtIniciar(); else if (a === 'mem_jugar') memIniciar(); else if (a.startsWith('est_')) estClick(a, k); else if (a.startsWith('dia_')) diaClick(a); else if (a.startsWith('med_')) medClick(a); else if (a === 'not_borrar') { e.notis = []; notiNuevas = 0; sfx.click(); pintarNotis(); guardar(); render(); } else if (a === 'vs_open') { sfx.click(); abrir('vestir'); } else if (a === 'vs_f') { sfx.click(); vF = k; render(); } else if (a === 'vs_pet') { const arr = petsActivas(); if (arr.includes(k)) { arr.splice(arr.indexOf(k), 1); sfx.click(); } else if (arr.length < 3) { arr.push(k); sfx.click(); } else { toast('MÁXIMO 3 MASCOTAS ACTIVAS'); sfx.no(); return; } guardar(); pintar(); render(); } else if (a === 'vs_t') { const it = ITEMS[k], sl = it.slot; if (e.ropa[sl] === k) { if (PORDEFECTO[sl]) { sfx.no(); return; } e.ropa[sl] = null; } else e.ropa[sl] = k; sfx.click(); pintar(); render(); } else if (a === 'vs_nada') { sfx.click(); Object.assign(e.ropa, BASE().ropa); pintar(); render(); } else if (a === 'vs_x') { sfx.click(); cerrar(); } else if (a === 'vs_ok') { vsGuardar(); } else if (a === 'iv_cat') { sfx.click(); ivCat = k; ivF = 'todo'; iv = 'cat'; isel = null; render(); $('m-cuerpo').scrollTop = 0; } else if (a === 'iv_back') { sfx.click(); iv = 'hub'; isel = null; render(); } else if (a === 'iv_f') { sfx.click(); ivF = k; isel = null; render(); } else if (a === 'iv_sel') { sfx.click(); isel = isel === k ? null : k; render(); } else if (a === 'iv_item') { sfx.click(); const c = ['ropa', 'mue', 'jug', 'fon'].find(c => invListas()[c].includes(k)); if (c) { ivCat = c; ivF = 'todo'; iv = 'cat'; isel = k; render(); } } else if (a === 'it_nada') { e.ropa = Object.assign(e.ropa, BASE().ropa); sfx.click(); gesto('salto'); pintar(); guardar(); render(); } else if (a === 'iv_vestir') { sfx.click(); abrir('vestir'); } else if (a.startsWith('d_')) dClick(a, k); else if (a.startsWith('r_')) rClick(a, b); else if (a === 'tut_ver') { cerrar(); setTimeout(() => { if (libreParaTutorial()) iniciarTutorial(); else toast('Inténtalo cuando Simon esté despierto y sin visitas'); }, 600); } else if (a === 'c_canjear') canjear(); else if (a === 'c_reset_no') { resetPend = false; cdMsg = null; sfx.click(); render(); } else if (a === 'c_reset_ok') reiniciarTodo(); else if (a === 'f_dar') darComida(k); else if (a === 'f_sif') sifComer(); else if (a === 'f_comprar') comprarComida(k); else if (a === 'j_comprar') comprarSemilla(k); else if (a === 'j_plantar') jardinPlantar(k); else if (a === 'b_comprar') comprarBomba(); else if (a.startsWith('x_')) xClick(a, k);
   }
   $('m-cuerpo').addEventListener('click', mClick);
   $('vt-s1').addEventListener('click', mClick); $('vt-s2').addEventListener('click', mClick);
   $('m-x').onclick = cerrar;
   $('btn-tienda').onclick = () => { if (guiaBloq()) return; sfx.click(); abrir('tienda'); };
-  $('chip-mon').onclick = () => { sfx.click(); abrir('tienda'); };
+  $('chip-mon').onclick = () => { if (guiaBloq()) return; sfx.click(); abrir('tienda'); };
   $('chip-fue').onclick = () => { const r = racha(); toast(r ? 'RACHA: ' + r + (r === 1 ? ' DÍA' : ' DÍAS') + '. ¡VUELVE MAÑANA!' : 'SIN RACHA. ¡ABRE TU REGALO PARA EMPEZAR!'); };
   $('chip-niv').onclick = () => { const n = nivel(); toast(n >= NMAX ? 'CARIÑO AL MÁXIMO' : 'CARIÑO ' + (e.xp - xpDe(n)) + '/' + (xpDe(n + 1) - xpDe(n)) + ' PARA NV' + (n + 1)); };
 
