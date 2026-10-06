@@ -115,12 +115,12 @@
   .sv { font:inherit; font-size:11px; border:0; padding:8px 11px; background:#2fae5c; color:#fff; text-shadow:1px 1px 0 #1b6e3b;
     box-shadow:0 -3px 0 var(--noche), -3px 0 0 var(--noche), 3px 0 0 var(--noche), 0 3px 0 var(--noche); }
   #edicion.on { display:block; }
-  #ed-bd { display:flex; flex-wrap:wrap; gap:8px; overflow-y:auto; overflow-x:hidden; margin-bottom:10px; min-height:8px; max-height:34vh; align-content:flex-start; }
-  #ed-bd > button { flex:0 0 auto; background:#e8ecff; border:0; padding:5px; box-shadow:0 0 0 3px var(--noche); position:relative; } #ed-bd canvas { display:block; image-rendering:pixelated; max-height:34px; max-width:44px; object-fit:contain; }
+  #ed-bd { display:grid; grid-template-columns:repeat(auto-fill, minmax(56px, 1fr)); gap:8px; overflow-y:auto; overflow-x:hidden; margin-bottom:10px; min-height:8px; max-height:34vh; align-content:flex-start; }
+  #ed-bd > button { background:#e8ecff; border:0; padding:5px; box-shadow:0 0 0 3px var(--noche); position:relative; touch-action:pan-y; } #ed-bd canvas { display:block; image-rendering:pixelated; max-height:34px; max-width:44px; object-fit:contain; }
   #ed-buscar { font:inherit; font-size:8px; width:100%; box-sizing:border-box; padding:9px 10px; margin-bottom:8px; border:0; background:var(--noche); color:#fff; box-shadow:0 0 0 2px var(--linea); }
   #ed-buscar::placeholder { color:#6a74b0; }
   #ed-filtros.th-chips { margin-bottom:8px; }
-  #ed-bd > button div { font-size:5px; color:#232b63; margin-top:3px; max-width:48px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; } #ed-bd > button { display:flex; flex-direction:column; align-items:center; justify-content:center; width:56px; height:62px; } #ed-bd > button.sel { box-shadow:0 0 0 3px #ffd84a; }
+  #ed-bd > button div { font-size:5px; color:#232b63; margin-top:3px; max-width:48px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; } #ed-bd > button { display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:62px; } #ed-bd > button.sel { box-shadow:0 0 0 3px #ffd84a; }
   .mu-f, .mu-x { width:17px; height:17px; border:0; border-radius:50%; font-size:9px; line-height:17px; padding:0; z-index:3; color:#fff; box-shadow:0 0 0 2px #12163a; }
   .mu-f { background:#3a7fe8; } .mu-x { background:#e8353f; }
   .mu-f.ov, .mu-x.ov { position:fixed; top:0; left:0; display:none; margin:0; z-index:20; }
@@ -137,7 +137,7 @@
   #ed-capa-ctrl.off { opacity:.4; pointer-events:none; }
   #cg { display:none; position:absolute; inset:0; z-index:26; background:#2a2230; flex-direction:column; align-items:center; }
   #cg.on { display:flex; } #cg-bar { width:100%; display:flex; justify-content:space-between; align-items:center; padding:8px 12px 2px; box-sizing:border-box; } #cg-t { font-size:9px; color:#ffd84a; } #cg-x { padding:6px 10px; font-size:8px; } #cg-h { display:none; width:min(92%,360px); height:10px; background:#12102a; box-shadow:0 0 0 2px #5a4a8a; margin:4px 0 8px; } #cg-hb { height:100%; width:100%; background:#5ac870; box-shadow:inset 0 3px 0 rgba(255,255,255,.4); } #cg-h.on { display:block; }
-  #cg-cx { display:none; position:absolute; inset:0; z-index:10; background:rgba(10,8,30,.78); flex-direction:column; align-items:center; justify-content:center; padding:16px; box-sizing:border-box; } #cg-cx.on { display:flex; } #cg-cx-bx { background:#1a1f4a; box-shadow:0 0 0 3px #ffd84a,0 6px 0 #12102a; padding:14px 16px 12px; max-width:320px; width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; } #cg-cx-top { display:flex; align-items:center; gap:12px; width:100%; } #cg-cxp { width:52px; height:56px; flex:none; image-rendering:pixelated; } #cg-cxt { flex:1; font-size:9px; line-height:1.7; color:#fff; } #cg-cxb { width:100%; padding:11px 10px; font-size:9px; display:none; }
+  #cg-cx { display:none; width:min(94%,380px); margin:6px auto 0; box-sizing:border-box; flex-direction:column; align-items:center; z-index:10; } #cg-cx.on { display:flex; } #cg-cx-bx { background:#1a1f4a; box-shadow:0 0 0 3px #ffd84a,0 4px 0 #12102a; padding:8px 10px; max-width:380px; width:100%; display:flex; align-items:center; gap:8px; box-sizing:border-box; } #cg-cx-top { display:flex; align-items:center; gap:8px; flex:1; min-width:0; } #cg-cxp { width:34px; height:37px; flex:none; image-rendering:pixelated; } #cg-cxt { flex:1; font-size:8px; line-height:1.4; color:#fff; } #cg-cxb { flex:none; padding:7px 10px; font-size:8px; display:none; }
   #cgc { image-rendering:pixelated; touch-action:none; display:block; margin:auto 0; }
   body.cocinando .botones, body.cocinando .lateral, body.cocinando .tareas, body.cocinando #t-bomba, body.cocinando #burbuja { visibility:hidden; }
   #ban { display:none; position:absolute; left:0; right:0; bottom:0; z-index:25; background:linear-gradient(#2c6a88,#1a3a5a); border-top:4px solid #8ad0ff; padding:10px 12px calc(12px + env(safe-area-inset-bottom)); text-align:center; }
@@ -590,7 +590,7 @@
   const CLAVE_BK = 'simon-v1-bk';
   const ESQUEMA = 1;
   let guardaCount = 0;
-  const VERSION_JUEGO = '2.0';
+  const VERSION_JUEGO = 'Beta v.397';
 
   /* === IndexedDB helper (respaldo silencioso) === */
   const IDB_NAME = 'simon-idb', IDB_STORE = 'save';
@@ -2549,7 +2549,7 @@
   Object.assign(ITEMS.sofa, { tema: 'sala' }); ['mesita', 'librero', 'tele', 'acuario', 'baul', 'globo', 'telescopio', 'estante'].forEach(k => { ITEMS[k].tema = 'sala'; });
   ITEMS.cuadro_keke.tema = 'cocina'; ITEMS.espejo.tema = 'entrada';
   const temaDe = k => (ITEMS[k] && ITEMS[k].tema) || 'todas';
-  const iconoHabDe = k => { const t = temaDe(k); return (t === 'estudio' || t === 'bano') ? (HAB_ICO[t] || '') : ''; };   // solo estudio y baño restringen de verdad dónde se puede colocar (ver colocar())
+  const iconoHabDe = k => { const t = temaDe(k); return (t === 'estudio' || t === 'bano' || (ITEMS[k] && ITEMS[k].exclusivo)) ? (HAB_ICO[t] || '') : ''; };   // estudio, baño y los ítems exclusivos de una habitación (camas, clóset, etc.) restringen dónde se puede colocar (ver colocar())
   const MERC_POOL = ['sud_dorada', 'sud_negra', 'sud_morada', 'monoculo', 'bufanda_dorada', 'pared_noche', 'alf_dorada', 'dino', 'cohete', 'marco_planeta'];
   const ORDEN = {
     ropa: ['sud_azul', 'sud_roja', 'sud_verde', 'sud_naranja', 'sud_rosa', 'sud_celeste', 'gafas', 'gafas_corazon', 'mono', 'corbata', 'bufanda', 'collar', 'audifonos', 'orejas_gato', 'capa_roja', 'capa_azul', 'monodorado', 'sud_calabaza', 'sud_navidad', 'sud_dorada', 'sud_negra', 'sud_morada', 'monoculo', 'bufanda_dorada', 'sud_arcoiris'],
@@ -3356,11 +3356,10 @@
   const REF_CAD = ['refri_menta', 'refri_retro', 'refri_keke', 'refri_acero', 'refri_negro', 'refri_doble'];
   const refriNv = k => !k ? 1 : k === 'refri_dorado' ? 7 : REF_CAD.indexOf(k) + 2;
   const refReq = k => { const i = REF_CAD.indexOf(k); return i > 0 && !e.tiene[REF_CAD[i - 1]] ? REF_CAD[i - 1] : null; };
-  const FRESCO_MS = 3 * 86400000;   // los ingredientes duran 3 días frescos
   function ingL(k) { e.ing = e.ing || {}; const v = e.ing[k]; if (typeof v === 'number') e.ing[k] = Array.from({ length: v }, () => Date.now()); else if (!Array.isArray(v)) e.ing[k] = []; return e.ing[k]; }
-  const ingN = k => ingL(k).length;   // total guardados (frescos y pasados)
-  const ingF = k => ingL(k).filter(t => Date.now() - t < FRESCO_MS).length;   // frescos
-  const ingP = k => ingN(k) - ingF(k);   // pasados
+  const ingN = k => ingL(k).length;   // total guardados: no caducan, se quedan para siempre hasta que se usan
+  const ingF = k => ingN(k);   // todo lo guardado cuenta como disponible
+  const ingP = () => 0;   // ya no hay ingredientes "pasados"
   const IGRID = {
     jitomate() { const g = Grid(14, 14); ovalG(g, 7, 8, 6, 5, '#e8353f'); ovalG(g, 7, 7, 5, 3, '#ff6a60'); g.rect(4, 3, 6, 2, '#3a9a50'); g.rect(6, 1, 2, 3, '#2a7a3a'); g.rect(3, 4, 2, 1, '#5ac870'); g.rect(9, 4, 2, 1, '#5ac870'); g.set(4, 6, '#ffffff'); g.contour('#7a1018'); return g; },
     lechuga() { const g = Grid(14, 14); ovalG(g, 7, 8, 6, 5, '#4ab860'); ovalG(g, 7, 7, 4, 3, '#8ae08a'); g.rect(6, 4, 1, 8, '#2a8a40'); g.rect(3, 7, 3, 1, '#2a8a40'); g.rect(9, 8, 3, 1, '#2a8a40'); g.rect(5, 5, 2, 1, '#c8f4b0'); g.contour('#1a5a2a'); return g; },
@@ -3384,13 +3383,13 @@
   }
   function renderMkt(h) {
     const cap = ingCap();
-    h += `<div class="th-nota">Ingredientes para cocinar. Se guardan en el REFRI (caben ${cap} de cada uno) y duran 3 días frescos.</div><div class="th-g3">${ING_ORD.map(k => {
+    h += `<div class="th-nota">Ingredientes para cocinar. Se guardan en el REFRI (caben ${cap} de cada uno) y no se echan a perder.</div><div class="th-g3">${ING_ORD.map(k => {
       const F = ING[k], bloq = nivel() < F.nv, n = ingN(k), nf = ingF(k);
       return `<button class="th-c ${bloq ? 'lock' : ''} ${tsel === k ? 'sel' : ''}" data-a="tv_sel" data-k="${k}">${n > 0 ? `<span class="th-cant">x${nf}</span>` : ''}<div class="th-pv"><canvas data-prev="ig_${k}"></canvas></div><div class="th-nm">${F.n}</div>${bloq ? `<span class="pr no">🔒 NV${F.nv}</span>` : `<span class="pr ${e.monedas >= F.p && n < cap ? '' : 'no'}">$ ${F.p}</span>`}</button>`;
     }).join('')}</div>`;
     if (tsel && ING[tsel]) {
       const F = ING[tsel], n = ingN(tsel);
-      tSheetH = `<div class="th-big"><canvas data-prev="ig_${tsel}"></canvas></div><div class="th-n">${F.n}</div><div class="th-i">INGREDIENTE: NO SE COME,<br>SE USA PARA COCINAR<br>EN EL REFRI: ${n}/${cap}<br>DURAN 3 DIAS FRESCOS</div>` +
+      tSheetH = `<div class="th-big"><canvas data-prev="ig_${tsel}"></canvas></div><div class="th-n">${F.n}</div><div class="th-i">INGREDIENTE: NO SE COME,<br>SE USA PARA COCINAR<br>EN EL REFRI: ${n}/${cap}<br>NO SE ECHA A PERDER</div>` +
         (nivel() < F.nv ? `<div class="est bloq">CARIÑO NV${F.nv}</div>` : n >= cap ? '<div class="est">REFRI LLENO</div>' : `<button class="bt ${e.monedas >= F.p ? 'ok' : 'no'} gran" data-a="ig_comprar" data-k="${tsel}">COMPRAR · $ ${F.p}</button>`);
     } else tsel = null;
     return h;
@@ -3548,14 +3547,13 @@
     return false;
   }
   function renderRefri() {
-    const k = e.cuarto.refri, nom = k && ITEMS[k] ? ITEMS[k].n : 'REFRI BASICO', cap = ingCap(), tot = ING_ORD.reduce((a, i) => a + ingN(i), 0), pas = ING_ORD.reduce((a, i) => a + ingP(i), 0);
+    const k = e.cuarto.refri, nom = k && ITEMS[k] ? ITEMS[k].n : 'REFRI BASICO', cap = ingCap(), tot = ING_ORD.reduce((a, i) => a + ingN(i), 0);
     $('m-titulo').textContent = 'REFRI';
     let h = `<div class="th-top"><span>NV ${refriNv(k)} · ${nom}</span><span>CABEN ${cap} DE CADA UNO</span></div><button class="bt" style="padding:6px 10px;font-size:7px;margin:0 0 10px" data-a="rf_mejorar">VER REFRIS Y MEJORAR</button>`;
     if (!tot) h += `<div class="centro" style="font-size:8px;line-height:1.9;margin:6px 0 12px">El refri está vacío. Compra ingredientes en el MERCADO para poder cocinar.</div>`;
-    else h += `<div class="th-nota">Los ingredientes duran 3 días frescos. Los pasados no sirven para cocinar: tíralos.</div>`;
-    h += `<div class="th-g3">${ING_ORD.map(i => { const n = ingN(i), f = ingF(i), p = ingP(i); return `<div class="th-c ${n ? '' : 'lock'}" style="cursor:default">${f ? `<span class="th-cant">x${f}</span>` : ''}<div class="th-pv"><canvas data-prev="ig_${i}"></canvas></div><div class="th-nm">${ING[i].n}</div>${p ? `<button class="pr no" style="border-color:#ff7b84;color:#ff9aa2" data-a="ig_tirar" data-k="${i}">TIRAR ${p} PASADO${p > 1 ? 'S' : ''}</button>` : `<span class="pr ${n >= cap ? 'ok' : 'no'}">${n}/${cap}</span>`}</div>`; }).join('')}</div>`;
+    else h += `<div class="th-nota">Los ingredientes no se echan a perder: se quedan guardados hasta que los uses.</div>`;
+    h += `<div class="th-g3">${ING_ORD.map(i => { const n = ingN(i); return `<div class="th-c ${n ? '' : 'lock'}" style="cursor:default">${n ? `<span class="th-cant">x${n}</span>` : ''}<div class="th-pv"><canvas data-prev="ig_${i}"></canvas></div><div class="th-nm">${ING[i].n}</div><span class="pr ${n >= cap ? 'ok' : 'no'}">${n}/${cap}</span></div>`; }).join('')}</div>`;
     h += `<div style="display:flex;gap:8px;margin-top:14px"><button class="bt gran" style="flex:1;padding:12px 0" data-a="rf_ir">MERCADO</button><button class="bt ok gran" style="flex:1;padding:12px 0" data-a="ck_abrir">COCINAR</button></div>`;
-    if (pas) h += `<button class="bt gran" style="margin-top:8px;padding:10px 0;background:#ff7b84" data-a="ig_tirar_todo">TIRAR TODO LO PASADO (${pas})</button>`;
     return h;
   }
   ORDEN.comida = Object.keys(COMIDAS); ORDEN.extras = ['bomba', 'jarabe']; ORDEN.juguetes = Object.keys(ITEMS).filter(k => ITEMS[k].slot === 'juguete'); ORDEN.cuarto.push(...Object.keys(nuevosItems), 'puf_azul', 'puf_rojo', 'puf_verde', 'puf_rosa', 'puf_morado', 'puf_dorado');
@@ -3634,13 +3632,13 @@
   const CK_PASO = { cortar: 'CORTAR', cocinar: 'COCINAR', armar: 'EMPLATAR' };
   const CG_MODO = { ensalada: { lechuga: 'c', jitomate: 'c' }, hotcakes: { harina: 'f', huevo: 'f', leche: 'f' }, tostada: { pan: 'f', queso: 'cf' }, licuado: { naranja: 'c', leche: 'f' }, tacocasero: { tortilla: 'f', carne: 'cf', jitomate: 'c' }, kekecasero: { harina: 'f', huevo: 'f', azucar: 'f', chocolate: 'c' }, kekeperro: { harina: 'f', huevo: 'f', carne: 'cf' } };
   function ckFaltan(r) { return Object.keys(r.ing).filter(k => ingF(k) < r.ing[k]); }
-  function ckGasta(r, extra) {   // usa primero los ingredientes más viejos que aún están frescos
-    Object.keys(r.ing).forEach(k => { const L = ingL(k).slice().sort((a, b) => a - b); let n = r.ing[k] + ((extra && extra[k]) || 0); const resto = []; L.forEach(t => { if (n > 0 && Date.now() - t < FRESCO_MS) n--; else resto.push(t); }); e.ing[k] = resto; });
+  function ckGasta(r, extra) {   // usa primero los ingredientes más viejos
+    Object.keys(r.ing).forEach(k => { const L = ingL(k).slice().sort((a, b) => a - b), n = r.ing[k] + ((extra && extra[k]) || 0); e.ing[k] = L.slice(n); });
   }
   function renderCocinar() {
     $('m-titulo').textContent = 'COCINAR';
     if (!ck) {
-      let h = `<div class="th-nota">Elige qué cocinar. Verás la estufa desde arriba: corta, mueve la sartén y no dejes que se queme. Solo sirven ingredientes frescos.</div>`;
+      let h = `<div class="th-nota">Elige qué cocinar. Verás la estufa desde arriba: corta, mueve la sartén y no dejes que se queme.</div>`;
       h += RECETAS.map(r => {
         const falt = ckFaltan(r), bloq = nivel() < r.nv, ok = !falt.length && !bloq;
         return `<div class="ck-r ${ok ? '' : 'no'}"><div class="ck-pv"><canvas data-prev="fd_pl_${r.id}"></canvas></div><div class="ck-tx"><b>${r.n}${r.perro ? ' (' + (e.sifK || 0) + ')' : ''}</b><div class="ck-ing">${Object.keys(r.ing).map(k => `<span class="${ingF(k) >= r.ing[k] ? 'ok' : 'x'}"><canvas data-prev="ig_${k}"></canvas>${r.ing[k] > 1 ? 'x' + r.ing[k] : ''}</span>`).join('')}</div></div>` +
@@ -3655,12 +3653,12 @@
   }
   function ckIr(id) {
     const r = RECETAS.find(x => x.id === id); if (!r) return;
-    if (ckFaltan(r).length) { toast('Faltan ingredientes frescos: ' + ckFaltan(r).map(k => ING[k].n.toLowerCase()).join(', ')); sfx.no(); return; }
+    if (ckFaltan(r).length) { toast('Faltan ingredientes: ' + ckFaltan(r).map(k => ING[k].n.toLowerCase()).join(', ')); sfx.no(); return; }
     sfx.click(); ck = null; modal = null; $('modal').classList.remove('on', 'sheet'); $('escena').classList.remove('alto'); cgIni(r);
   }
   function cgTutorial() {
     const r = RECETAS.find(x => x.id === 'tostada'), n = Date.now(); e.ing = e.ing || {};
-    ['pan', 'queso'].forEach(k => { const L = ingL(k).filter(t => n - t < FRESCO_MS); while (L.length < 2) L.push(n); e.ing[k] = L; });
+    ['pan', 'queso'].forEach(k => { const L = ingL(k); while (L.length < 2) L.push(n); e.ing[k] = L; });
     introPend = Date.now() + 1800000; ck = null; modal = null; $('modal').classList.remove('on', 'sheet'); $('escena').classList.remove('alto'); cgIni(r, true);
   }
   function cocTutFin(r, est, porc) {
@@ -3668,9 +3666,7 @@
     cortexCamina(() => dialogo([
       C('¡Muy bien! Mira lo que preparaste.'),
       { q: 'CORTEX', t: '', fan: { g: () => FGRID['pl_' + r.id](), t: r.n, d: (est === 3 ? '¡PERFECTA! ' : est === 2 ? 'BIEN HECHA. ' : '') + 'SE GUARDÓ EN ALIMENTAR (x' + porc + ')' } },
-      C('Simon puede comérsela desde ALIMENTAR.'),
-      C('Desde ahora habrá tiempo límite. Si se acaba, no pierdes nada; pero si algo se quema, pierdes los ingredientes.'),
-      C('Compra más en el MERCADO. ¡Buen provecho, chef!')
+      C('Se guarda en ALIMENTAR. Ojo: si algo se quema, pierdes los ingredientes. ¡Buen provecho, chef!')
     ], () => cortexSale(() => { introPend = 0; pintar(); setTimeout(saludar, 600); })), .07);
   }
   function introCocina() {
@@ -3679,10 +3675,8 @@
     if (!eventoLibre(EV_INTE)) { evAgregar('introC', 25, () => escenaId() === 'cocina' && eventoLibre(EV_INTE), introCocina); return; }
     introPend = Date.now() + 600000;
     cortexCamina(() => dialogo([
-      C('¡Esta es la COCINA! Aquí puedes preparar platillos únicos para Simon.'),
-      C('Los ingredientes se compran en el MERCADO de la tienda y se guardan en el REFRI. Duran 3 días frescos.'),
-      C('Para cocinar, toca la estufa. Verás todo desde arriba: cortas, cocinas y sirves.'),
-      C('Hagamos una tostada juntos. Te dejo los ingredientes. ¡Yo te guío!')
+      C('¡Esta es la COCINA! Compra ingredientes en el MERCADO y guárdalos en el REFRI.'),
+      C('Toca la estufa. Hagamos una tostada juntos, ¡yo te guío!')
     ], () => cortexSale(() => { if (escenaId() === 'cocina') cgTutorial(); else introPend = 0; })), .07);
   }
   function ckClick(a, k) { if (a === 'ck_ir') ckIr(k); else if (a === 'ck_fin') { ck = null; sfx.click(); render(); } }
@@ -3735,7 +3729,7 @@
   function cgCxPon() {
     const b = $('cg-cx'); if (!cg || !cg.tut) { b.classList.remove('on'); return; } b.classList.add('on');
     const pc = $('cg-cxp'), px = pc.getContext('2d'); px.imageSmoothingEnabled = false; px.clearRect(0, 0, 52, 56); const kc = cortexClave(); sprite(kc, () => cortexG(), 0); px.drawImage(gridCanvas(recorte(gridCache[kc], 7, 0, 46, 49)), 0, 0, 52, 56);
-    cgCx('Mira: a la izquierda se corta, a la derecha se cocina y abajo se sirve.', () => cgCx('Cuchillo = cortar. Llama = cocinar. Sigue la mano que te mostraré.', () => { cg.tutI = 2; cgCx('', null); }));
+    cgCx('Corta a la izquierda, cocina a la derecha y sirve abajo. ¡Yo te guío!', () => { cg.tutI = 2; cgCx('', null); });
   }
   function cgCx(t, cb) {
     const b = $('cg-cxb'); if (!cg) return; cg.cxT = t; $('cg-cxt').textContent = t;
@@ -3758,7 +3752,8 @@
   function cgNueva(k, modo, id) { return { id, k, modo, loc: 'cesta', corte: false, cuts: [], cq: [], cook: [0, 0], lado: 0, quemada: false, x: 0, y: 0, salto: 0, ok1: false, ok2: false }; }
   function cgAyuda() { cg.idle = 0; }
   function cgLayout() {
-    const cv = $('cgc'), a = $('cg'), w = a.clientWidth, h = a.clientHeight - 44, s = Math.max(1, Math.floor(Math.min(w / CGW, h / CGH) * 4) / 4);
+    const cv = $('cgc'), a = $('cg'), w = a.clientWidth, cxRes = (cg && cg.tut) ? 56 : 0;   // espacio reservado abajo de la estufa para el diálogo de Cortex
+    const h = a.clientHeight - 44 - cxRes, s = Math.max(1, Math.floor(Math.min(w / CGW, h / CGH) * 4) / 4);
     cv.width = CGW; cv.height = CGH; cv.style.width = Math.floor(CGW * s) + 'px'; cv.style.height = Math.floor(CGH * s) + 'px';
   }
   function cgCerrar() { $('cg-cx').classList.remove('on'); cancelAnimationFrame(cgRaf); cgRaf = 0; cg = null; document.body.classList.remove('cocinando'); $('cg').classList.remove('on'); }
@@ -4092,7 +4087,9 @@
     const otro = e.deco.find(o => o !== d && o.h === 'estudio' && ITEMS[o.k] && ITEMS[o.k].zona === z && o.s === mejor); if (otro) otro.s = d.s;
     d.s = mejor; sfx.click();
   }
+  const habNombre = t => (HABS.find(h => h.id === t) || {}).n || String(t).toUpperCase();
   function colocar(k) {
+    if (ITEMS[k].exclusivo && ITEMS[k].tema && ITEMS[k].tema !== e.hab) { toast('Este objeto solo va en: ' + habNombre(ITEMS[k].tema)); sfx.no(); return false; }
     if (ITEMS[k].tema === 'bano' && e.hab !== 'bano') { toast('Este objeto solo va en el BAÑO'); sfx.no(); return false; }
     const esE = ITEMS[k].tema === 'estudio';
     if (esE !== (e.hab === 'estudio')) { toast(esE ? 'Este objeto solo va en el ESTUDIO' : 'El ESTUDIO solo admite objetos de estudio'); sfx.no(); return false; }
@@ -7563,8 +7560,15 @@
 
   /* ===================== DECORAR EL CUARTO ===================== */
   const ptoLog = ev => { const r = cv.getBoundingClientRect(); return { x: (ev.clientX - r.left) / r.width * LW, y: (ev.clientY - r.top) / r.height * LH }; };
+  function edTap(el, fn) {   // actúa solo si fue un toque real; si el dedo se movió (deslizando la lista para hacer scroll), no hace nada
+    let sx = 0, sy = 0, pid = null, mov = false;
+    el.addEventListener('pointerdown', ev => { pid = ev.pointerId; sx = ev.clientX; sy = ev.clientY; mov = false; });
+    el.addEventListener('pointermove', ev => { if (ev.pointerId !== pid) return; if (Math.hypot(ev.clientX - sx, ev.clientY - sy) > 9) mov = true; });
+    const fin = ev => { if (ev.pointerId !== pid) return; pid = null; if (!mov) { ev.preventDefault(); fn(ev); } };
+    el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', () => { pid = null; mov = false; });
+  }
   const filtroCat = k => { const it = ITEMS[k]; return it.semilla ? 'flores' : (it.slot === 'decoP' || it.estilo === 'pared') ? 'pared' : 'piso'; };
-  const FILTRO_NOM = { disp: 'DISPONIBLES', pared: 'PARED', piso: 'PISO', flores: 'FLORES' };
+  const FILTRO_NOM = { disp: 'COLOCAR', pared: 'PARED', piso: 'PISO', flores: 'FLORES' };
   function pintarEdLista() {
     const bd = $('ed-bd'); bd.innerHTML = '';
     let lista = (edit._todos || []).slice();
@@ -7600,8 +7604,8 @@
       b.appendChild(c); b.appendChild(nm);
       if (iAqui >= 0 && edit.sel === iAqui) b.classList.add('sel');
       if (iAqui >= 0) {
-        if (muProtegido(k)) b.onpointerdown = ev => { ev.preventDefault(); edit.sel = iAqui; sfx.click(); pintarEdicion(); };
-        else b.onpointerdown = ev => { ev.preventDefault(); e.deco.splice(iAqui, 1); edit.sel = null; sfx.click(); guardar(); pintarEdicion(); };   // tocar un item ya colocado aquí lo quita; mover/voltear se hace tocándolo en la escena
+        if (muProtegido(k)) edTap(b, () => { edit.sel = iAqui; sfx.click(); pintarEdicion(); });
+        else edTap(b, () => { e.deco.splice(iAqui, 1); edit.sel = null; sfx.click(); guardar(); pintarEdicion(); });   // tocar un item ya colocado aquí lo quita; mover/voltear se hace tocándolo en la escena
       } else {
         const colocarEnPunto = ptEv => {
           if (!colocar(k)) return;
@@ -7612,7 +7616,7 @@
           }
           edit.sel = j; sfx.compra(); guardar(); pintarEdicion();
         };
-        b.onpointerdown = ev => { ev.preventDefault(); colocarEnPunto(null); };
+        edTap(b, () => colocarEnPunto(null));
       }
       bd.appendChild(b);
     });
@@ -8217,9 +8221,9 @@
     if (petActiva('pet_sif')) buffs.push(['pet_sif', 'SIF', 'Jugar con Simon le quita 10% menos de energía.']);
     if (ojoAct()) buffs.push(['ojo_pet', 'OJO', 'Simon duerme 10% más rápido.']);
     if (simonLevita()) buffs.push(['aura_eterna', 'LEVITANDO', 'Aura puesta + Semilla Eterna viva: Simon flota.']);
-    h += `<div style="margin-top:14px;font-size:7px;color:#aab4ff">BUFFOS ACTIVOS</div>`;
+    h += `<div style="margin-top:14px;font-size:7px;color:#aab4ff">VENTAJAS ACTIVAS</div>`;
     h += buffs.length ? buffs.map(([ic, bn, bd]) => `<div class="buff-row"><div class="buff-ic"><canvas data-prev="${ic}"></canvas></div><div class="buff-tx"><b>${bn}</b><span>${bd}</span></div></div>`).join('') :
-      `<div class="centro" style="font-size:7px;color:#aab4ff;margin:8px 0">Ninguno por ahora. Las plantas y mascotas de Simon dan buffos.</div>`;
+      `<div class="centro" style="font-size:7px;color:#aab4ff;margin:8px 0">Ninguna por ahora. Las plantas y mascotas de Simon dan ventajas.</div>`;
     const M = misionesHoy(), ok = M.ids.filter(i => M.ok[i]).length;
     h += `<div style="margin-top:12px;font-size:7px;color:#aab4ff">MISIONES DE HOY: ${ok}/${M.ids.length}</div>`;
     h += `<div style="margin-top:14px"><button class="bt ok" style="width:100%" data-a="vs_open">VESTIR A SIMON</button></div>`;
@@ -8660,7 +8664,14 @@
     cu.scrollTop = sc;
     if (guia && modal === 'comida') requestAnimationFrame(guiaMarca);   // actualizar flecha tutorial al instante
   }
-  const baseTienda = k => (tab !== 'cuarto' || !habBloq(k)) && (tab !== 'ropa' || fRopa === 'todo' || (fRopa === 'prem' ? ITEMS[k].prem : ITEMS[k].slot === fRopa)) && (tab !== 'cuarto' || fHab === 'todo' || ((esMueble(k) || ITEMS[k].pat || ITEMS[k].refri || ITEMS[k].util) && temaDe(k) === fHab)) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k] || ITEMS[k].prem);
+  const restriccionHab = k => {   // ¿a qué habitación está realmente restringido este item? null = se puede colocar en cualquier lado
+    const it = ITEMS[k]; if (!it) return null; const t = it.tema;
+    if (!t || t === 'todas') return null;
+    if (!esMueble(k)) return t;   // papel tapiz, pisos, refris y similares (se equipan, no se arrastran) siempre son exclusivos de su habitación
+    if (t === 'bano' || t === 'estudio') return t;
+    return it.exclusivo ? t : null;
+  };
+  const baseTienda = k => (tab !== 'cuarto' || !habBloq(k)) && (tab !== 'ropa' || fRopa === 'todo' || (fRopa === 'prem' ? ITEMS[k].prem : ITEMS[k].slot === fRopa)) && (tab !== 'cuarto' || fHab === 'todo' || ((esMueble(k) || ITEMS[k].pat || ITEMS[k].refri || ITEMS[k].util) && (fHab === 'general' ? !restriccionHab(k) : restriccionHab(k) === fHab))) && (tab === 'comida' || k === 'bomba' || k === 'jarabe' || !(ITEMS[k].mercader || ITEMS[k].codigo) || e.tiene[k] || ITEMS[k].prem);
   var tv = 'hub', tvPre = false, tsel = null, tSheetH = '';
   const CATS = [['ropa', 'ROPA', 'sud_azul'], ['cuarto', 'MUEBLES', 'silla'], ['comida', 'COMIDA', 'fd_dona'], ['mkt', 'MERCADO', 'ig_jitomate'], ['juguetes', 'JUGUETES', 'juguete_azul'], ['semillas', 'SEMILLAS', 'sm_brote'], ['extras', 'EXTRAS', 'fd_bomba'], ['prem', 'PREMIUM', 'alas_angel']];
   const catDe = k => ['ropa', 'cuarto', 'juguetes'].find(t => ORDEN[t].includes(k));
@@ -8750,7 +8761,7 @@
     if (tab === 'mkt') return renderMkt(h);
     if (tab === 'semillas') return renderSemillas(h);
     if (tab === 'ropa') h += `<div class="th-chips">${ROPA_SLOTS.map(([f, t]) => `<button class="${fRopa === f ? 'on' : ''}${f === 'prem' ? ' prem' : ''}" data-a="fr" data-k="${f}">${t}</button>`).join('')}</div>`;
-    if (tab === 'cuarto') h += `<div class="th-chips">${[['todo', 'TODO'], ['estudio', 'ESTUDIO'], ['juegos', 'JUEGOS'], ['sala', 'RECAMARA'], ['bano', 'BAÑO'], ['cocina', 'COCINA'], ['entrada', 'ENTRADA'], ['jardin', 'JARDÍN']].filter(([f]) => f === 'todo' || !habBloq0(f)).map(([f, t]) => `<button class="${fHab === f ? 'on' : ''}" data-a="fh" data-k="${f}">${t}</button>`).join('')}</div>`;
+    if (tab === 'cuarto') h += `<div class="th-chips">${[['todo', 'TODO'], ['general', 'GENERAL'], ['estudio', 'ESTUDIO'], ['juegos', 'JUEGOS'], ['sala', 'RECAMARA'], ['bano', 'BAÑO'], ['cocina', 'COCINA'], ['entrada', 'ENTRADA'], ['jardin', 'JARDÍN']].filter(([f]) => f === 'todo' || f === 'general' || !habBloq0(f)).map(([f, t]) => `<button class="${fHab === f ? 'on' : ''}" data-a="fh" data-k="${f}">${t}</button>`).join('')}</div>`;
     const base = ORDEN[tab].filter(baseTienda).map((k, i) => [k, grupoT(k), i]).sort(['cuarto', 'ropa', 'juguetes'].includes(tab) ? (x, y) => { const A = ordenT(x[0]), B = ordenT(y[0]); for (let j = 0; j < A.length; j++) if (A[j] !== B[j]) return A[j] - B[j]; return x[2] - y[2]; } : (x, y) => x[1] - y[1] || x[2] - y[2]).map(x => x[0]), vis = (e.tn || {})[ct] || 1;
     h += `<div class="th-nota">${tab === 'juguetes' ? 'Solo uno a la vez: el que usa al JUGAR.' : tab === 'cuarto' ? 'Se colocan con la casita.' : tab === 'comida' ? 'La comida especial da energía.' : tab === 'ropa' && fRopa === 'prem' ? 'No se compran: se ganan. Toca una para ver cómo.' : ''}</div>`;
     h += `<div class="th-g3">${base.map(k => {
@@ -8771,7 +8782,6 @@
     if (a === 'tv_cat') { sfx.click(); if (k === 'prem') { tab = 'ropa'; fRopa = 'prem'; } else { tab = k; if (k === 'ropa' && fRopa === 'prem') fRopa = 'todo'; } tv = 'cat'; tsel = null; e.tn = e.tn || {}; e.tn[k] = nivel(); guardar(); render(); $('m-cuerpo').scrollTop = 0; return; } else if (a === 'tv_back') { sfx.click(); tv = 'hub'; tsel = null; render(); return; } else if (a === 'tv_sel') { sfx.click(); tsel = tsel === k ? null : k; render(); return; } else if (a === 'tv_item') { sfx.click(); tab = catDe(k); fRopa = 'todo'; fHab = 'todo'; tv = 'cat'; tsel = k; render(); return; } else if (a === 'fr') { fRopa = k; tsel = null; sfx.click(); render(); } else if (a === 'fh') { fHab = k; tsel = null; sfx.click(); render(); } else if (a === 'comprar') comprar(k); else if (a === 'poner') poner(k);
     else if (a === 'ojo_tog') { e.ojoOn = e.ojoOn === 0 ? 1 : 0; sfx.click(); if (e.ojoOn) ojoSnd(); guardar(); render(); }
     else if (a.startsWith('ck_') && a !== 'ck_abrir') ckClick(a, k); else if (a === 'ck_abrir') { ck = null; sfx.click(); abrir('cocinar'); } else if (a === 'rf_abrir') { sfx.click(); abrir('refri'); } else if (a === 'rf_mejorar') { sfx.click(); tab = 'cuarto'; fHab = 'cocina'; tv = 'cat'; tvPre = true; abrir('tienda'); }
-    else if (a === 'ig_tirar') { const L = ingL(k).filter(t => Date.now() - t < FRESCO_MS); e.ing[k] = L; sfx.click(); guardar(); render(); } else if (a === 'ig_tirar_todo') { ING_ORD.forEach(i => { e.ing[i] = ingL(i).filter(t => Date.now() - t < FRESCO_MS); }); sfx.click(); guardar(); render(); }
     else if (a === 'ig_comprar') comprarIng(k); else if (a === 'rf_ir') { cerrar(); tab = 'mkt'; tv = 'cat'; tvPre = true; tsel = null; sfx.click(); abrir('tienda'); }
     else if (a === 'j_ir_tienda') { cerrar(); tab = 'semillas'; tv = 'cat'; tvPre = true; tsel = null; sfx.click(); abrir('tienda'); }
     else if (a === 'quitar') quitar(k); else if (a === 'mcomprar') comprarMerc(k); else if (a === 'compartir') compartirFoto(); else if (a === 'guardar') guardarFoto(); else if (a === 'abrirreg') abrirRegalo(); else if (a === 'cerrar') cerrar();
