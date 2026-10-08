@@ -1,4 +1,4 @@
-const CACHE = 'simon-v414';
+const CACHE = 'simon-v431';
 const ARCHIVOS = [
   './',
   './index.html',

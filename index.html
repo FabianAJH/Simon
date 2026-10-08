@@ -26,6 +26,7 @@
           <div class="stat"><canvas class="sic" id="si-f" width="7" height="7"></canvas><div class="hp"><div class="hpf" id="s-feliz"></div></div></div>
           <div class="stat"><canvas class="sic" id="si-l" width="7" height="7"></canvas><div class="hp"><div class="hpf" id="s-limp"></div></div></div>
         </div>
+        <button class="chip-enf oculto" id="chip-enf" title="Simon tiene resfriado"><canvas id="ic-term" width="8" height="18"></canvas></button>
       </div>
       <div class="der2"><div class="chip" id="chip-mon"><canvas id="ic-mon" width="6" height="6"></canvas><span id="v-mon">0</span></div><button class="ibtn" id="b-noti"><canvas id="ic-not" width="11" height="11"></canvas><span class="nbadge oculto" id="nb-noti">0</span></button><button class="ibtn" id="b-ajustes"><canvas id="ic-aju" width="11" height="11"></canvas></button></div>
     </div>
@@ -67,7 +68,7 @@
     <button class="btn c-ci" id="b-inv" aria-label="Inventario"><canvas id="ib-inv" width="12" height="12"></canvas><span id="l-inv">Inventario</span></button>
   </nav>
   <div id="ban"><div id="ban-t">1/4 PIOJOS</div><div id="ban-h"></div><div id="ban-b"><div id="ban-p"></div></div><button class="bt" id="ban-x">SALIR</button></div>
-  <div id="edicion"><div id="ed-grip"><span></span></div><button class="ibtn" id="ed-eye" aria-label="Ocultar menú"><canvas id="ic-eye" width="13" height="7"></canvas></button><div id="ed-capa-ctrl" class="off"><button class="ibtn" id="ed-atras" aria-label="Capa atrás">▼</button><span id="ed-ci">-</span><button class="ibtn" id="ed-adel" aria-label="Capa adelante">▲</button></div><button class="ibtn" id="ed-trash" aria-label="Quitar todo en esta habitación">🗑️</button><button class="sv" id="ed-x" aria-label="Guardar">✓</button><div id="ed-filtros" class="th-chips"></div><input id="ed-buscar" type="text" placeholder="BUSCAR MUEBLE..." autocomplete="off"><div id="ed-bd"></div>
+  <div id="edicion"><div id="ed-grip"><span></span></div><button class="ibtn" id="ed-eye" aria-label="Ocultar menú"><canvas id="ic-eye" width="13" height="7"></canvas></button><div id="ed-capa-ctrl" class="off"><button class="ibtn" id="ed-atras" aria-label="Capa atrás">▼</button><span id="ed-ci">-</span><button class="ibtn" id="ed-adel" aria-label="Capa adelante">▲</button></div><button class="ibtn" id="ed-trash" aria-label="Quitar todo en esta habitación">🗑️</button><button class="sv" id="ed-x" aria-label="Guardar">✓</button><div id="ed-filtros" class="th-chips"></div><div class="buscar-wrap"><input id="ed-buscar" type="text" placeholder="BUSCAR MUEBLE..." autocomplete="off"><button id="ed-buscar-x" class="buscar-x" aria-label="Borrar búsqueda" style="display:none">✕</button></div><div id="ed-bd"></div>
     <div id="ed-confirm"><div class="ed-confirm-bx"><p>¿Quitar TODO de esta habitación?<br>Muebles, pared y piso volverán a como estaban al inicio.<br>No se puede deshacer.</p><div class="ed-confirm-bt"><button class="bt" id="ed-conf-no">CANCELAR</button><button class="bt ok" id="ed-conf-si">SÍ, QUITAR TODO</button></div></div></div>
   </div>
   <button id="ed-ov-f" class="mu-f ov">⟲</button><button id="ed-ov-x" class="mu-x ov">✕</button>
@@ -88,7 +89,7 @@
     <div id="mem-hud"><span id="mem-r"></span><span id="mem-pts"></span><span id="mem-f"></span><button id="mem-x" class="mini-btn">SALIR</button></div><div id="mem-grid"></div>
     <div id="mem-fin"><div class="mj-t">¡FIN DE LA PARTIDA!</div><div id="mem-res"></div><div class="mj-bt"><button class="bt ok" id="mem-otra">OTRA VEZ</button><button class="bt" id="mem-sal">SALIR</button></div></div></div></div>
   <div class="modal" id="modal"><div class="ventana">
-    <div class="vt"><div class="vt-row"><div class="vt-l"><span id="m-titulo"></span><span id="vt-s1"></span></div><div class="vt-r"><span id="vt-s2"></span><button class="x" id="m-x">X</button></div></div></div>
+    <div class="vt"><div class="vt-row"><div class="vt-l"><span id="m-titulo"></span><span id="vt-s1"></span></div><div class="vt-r"><span id="vt-s2"></span></div></div><button class="x" id="m-x" aria-label="Cerrar">X</button></div>
     <button class="ibtn" id="vs-trash" aria-label="Quitar toda la ropa">🗑️</button>
     <div id="vs-grip"><span></span></div>
     <div class="vc" id="m-cuerpo"></div>

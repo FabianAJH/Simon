@@ -412,10 +412,16 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     else if (boca === 't') { capa(g, null, L => { L.rect(24, 43, 8, 6, '#1a1630'); }); g.rect(25, 47, 6, 2, '#e0607a'); g.set(24, 43, TINTA); g.set(31, 43, TINTA); g.set(24, 48, TINTA); g.set(31, 48, TINTA); }
     else [[23, 44], [24, 45], [25, 46], [26, 46], [27, 46], [28, 46], [29, 46], [30, 46], [31, 45], [32, 44]].forEach(([x, y]) => g.set(x, y, TINTA));
     }
-    if (est.en) { g.rect(27, 39, 3, 2, '#ff6a78'); g.set(27, 39, '#ffc0c8'); const f = est.l || 0; g.rect(28, 41, 1, 1 + f, '#bfe8ff'); g.set(28, 42 + f, '#e8f8ff'); }
+    if (est.en) {
+      g.rect(27, 39, 3, 2, '#ff6a78'); g.set(27, 39, '#ffc0c8'); const f = est.l || 0; g.rect(28, 41, 1, 1 + f, '#bfe8ff'); g.set(28, 42 + f, '#e8f8ff');
+      if (!atras) [[12, 42], [44, 42]].forEach(([cx, cy]) => { for (let dy = -1; dy <= 1; dy++) for (let dx = -2; dx <= 2; dx++) if ((dx + dy) % 2 === 0) g.set(cx + dx, cy + dy, '#ff8aa6'); });
+    }
     if (ropa.orejas) accOrejas(g, ropa.orejas);
     if (ropa.cuello) accCuello(g, ropa.cuello);
     if (ropa.cara && !atras) accGafas(g, ropa.cara);
+    if (est.en && !atras && ropa.cara && ropa.cara !== 'nariz_payaso' && ropa.cara !== 'casco_espacial') {
+      g.rect(27, 39, 3, 2, '#ff6a78'); g.set(27, 39, '#ffc0c8'); const f = est.l || 0; g.rect(28, 41, 1, 1 + f, '#bfe8ff'); g.set(28, 42 + f, '#e8f8ff');
+    }
     if (est.fl) {                                                      // hambre: el cuerpo se ve flaquito
       const k0 = est.fl === 2 ? .66 : .8, src = g.d.slice();
       for (let y = 44; y < SH; y++) {
@@ -620,10 +626,8 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     if (t % 5 < 3) { ctx.fillStyle = '#ff5a5a'; ctx.fillRect(ax + nave + 3, ay + 23 - (t % 5) * 3, 1, 2); }
     if ((tk >> 3) % 2 && !dlg && !modal) { ctx.fillStyle = '#ffe45a'; ctx.fillRect(a.x + 11, a.y - 7, 10, 1); ctx.fillRect(a.x + 12, a.y - 6, 8, 1); ctx.fillRect(a.x + 13, a.y - 5, 6, 1); ctx.fillRect(a.x + 14, a.y - 4, 4, 1); ctx.fillRect(a.x + 15, a.y - 3, 2, 1); }
   }
-  const repisasCoc = (OX, RY, W) => {   // x0, x1, base, alto máximo: las de arriba se reparten según el ancho de la pantalla
-    const sw = 26, m = 4, n = Math.max(2, Math.floor((W - 2 * m + 10) / (sw + 10))), st = (W - 2 * m - sw) / (n - 1), L = [];
-    for (let i = 0; i < n; i++) { const x = Math.round(m + i * st); L.push([x, x + sw, 20, 19]); }
-    return [...L, [OX + 52, OX + 82, RY - 40, RY - 46], [OX + 88, OX + 118, RY - 40, RY - 46]];
+  const repisasCoc = (OX, RY, W) => {   // x0, x1, base, alto máximo: solo las dos repisas inferiores para dejar la pared libre
+    return [[OX + 52, OX + 82, RY - 40, RY - 46], [OX + 88, OX + 118, RY - 40, RY - 46]];
   };
   function cocinaGrid(W, H, RY, OX, S) {   // cocina moderna: azulejo metro blanco, muebles blancos con cubierta de madera, campana y ventana de madera
     S = S || {}; const g = Grid(W, H), dy = RY - 59, FY = RY + 35, M = '#c8a070';
@@ -767,7 +771,11 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
   }
   function jardinPlotRect(i, n, W, H) {
     const s = jardinSlot(i, n, W);
-    return { x: s.cx - JARDIN_POTW / 2 - 7, y: s.base - JARDIN_POTH - 26, w: JARDIN_POTW + 14, h: JARDIN_POTH + 30 };   // cubre también el tallo y la floración alienígena que crece encima (más alta y ancha que antes)
+    if (s.piso) {
+      return { x: s.cx - 20, y: s.base - 48, w: 40, h: 64 };
+    } else {
+      return { x: s.cx - 20, y: RY - 44, w: 40, h: (s.base - (RY - 44)) + 18 };
+    }
   }
   const JARDIN_POTS = [['#e3a86a', '#c47a46', '#f3cf9a'], ['#d98a52', '#b86a3a', '#f0c08a'], ['#cf7a46', '#a85c30', '#e8b888']];
   function florP(g, x, y, petal, centro, grande) {   // florecita de pixeles: chica (4) o grande (8 pétalos)
@@ -1191,7 +1199,8 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     ctx.drawImage(sprite('obra' + LW + 'x' + LH + '_' + frame, () => obraGrid(LW, LH, frame), 0), 0, 0);
   }
   function irHab(i) {
-    if (guiaBloq()) return;
+    if (typeof guiaBloq === "function" && guiaBloq("nav")) return;
+    if (modal && modal !== 'editar' && !['run', 'mem', 'rt'].includes(modal)) cerrar();
     if (!puedeMoverse()) return;
     const h = HABS[i]; if (!h) return;
     if (nivel() < h.nv) { sfx.no(); irA(() => { vistaBloq = h.id; mostrarHabLetrero(h); }); return; }
@@ -1202,9 +1211,9 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     if (e.dormido) { toast('SIMON ESTÁ DURMIENDO'); sfx.no(); return; }
     if (id === 'parque' && nivelAbandono() >= 2) { toast('SIMON ESTÁ MUY DÉBIL...'); sfx.no(); return; }
     cerrar(); cambiando = true;
-    setTimeout(() => { cambiando = false; irA(() => { lugar = id; llegada = { t: 0 }; }); }, 60);
+    setTimeout(() => { cambiando = false; irA(() => { lugar = id; llegada = { t: 0 }; if (typeof navPush === 'function') navPush(); }); }, 60);
   }
-  function volverACasa() { if (!puedeMoverse()) return; sfx.click(); irA(() => { lugar = null; llegada = null; }); setTimeout(() => { decir('Sí.', e.traductor ? 'Qué rico el parque. Ahora a casa.' : null, 2800); hablar(); }, 700); }
+  function volverACasa() { if (!puedeMoverse()) return; sfx.click(); irA(() => { lugar = null; llegada = null; if (typeof navPop === 'function') navPop(); }); setTimeout(() => { decir('Sí.', e.traductor ? 'Qué rico el parque. Ahora a casa.' : null, 2800); hablar(); }, 700); }
   $('fl-izq').onclick = () => { if (lugar) volverACasa(); else irHab(habIdxActual() - 1); };
   $('fl-der').onclick = () => irHab(habIdxActual() + 1);
   function renderMapa() {

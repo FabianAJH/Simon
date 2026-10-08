@@ -1634,6 +1634,61 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
   };
   FGRID.bebida = function () { const g = Grid(10, 15); capa(g, '#0a1a3a', L => { sombrear(L, (x, y) => x >= 1 && x <= 8 && y >= 2 && y <= 13, 4.5, 8, 5, 6, ['#8ad0ff', '#2a90e8', '#1a5ab0', '#0e3478']); L.rect(1, 1, 8, 2, '#c8d0e0'); L.rect(2, 13, 6, 1, '#c8d0e0'); }); g.art(3, 4, ['...yy', '..yy.', '.yyy.', 'yyyyy', '..yy.', '.yy..', 'yy...'], { y: '#ffe45a' }); g.rect(2, 2, 6, 1, '#ffffff'); return g; };
   FGRID.keke = pizzaGrid; Object.keys(FGRID).forEach(k => { FX['c_' + k] = FGRID[k]; });
+  function termometroGrid() {
+    const g = Grid(8, 18);
+    const O = "#232b63", w = "#ffffff", g1 = "#d8e4f8", r = "#ff3a50", rd = "#c0182c", rl = "#ffa0b0", m = "#8a96c0";
+    g.rect(2, 0, 4, 1, O);
+    for (let y = 1; y <= 12; y++) { g.set(1, y, O); g.set(6, y, O); }
+    g.set(0, 13, O); g.set(7, 13, O);
+    g.set(0, 14, O); g.set(7, 14, O);
+    g.set(0, 15, O); g.set(7, 15, O);
+    g.set(1, 16, O); g.set(6, 16, O);
+    g.rect(2, 17, 4, 1, O);
+    for (let y = 1; y <= 12; y++) {
+      g.set(2, y, w);
+      g.set(3, y, r);
+      g.set(4, y, rd);
+      g.set(5, y, (y % 3 === 0) ? m : g1);
+    }
+    g.set(3, 1, rl);
+    g.rect(1, 13, 6, 3, r);
+    g.rect(2, 16, 4, 1, r);
+    g.set(2, 13, w); g.set(3, 13, rl);
+    g.set(5, 14, rd); g.set(5, 15, rd);
+    return g;
+  }
+  function termometroFlotanteGrid(f) {
+    const g = Grid(11, 12);
+    const O = "#232b63", w = "#ffffff", r = "#ff3a50", rd = "#c0182c", rl = "#ffa0b0", y = "#ffd84a", c = "#4ab8ff", cl = "#dff3ff";
+    g.art(0, 0, [
+      "..OOOOOOO..",
+      ".OwwwwwwwO.",
+      "OwwwwwwwwwO",
+      "OwwwwwwwwwO",
+      "OwwwwwwwwwO",
+      "OwwwwwwwwwO",
+      "OwwwwwwwwwO",
+      "OwwwwwwwwwO",
+      ".OwwwwwwwO.",
+      "..OwwwwwO..",
+      "...OwwO....",
+      "....OO....."
+    ], { O, w });
+    if (f % 2 === 0) {
+      g.rect(4, 6, 3, 2, r); g.set(4, 6, rl); g.set(6, 7, rd);
+      g.rect(5, 2, 1, 4, r);
+      if (f === 2) { g.set(5, 2, y); g.set(3, 2, rl); g.set(7, 2, rl); }
+      g.set(3, 3, "#8a96d8"); g.set(3, 5, "#8a96d8");
+    } else {
+      g.set(5, 2, c);
+      g.rect(4, 3, 3, 4, c);
+      g.rect(4, 7, 3, 1, c);
+      g.set(4, 4, cl); g.set(4, 5, cl);
+      g.set(6, 6, "#1e5088");
+    }
+    return g;
+  }
+
   /* ===================== MERCADO E INGREDIENTES ===================== */
   const ING = {
     jitomate: { n: 'JITOMATE', p: 6, nv: 1 }, lechuga: { n: 'LECHUGA', p: 6, nv: 1 }, huevo: { n: 'HUEVO', p: 8, nv: 1 }, harina: { n: 'HARINA', p: 8, nv: 1 },
@@ -1669,7 +1724,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
     if (nivel() < F.nv) { toast('Necesitas cariño nivel ' + F.nv); sfx.no(); return; }
     if (ingN(k) >= ingCap()) { toast('Tu refri ya no tiene lugar para más ' + F.n.toLowerCase() + (CAP_REFRI[e.cuarto.refri] ? '' : '. Un refri más grande guarda más')); sfx.no(); return; }
     if (e.monedas < F.p) { faltanMon(F.p - e.monedas); sfx.no(); return; }
-    e.monedas -= F.p; ingL(k).push(Date.now()); e.st.compras++; sfx.compra(); toast('¡COMPRASTE: ' + F.n + '! (' + ingN(k) + '/' + ingCap() + ')'); pintar(); guardar(); render();
+    e.monedas -= F.p; if (typeof animarMonedas === 'function') animarMonedas(F.p, true); ingL(k).push(Date.now()); e.st.compras++; sfx.compra(); toast('¡COMPRASTE: ' + F.n + '! (' + ingN(k) + '/' + ingCap() + ')'); pintar(); guardar(); render();
   }
   function renderMkt(h) {
     const cap = ingCap();
@@ -1689,7 +1744,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
     const hb = habBloq0('jardin'); if (hb) { toast(hb.n + ' se desbloquea en cariño NV' + hb.nv); sfx.no(); return; }
     if (e.monedas < S.precio) { faltanMon(S.precio - e.monedas); sfx.no(); return; }
     if ((e.semillas[id] || 0) >= 99) { toast('Ya tienes demasiadas'); return; }
-    e.monedas -= S.precio; e.semillas[id] = (e.semillas[id] || 0) + 1; e.st.compras++; sfx.compra(); toast('¡COMPRASTE: ' + S.n.toUpperCase() + '!'); pintar(); guardar(); render();
+    e.monedas -= S.precio; if (typeof animarMonedas === 'function') animarMonedas(S.precio, true); e.semillas[id] = (e.semillas[id] || 0) + 1; e.st.compras++; sfx.compra(); toast('¡COMPRASTE: ' + S.n.toUpperCase() + '!'); pintar(); guardar(); render();
   }
   function renderSemillas(h) {
     h += `<div class="th-nota">Semillas que Simon trajo sin saber de dónde. Se siembran en el JARDÍN (cariño NV10).</div><div class="th-g3">${Object.keys(SEMILLAS).filter(k => !SEMILLAS[k].exclusivo).map(k => {
@@ -1830,20 +1885,21 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
       const r = jardinPlotRect(i, n, LW, LH);
       if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
         const p = plots[i];
-        if (!p.k) { jSel = i; abrir('jardin'); } else if (p.etapa === 'listo') jardinCosechar(i); else jardinRegar(i);
+        if (!p.k) { sfx.click(); jSel = i; abrir('jardin'); } else if (p.etapa === 'listo') jardinCosechar(i); else jardinRegar(i);
         return true;
       }
     }
     return false;
   }
   function renderRefri() {
-    const k = e.cuarto.refri, nom = k && ITEMS[k] ? ITEMS[k].n : 'REFRI BASICO', cap = ingCap(), tot = ING_ORD.reduce((a, i) => a + ingN(i), 0);
+    const k = e.cuarto.refri, nom = k && ITEMS[k] ? ITEMS[k].n : 'REFRI BASICO', cap = ingCap();
     $('m-titulo').textContent = 'REFRI';
-    let h = `<div class="th-top"><span>NV ${refriNv(k)} · ${nom}</span><span>CABEN ${cap} DE CADA UNO</span></div><button class="bt" style="padding:6px 10px;font-size:7px;margin:0 0 10px" data-a="rf_mejorar">VER REFRIS Y MEJORAR</button>`;
-    if (!tot) h += `<div class="centro" style="font-size:8px;line-height:1.9;margin:6px 0 12px">El refri está vacío. Compra ingredientes en el MERCADO para poder cocinar.</div>`;
-    else h += `<div class="th-nota">Los ingredientes no se echan a perder: se quedan guardados hasta que los uses.</div>`;
-    h += `<div class="th-g3">${ING_ORD.map(i => { const n = ingN(i); return `<div class="th-c ${n ? '' : 'lock'}" style="cursor:default">${n ? `<span class="th-cant">x${n}</span>` : ''}<div class="th-pv"><canvas data-prev="ig_${i}"></canvas></div><div class="th-nm">${ING[i].n}</div><span class="pr ${n >= cap ? 'ok' : 'no'}">${n}/${cap}</span></div>`; }).join('')}</div>`;
-    h += `<div style="display:flex;gap:8px;margin-top:14px"><button class="bt gran" style="flex:1;padding:12px 0" data-a="rf_ir">MERCADO</button><button class="bt ok gran" style="flex:1;padding:12px 0" data-a="ck_abrir">COCINAR</button></div>`;
+    let h = `<div class="th-top"><span>NV ${refriNv(k)} · ${nom}</span><span>CABEN ${cap} DE CADA UNO</span></div>`;
+    h += `<div class="th-g3">${ING_ORD.map(i => {
+      const F = ING[i], n = ingN(i), bloq = nivel() < F.nv, lleno = n >= cap, puede = !bloq && !lleno && e.monedas >= F.p;
+      return `<div class="th-c ${n ? '' : 'lock'}" style="cursor:default">${n ? `<span class="th-cant">x${n}</span>` : ''}<div class="th-pv"><canvas data-prev="ig_${i}"></canvas></div><div class="th-nm">${F.n}</div><div style="display:flex;align-items:center;justify-content:center;gap:4px;width:100%"><span class="pr ${lleno ? 'ok' : 'no'}" style="padding:2px 4px;font-size:7px;line-height:1">${n}/${cap}</span><button class="bt ${puede ? 'ok' : 'no'}" style="padding:2px 5px;font-size:7px;line-height:1;margin:0;white-space:nowrap" data-a="ig_comprar" data-k="${i}">+$${F.p}</button></div></div>`;
+    }).join('')}</div>`;
+    h += `<div style="display:flex;gap:8px;margin-top:14px"><button class="bt gran" style="flex:1;padding:12px 0" data-a="rf_mejorar">Mejorar Refri</button><button class="bt ok gran" style="flex:1;padding:12px 0" data-a="ck_abrir">COCINAR</button></div>`;
     return h;
   }
   ORDEN.comida = Object.keys(COMIDAS); ORDEN.extras = ['bomba', 'jarabe']; ORDEN.juguetes = Object.keys(ITEMS).filter(k => ITEMS[k].slot === 'juguete'); ORDEN.cuarto.push(...Object.keys(nuevosItems), 'puf_azul', 'puf_rojo', 'puf_verde', 'puf_rosa', 'puf_morado', 'puf_dorado');

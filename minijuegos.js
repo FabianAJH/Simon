@@ -619,11 +619,10 @@
     }
     if (ban.f === 'fin') { for (let i = 0; i < 6; i++) { const x = SX + 6 + i * 9, y = SY + 4 + Math.round(Math.sin(tk / 2 + i) * 6) - ban.t; ctx.fillStyle = '#ffffff'; ctx.fillRect(x, y, 2, 2); ctx.fillStyle = '#8ad0ff'; ctx.fillRect(x + 1, y + 1, 1, 1); } }
   }
-  function banoToca(x, y) {   // regadera y lavabo del baño
+  function banoToca(x, y) {   // regadera del baño (lavabo sin interacción, solo escenario)
     if (ban || dlg || modal || introActiva || escenaId() !== 'bano' || edit) return false;
     const FY = RY + 35;
     if (x >= OX + 90 && y >= RY - 52 && y <= FY + 6) { sfx.click(); banStart(); return true; }
-    if (x <= OX + 50 && x < SX && y >= RY - 46 && y <= RY + 24) { chapoteo(.08, .5); setTimeout(() => chapoteo(.05, .3), 200); decir('Sí.', e.traductor ? 'Agüita fresca. Me encanta.' : null, 2200); hablar(); return true; }
     return false;
   }
   function lineasBomba() {
@@ -732,7 +731,7 @@
   function comprarBomba() {
     if (e.monedas < BOMBA_PRECIO) { faltanMon(BOMBA_PRECIO - e.monedas); sfx.no(); return; }
     if ((e.bombas || 0) >= BOMBA_MAX) { toast('Ya tienes demasiadas'); return; }
-    e.monedas -= BOMBA_PRECIO; e.bombas = (e.bombas || 0) + 1; e.st.compras++; sfx.compra(); toast('¡COMPRASTE: BOMBA!'); pintar(); guardar(); render();
+    e.monedas -= BOMBA_PRECIO; if (typeof animarMonedas === 'function') animarMonedas(BOMBA_PRECIO, true); e.bombas = (e.bombas || 0) + 1; e.st.compras++; sfx.compra(); toast('¡COMPRASTE: BOMBA!'); pintar(); guardar(); render();
   }
   $('t-bomba').onclick = lanzarBomba;
 
@@ -761,7 +760,6 @@
     if (e.dormido) { cerrar(); decir('Zzz...'); sfx.no(); return; }
     if (nivel() < MJ_NV) { toast('Se desbloquea en cariño NV' + MJ_NV); sfx.no(); return; }
     if (e.energia < MJ_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
-    if (e.hambre < 10) { cerrar(); decir('Sí...', e.traductor ? 'Tengo mucha hambre...' : null); hablar(); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
     cerrar();
     e.energia = clamp(e.energia - sifE(MJ_COSTO)); pintar();
@@ -839,9 +837,9 @@
     mision('jugar'); revisar(); pintar(); guardar();
     $('mj-res').innerHTML = `MONEDAS ATRAPADAS: ${mj.monedas}<br>RÉCORD: ${e.mj.rec}${nuevo ? '<br><span style="color:#ffd84a">¡NUEVO RÉCORD!</span>' : ''}<br>+${gana} MONEDAS`;
     $('mj-otra').style.opacity = e.energia >= MJ_COSTO ? 1 : .4;
-    $('mj-fin').classList.add('on'); if (nuevo) sfx.nivel();
+    $('mj-fin').classList.add('on'); if (nuevo && (!celQ || !celQ.length)) sfx.nivel();
   }
-  function mjSalir() { if (!mj) return; if (!mj.fin) mjFin(); cancelAnimationFrame(mj.raf); mj = null; $('mj').classList.remove('on'); $('mj-fin').classList.remove('on'); pintar(); hablar(); corazones(2); }
+  function mjSalir() { if (!mj) return; if (!mj.fin) mjFin(); cancelAnimationFrame(mj.raf); mj = null; $('mj').classList.remove('on'); $('mj-fin').classList.remove('on'); pintar(); hablar(); corazones(2); if (typeof celebraCheck === 'function' && celQ && celQ.length) celebraCheck(); }
   function mjMueve(ev) { if (!mj || mj.fin) return; const r = mjCv.getBoundingClientRect(); mj.objetivo = Math.max(14, Math.min(82, (ev.clientX - r.left) / r.width * 96)); }
   mjCv.addEventListener('pointerdown', ev => { mjMueve(ev); try { mjCv.setPointerCapture(ev.pointerId); } catch (_) {} });
   mjCv.addEventListener('pointermove', mjMueve);
@@ -872,7 +870,6 @@
     if (nivel() < RT_NV) { toast('Se desbloquea en cariño NV' + RT_NV); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo bailar.' : null, 3000); sfx.no(); return; }
     if (e.energia < RT_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
-    if (e.hambre < 10) { cerrar(); decir('Sí...', e.traductor ? 'Tengo mucha hambre...' : null); hablar(); sfx.no(); return; }
     cerrar(); e.energia = clamp(e.energia - sifE(RT_COSTO)); pintar(); musicaOff(); lluviaOff();
     const a = !e.mudo && audio();
     rt = { notas: rtNotas(), pts: 0, combo: 0, mejor: 0, per: 0, bien: 0, fall: 0, t: 0, t0: 0, fin: false, raf: 0, aud: !!a, sig: 0, timer: 0, pad: [0, 0, 0], lado: 1, bail: 0, boca: 0 };
@@ -977,9 +974,9 @@
     const nota_ = acc >= 90 ? 'S' : acc >= 75 ? 'A' : acc >= 55 ? 'B' : 'C';
     $('rt-res').innerHTML = `NOTA: ${nota_} (${acc}%)<br>PUNTOS: ${rt.pts}<br>MEJOR COMBO: ${rt.mejor}<br>RÉCORD: ${e.rt.rec}${nuevo ? '<br><span style="color:#ffd84a">¡NUEVO RÉCORD!</span>' : ''}<br>+${gana} MONEDAS`;
     $('rt-otra').style.opacity = e.energia >= RT_COSTO ? 1 : .4;
-    $('rt-fin').classList.add('on'); if (acc >= 75 || nuevo) sfx.nivel(); gesto('baile');
+    $('rt-fin').classList.add('on'); if ((acc >= 75 || nuevo) && (!celQ || !celQ.length)) sfx.nivel(); gesto('baile');
   }
-  function rtSalir() { if (!rt) return; if (!rt.fin) rtFin(); cancelAnimationFrame(rt.raf); clearInterval(rt.timer); rt = null; $('rt').classList.remove('on'); $('rt-fin').classList.remove('on'); musicaOn(); pintar(); hablar(); corazones(2); }
+  function rtSalir() { if (!rt) return; if (!rt.fin) rtFin(); cancelAnimationFrame(rt.raf); clearInterval(rt.timer); rt = null; $('rt').classList.remove('on'); $('rt-fin').classList.remove('on'); musicaOn(); pintar(); hablar(); corazones(2); if (typeof celebraCheck === 'function' && celQ && celQ.length) celebraCheck(); }
   rtCv.addEventListener('pointerdown', ev => { if (!rt) return; ev.preventDefault(); const r = rtCv.getBoundingClientRect(); rtTap(Math.max(0, Math.min(2, Math.floor((ev.clientX - r.left) / r.width * 3)))); });
   document.addEventListener('keydown', ev => { if (!rt || rt.fin) return; const m = { ArrowLeft: 0, a: 0, j: 0, ArrowDown: 1, s: 1, k: 1, ArrowRight: 2, d: 2, l: 2 }[ev.key]; if (m !== undefined) rtTap(m); });
   $('rt-x').onclick = () => { sfx.click(); rtSalir(); };
@@ -1001,7 +998,6 @@
     if (nivel() < RUN_NV) { toast('Se desbloquea en cariño NV' + RUN_NV); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
     if (e.energia < RUN_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
-    if (e.hambre < 10) { cerrar(); decir('Sí...', e.traductor ? 'Tengo mucha hambre...' : null); hablar(); sfx.no(); return; }
     cerrar(); modal = 'run'; e.energia = clamp(e.energia - sifE(RUN_COSTO)); pintar();
     run = { t: 0, dist: 0, kekes: 0, monedas: 0, y: 0, vy: 0, suelo: true, obs: [], items: [], sig: 70, fx: [], fin: false, muerto: 0, ult: performance.now(), raf: 0, saltos: 0 };
     $('run-fin').classList.remove('on'); $('run-tip').style.display = ''; $('run').classList.add('on'); runHud();
@@ -1075,9 +1071,9 @@
     mision('jugar'); revisar(); pintar(); guardar();
     $('run-res').innerHTML = `PUNTOS: ${pts}<br>KEKES: ${run.kekes}<br>MONEDAS ATRAPADAS: ${run.monedas}<br>RÉCORD: ${e.run.rec}${nuevo ? '<br><span style="color:#ffd84a">¡NUEVO RÉCORD!</span>' : ''}<br>+${gana} MONEDAS`;
     $('run-otra').style.opacity = e.energia >= RUN_COSTO ? 1 : .4;
-    $('run-fin').classList.add('on'); if (nuevo) sfx.nivel();
+    $('run-fin').classList.add('on'); if (nuevo && (!celQ || !celQ.length)) sfx.nivel();
   }
-  function runSalir() { if (!run) return; if (!run.fin && (run.muerto || run.t > 1)) runFin(); cancelAnimationFrame(run.raf); run = null; $('run').classList.remove('on'); $('run-fin').classList.remove('on'); modal = null; pintar(); hablar(); corazones(2); }
+  function runSalir() { if (!run) return; if (!run.fin && (run.muerto || run.t > 1)) runFin(); cancelAnimationFrame(run.raf); run = null; $('run').classList.remove('on'); $('run-fin').classList.remove('on'); modal = null; pintar(); hablar(); corazones(2); if (typeof celebraCheck === 'function' && celQ && celQ.length) celebraCheck(); }
   runCv.addEventListener('pointerdown', ev => { ev.preventDefault(); runSalto(); });
   document.addEventListener('keydown', ev => { if (!run || run.fin) return; if (ev.key === ' ' || ev.key === 'ArrowUp') { ev.preventDefault(); runSalto(); } });
   $('run-x').onclick = () => { sfx.click(); runSalir(); };
@@ -1099,10 +1095,9 @@
     if (nivel() < MEM_NV) { toast('Se desbloquea en cariño NV' + MEM_NV); sfx.no(); return; }
     if (e.enf) { cerrar(); decir('Sí... ¡achú!', e.traductor ? 'Resfriado no puedo jugar.' : null, 3000); sfx.no(); return; }
     if (e.energia < MEM_COSTO) { cerrar(); decir('Sí...', e.traductor ? 'Estoy muy cansado.' : null); hablar(); sfx.no(); avisoSueno(); return; }
-    if (e.hambre < 10) { cerrar(); decir('Sí...', e.traductor ? 'Tengo mucha hambre...' : null); hablar(); sfx.no(); return; }
     cerrar(); modal = 'mem'; e.energia = clamp(e.energia - sifE(MEM_COSTO)); pintar();
     mem = { ronda: 0, pts: 0, fallos: 0, combo: 0, mejorCombo: 0, rondasOk: 0, fin: false, to: [], cartas: [], a: null, lock: true, consec: 0, rf: 0, pistas: 0, t0: 0, perdio: false };
-    $('mem-fin').classList.remove('on'); $('mem').classList.add('on'); memRetrato(); memRonda();
+    $('mem-fin').classList.remove('on'); $('mem').classList.add('on'); memRetrato(); memRonda(); if (typeof navPush === 'function') navPush();
   }
   function memHud() { $('mem-r').textContent = 'RONDA ' + (mem.ronda + 1) + '/' + MEM_RONDAS.length; $('mem-pts').textContent = 'PTS ' + mem.pts; $('mem-f').textContent = 'FALLOS ' + mem.rf + '/' + MEM_RONDAS[mem.ronda].max; }
   function memRonda() {
@@ -1154,11 +1149,11 @@
     mision('jugar'); revisar(); pintar(); guardar();
     $('mem-res').innerHTML = `${mem.perdio ? '<span style="color:#ff8a8a">SIN INTENTOS</span><br>' : ''}RONDAS: ${mem.rondasOk}/${MEM_RONDAS.length}<br>PUNTOS: ${mem.pts}<br>FALLOS: ${mem.fallos}<br>MEJOR RACHA: ${mem.mejorCombo}<br>RÉCORD: ${e.mem.rec}${nuevo ? '<br><span style="color:#ffd84a">¡NUEVO RÉCORD!</span>' : ''}<br>+${gana} MONEDAS`;
     $('mem-otra').style.opacity = e.energia >= MEM_COSTO ? 1 : .4;
-    $('mem-fin').classList.add('on'); if (mem.rondasOk >= 2 || nuevo) sfx.nivel();
+    $('mem-fin').classList.add('on'); if ((mem.rondasOk >= 2 || nuevo) && (!celQ || !celQ.length)) sfx.nivel();
   }
   function memSalir() {
     if (!mem) return; if (!mem.fin && mem.pts > 0) memFin(); mem.to.forEach(clearTimeout); mem = null;
-    $('mem').classList.remove('on'); $('mem-fin').classList.remove('on'); modal = null; pintar(); hablar(); corazones(2); setTimeout(saludar, 500);
+    $('mem').classList.remove('on'); $('mem-fin').classList.remove('on'); modal = null; pintar(); hablar(); corazones(2); setTimeout(saludar, 500); if (typeof navPop === 'function') navPop(); if (typeof celebraCheck === 'function' && celQ && celQ.length) celebraCheck();
   }
   $('mem-grid').addEventListener('pointerdown', ev => { const b = ev.target.closest('.mc'); if (!b || !mem) return; ev.preventDefault(); memClick(+b.dataset.i); });
   $('mem-x').onclick = () => { sfx.click(); memSalir(); };
