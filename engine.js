@@ -23,7 +23,7 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
   const CLAVE_BK = 'simon-v1-bk';
   const ESQUEMA = 1;
   let guardaCount = 0;
-  const VERSION_JUEGO = 'Beta v,400';
+  const VERSION_JUEGO = 'Beta v,500';
 
   /* === IndexedDB helper (respaldo silencioso) === */
   const IDB_NAME = 'simon-idb', IDB_STORE = 'save';
@@ -1106,6 +1106,13 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
   const flechaGrid = dir => { const g = Grid(8, 11); for (let y = 0; y < 11; y++) { const a = y <= 5 ? y : 10 - y; for (let x = 0; x <= a + 1; x++) g.set(dir < 0 ? 7 - x : x, y, '#ffffff'); } g.contour('#232b63'); return g; };
   const HAB_ICO = { estudio: '📖', juegos: '🎮', sala: '🛏️', bano: '🛁', cocina: '🍳', entrada: '🚪', jardin: '🌷' };
   function pintarNav() {
+    const bVes = $('b-vestir');
+    if (bVes) {
+      const fuera = !!(lugar || calle || vistaBloq);
+      bVes.classList.toggle('bloq', fuera);
+      bVes.setAttribute('aria-disabled', fuera ? 'true' : 'false');
+      bVes.title = fuera ? 'Aquí no puedes usar esto' : 'Vestir a Simon';
+    }
     const bEd = $('b-editar');
     if (bEd) {
       const fuera = !!(lugar || calle || vistaBloq);

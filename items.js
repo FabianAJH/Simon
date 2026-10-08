@@ -1302,6 +1302,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
   const ROPA_SLOTS = [['todo', 'TODO'], ['sudadera', 'SUDADERAS'], ['cara', 'CARA'], ['cuello', 'CUELLO'], ['orejas', 'CABEZA'], ['espalda', 'ESPALDA'], ['aura', 'AURA'], ['mascota', 'MASCOTAS'], ['prem', 'PREMIUM']];
   // mascotas: se gestionan por separado (e.pets[]), no por slot de ropa, pero se listan como ropa para el UI
   ITEMS.pet_sif = { tipo: 'ropa', slot: 'mascota', n: 'SIF', p: 0, nv: 1, crop: [0, 0, 30, 26], mascota: true, prem: 'ADOPTAR A SIF' };
+  ITEMS.ojo_pet = { tipo: 'ropa', slot: 'mascota', n: 'OJO DE CTHULHU', p: 0, nv: 1, crop: [0, 0, 28, 28], mascota: true, prem: 'EVENTO LUNA DE SANGRE' };
   ORDEN.ropa.push(...Object.keys(ITEMS).filter(k => ITEMS[k].tipo === 'ropa' && !ORDEN.ropa.includes(k)));
   /* ===================== SECRETOS (huevos de pascua): objetos que no están en la tienda ===================== */
   // casco espacial: domo de cristal alrededor de la cabeza + aro metálico en el cuello
@@ -1364,6 +1365,13 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
   ITEMS.aura_trueno = { tipo: 'ropa', slot: 'aura', n: 'AURA DE TRUENO', p: 0, nv: 1, crop: CR.aura, secreto: true };
   ITEMS.aura_eterna = { tipo: 'ropa', slot: 'aura', n: 'AURA ETERNA', p: 0, nv: 1, crop: CR.aura, codigo: true, secreto: true };   // premio único de cosechar la Semilla Eterna
   const ropaSig = () => [e.ropa.cara, e.ropa.cuello, e.ropa.orejas, e.ropa.espalda, e.ropa.aura, e.ropa.sudadera].join(',') + (sinCorona ? 'N' : '');
+  var MINI = (typeof MINI !== 'undefined' && MINI) || {
+    keke: ['...r...', '.wwwww.', 'ppppppp', 'yyyyyyy', 'ppppppp', 'yyyyyyy', '.bbbbb.'],
+    luna: ['..yyy..', '.yyy...', 'yyy....', 'yyy....', 'yyy....', '.yyy...', '..yyyy.'],
+    rayo: ['....w..', '...yw..', '..yyw..', '.yyyyy.', '...yw..', '..yw...', '.y.....'],
+    normal: ['.yyyyy.', 'yyyyyyy', 'yykykyy', 'yyyyyyy', 'yyyyyyy', 'yykkkyy', '.yyyyy.'],
+    gota: ['.c...c.', 'ww.c...', 'wwwqqqq', 'wwwpppd', 'wwwpppd', 'wwppppd', 'ddddddd']
+  };
   const PREV = {};
   function prevGrid(k) {
     if (PREV[k]) return PREV[k];
@@ -1374,7 +1382,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
     if (k === 'pet_sif') return sifGrid({ boca: 'b', cola: 1 });
     if (k === 'ic_fuego') return llamaGrid(0, !racha());
     if (k === 'ic_mon') return FX.moneda();
-    if (k.startsWith('ic_')) { const COL = { a: '#4ab8ff', r: '#ff4a6a', w: '#ffffff', p: '#ff9ab0', y: '#ffd84a', b: '#a8601c', k: '#232b63', d: '#d8607e', c: '#9ad8ff', q: '#ffd0dc' }; g = Grid(7, 7); g.art(0, 0, { ham: MINI.keke, ene: MINI.luna, fel: MINI.normal, lim: MINI.gota }[k.slice(3)], COL); return g; }
+    if (k.startsWith('ic_')) { const COL = { a: '#4ab8ff', r: '#ff4a6a', w: '#ffffff', p: '#ff9ab0', y: '#ffd84a', b: '#a8601c', k: '#232b63', d: '#d8607e', c: '#9ad8ff', q: '#ffd0dc' }; g = Grid(7, 7); g.art(0, 0, { ham: MINI.keke, ene: MINI.rayo, fel: MINI.normal, lim: MINI.gota }[k.slice(3)], COL); return g; }
     if (k.startsWith('fo_')) return fotoGrid(k.slice(3));
     if (k.startsWith('lg_')) return lugarMini(k.slice(3));
     if (k.startsWith('hb_')) return habMini(k.slice(3));
@@ -1591,20 +1599,20 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
       g.art(4, 6, [".www.", "w...w", "...w.", "..w..", "..w.."], { w: '#ffffff' }); g.set(6, 11, '#ffffff'); g.rect(6, 0, 2, 2, '#ffd84a'); return g; }
   };
   const COMIDAS = {
-    manzana:     { n: 'MANZANA',            p: 12,  nv: 1, h: 14, e: 4,  f: 2,  t: '¡Crujiente!' },
-    galleta:     { n: 'GALLETA',            p: 10,  nv: 1, h: 8,  e: 3,  f: 6,  t: 'Dulce y con chispas.' },
-    dona:        { n: 'DONA',               p: 22,  nv: 1, h: 18, e: 6,  f: 8,  t: '¡Con chispitas!' },
-    helado:      { n: 'HELADO',             p: 28,  nv: 2, h: 10, e: 8,  f: 14, t: '¡Qué frío! ¡Qué rico!' },
-    taco:        { n: 'TACO',               p: 32,  nv: 2, h: 26, e: 10, f: 5,  t: '¡Ándale!' },
-    hamburguesa: { n: 'HAMBURGUESA',        p: 45,  nv: 2, h: 38, e: 12, f: 6,  t: '¡Qué gigante!' },
-    cafe:        { n: 'CAFÉ ESTELAR',       p: 38,  nv: 2, h: 2,  e: 30, f: 4,  t: '¡Ya estoy despierto!' },
-    chile:       { n: 'CHILE SUPERPICANTE', p: 50,  nv: 3, h: 5,  e: 40, f: 6,  t: '¡PICA, PICA, PICA!', fx: 'baile' },
-    sopa:        { n: 'SOPA DE NUBE',       p: 60,  nv: 3, h: 12, e: 38, f: 8,  t: 'Se siente como flotar.' },
-    batido:      { n: 'BATIDO ARCOÍRIS',    p: 85,  nv: 4, h: 10, e: 48, f: 10, t: '¡Estoy sintiendo colores!' },
-    cometa:      { n: 'FRUTA COMETA',       p: 130, nv: 5, h: 12, e: 65, f: 12, t: 'Sabe a mi planeta...' },
-    kekeoro:     { n: 'KEKE DORADO',        p: 220, nv: 6, h: 50, e: 80, f: 25, t: '¡EL KEKE LEGENDARIO!', fx: 'gran' },
-    bebida:      { n: 'BEBIDA ENERGETICA', p: 60,  nv: 2, h: 0,  e: 100, f: 6, t: '¡Sí! ¡Siento que puedo con todo!', fx: 'salto' },
-    misteriosa:  { n: 'CAJA MISTERIOSA',    p: 70,  nv: 2, rand: true }
+    kekeoro:     { n: 'KEKE DORADO',        p: 450, nv: 21, h: 50, e: 80,  f: 25, t: '¡EL KEKE LEGENDARIO!', fx: 'gran' },
+    cometa:      { n: 'FRUTA COMETA',       p: 240, nv: 16, h: 35, e: 65,  f: 15, t: 'Sabe a mi planeta...' },
+    bebida:      { n: 'BEBIDA ENERGÉTICA',  p: 180, nv: 14, h: 0,  e: 100, f: 8,  t: '¡Sí! ¡Siento que puedo con todo!', fx: 'salto' },
+    batido:      { n: 'BATIDO ARCOÍRIS',    p: 140, nv: 12, h: 0,  e: 55,  f: 12, t: '¡Estoy sintiendo colores!' },
+    chile:       { n: 'CHILE SUPERPICANTE', p: 110, nv: 9,  h: 25, e: 40,  f: 6,  t: '¡PICA, PICA, PICA!', fx: 'baile' },
+    misteriosa:  { n: 'CAJA MISTERIOSA',    p: 75,  nv: 8,  rand: true },
+    hamburguesa: { n: 'HAMBURGUESA',        p: 85,  nv: 7,  h: 65, e: 0,   f: 8,  t: '¡Qué gigante!' },
+    sopa:        { n: 'SOPA DE NUBE',       p: 60,  nv: 6,  h: 45, e: 0,   f: 8,  t: 'Se siente como flotar.' },
+    cafe:        { n: 'CAFÉ ESTELAR',       p: 50,  nv: 5,  h: 0,  e: 30,  f: 5,  t: '¡Ya estoy despierto!' },
+    taco:        { n: 'TACO',               p: 38,  nv: 4,  h: 32, e: 0,   f: 5,  t: '¡Ándale!' },
+    helado:      { n: 'HELADO',             p: 28,  nv: 3,  h: 18, e: 0,   f: 15, t: '¡Qué frío! ¡Qué rico!' },
+    dona:        { n: 'DONA',               p: 20,  nv: 2,  h: 20, e: 0,   f: 8,  t: '¡Con chispitas!' },
+    manzana:     { n: 'MANZANA',            p: 14,  nv: 1,  h: 14, e: 0,   f: 3,  t: '¡Crujiente!' },
+    galleta:     { n: 'GALLETA',            p: 10,  nv: 1,  h: 8,  e: 0,   f: 5,  t: 'Dulce y con chispas.' }
   };
   const SORPRESAS = [{ w: 3, e: 15, t: 'Sabe a... ¿calcetín?' }, { w: 3, e: 30, h: 8, t: '¡Sabe a lluvia!' }, { w: 2, e: 55, t: '¡Ahora puedo ver los sonidos!' }, { w: 1, e: 85, h: 25, f: 25, t: '¡Sabe a mil kekes!', fx: 'gran' }, { w: 2, e: 8, h: 30, f: 15, t: 'Hip... ¡hip!', fx: 'baile' }];
   function zGrid() {
@@ -1937,7 +1945,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
     "lazo_cabeza":[1,30],"gorro_fiesta":[2,35],"flores":[3,45],"orejas_perro":[4,50],"antenas":[5,60],"orejas_oso":[6,65],"cuernitos":[8,80],"audifonos_rosa":[9,85],"orejas_conejo":[11,100],"estrellas_flot":[13,115],"orejas_zorro":[15,130],"halo":[17,145],"audifonos_gamer":[19,160],"alitas_angel":[21,175],"alitas_demonio":[24,200],
     "capa_rosa":[5,160],"capa_verde":[9,235],"capa_negra":[13,310],"capa_morada":[17,385],"alas_angel":[21,500],"alas_murcielago":[22,520],"alas_mariposa":[25,580]
   };
-  const ECON_COM = {"manzana":[1,15],"galleta":[1,12],"dona":[2,28],"helado":[3,40],"taco":[4,48],"cafe":[5,60],"hamburguesa":[6,70],"misteriosa":[7,85],"chile":[8,85],"sopa":[9,100],"batido":[12,150],"cometa":[16,240],"kekeoro":[21,450]};
+  const ECON_COM = {"kekeoro":[21,450],"cometa":[16,240],"bebida":[14,180],"batido":[12,140],"chile":[9,110],"misteriosa":[8,75],"hamburguesa":[7,85],"sopa":[6,60],"cafe":[5,50],"taco":[4,38],"helado":[3,28],"dona":[2,20],"manzana":[1,14],"galleta":[1,10]};
   Object.keys(ECON).forEach(k => { if (ITEMS[k]) { ITEMS[k].nv = ECON[k][0]; ITEMS[k].p = ECON[k][1]; } });
   Object.keys(ECON_COM).forEach(k => { if (COMIDAS[k]) { COMIDAS[k].nv = ECON_COM[k][0]; COMIDAS[k].p = ECON_COM[k][1]; } });
   // Todos los precios x1.5: los topes diarios subieron ~1.6x (se juega más al día), así el ritmo de compra por día se mantiene
@@ -1949,7 +1957,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
   Object.keys(LVGIFT).forEach(n => { const it = ITEMS[LVGIFT[n]]; if (!it) return; it.gnv = +n; if (!it.prem) it.regalo = 'nivel'; });
   ['ropa', 'cuarto', 'juguetes'].forEach(t => ORDEN[t].sort((a, b) => ((ITEMS[a].nv || 1) - (ITEMS[b].nv || 1)) || ((ITEMS[a].p || 0) - (ITEMS[b].p || 0))));
   ORDEN.ropa.sort((a, b) => (!!ITEMS[a].prem) - (!!ITEMS[b].prem));
-  ORDEN.comida.sort((a, b) => (COMIDAS[a].nv - COMIDAS[b].nv) || (COMIDAS[a].p - COMIDAS[b].p));
+  ORDEN.comida.sort((a, b) => (COMIDAS[b].nv - COMIDAS[a].nv) || (COMIDAS[b].p - COMIDAS[a].p) || (((COMIDAS[b].e || 0) + (COMIDAS[b].h || 0)) - ((COMIDAS[a].e || 0) + (COMIDAS[a].h || 0))));
   /* ---- platos que cocina Simon: se comen desde ALIMENTAR, pero no se venden ---- */
   const RECETAS = [
     { id: 'ensalada', n: 'ENSALADA FRESCA', ing: { lechuga: 1, jitomate: 1 }, pasos: ['cortar', 'armar'], nv: 1, h: 22, e: 10, f: 6, t: 'Fresca y crujiente.' },
