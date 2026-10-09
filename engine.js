@@ -23,7 +23,7 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
   const CLAVE_BK = 'simon-v1-bk';
   const ESQUEMA = 1;
   let guardaCount = 0;
-  const VERSION_JUEGO = 'Beta v,500';
+  const VERSION_JUEGO = 'Beta v,400';
 
   /* === IndexedDB helper (respaldo silencioso) === */
   const IDB_NAME = 'simon-idb', IDB_STORE = 'save';

@@ -3758,115 +3758,8 @@
   $('b-inv').onclick = () => menuAbrir('inventario');
 
   /* ===================== NOTIFICACIONES ===================== */
-  let notiNuevas = 0;
-  function pintarNotis() {
-    const n = (e.notis || []).filter(x => !x.l).length, b = $('nb-noti');
-    b.textContent = n > 9 ? '9+' : n; b.classList.toggle('oculto', !n);
-  }
-  function notificar(t) {
-    if (!e.notis) e.notis = [];
-    const u = e.notis[0]; if (u && u.t === t && ahora() - u.ts < 60000) return;
-    e.notis.unshift({ t, ts: ahora(), l: 0 }); e.notis = e.notis.slice(0, 40); pintarNotis(); guardar();
-  }
-  const hace = ts => { const m = Math.max(0, Math.round((ahora() - ts) / 60000)); return m < 1 ? 'AHORA' : m < 60 ? 'HACE ' + m + ' MIN' : m < 1440 ? 'HACE ' + Math.round(m / 60) + ' H' : 'HACE ' + Math.round(m / 1440) + ' D'; };
-  function renderNotis() {
-    $('m-titulo').textContent = 'NOTIFICACIONES';
-    const L = e.notis || [];
-    if (!L.length) return '<div class="centro" style="font-size:8px;line-height:2;color:#aab4ff;padding:16px 0">Todo tranquilo por aquí.<br>Aquí verás lo nuevo que pase.</div>';
-    return L.map((n, i) => `<div class="noti ${i < notiNuevas ? 'nueva' : ''}">${n.t}<div class="nh">${hace(n.ts)}</div></div>`).join('') +
-      '<button class="bt" style="width:100%;padding:12px 0;margin-top:6px" data-a="not_borrar">BORRAR TODO</button>';
-  }
-  function resumenAusencia() {
-    if (!e.intro || ausenciaH < 1) return;
-    const h = ausenciaH, tx = h >= 48 ? Math.round(h / 24) + ' días' : Math.round(h) + (Math.round(h) === 1 ? ' hora' : ' horas');
-    const p = [];
-    if (e.hambre < 30) p.push('tenía mucha hambre'); if (e.feliz < 30) p.push('estaba triste'); if (e.energia < 25) p.push('quedó con sueño');
-    notificar('Estuviste fuera ' + tx + '. ' + (p.length ? 'Simon ' + p.join(', ') + '.' : 'Simon se portó bien.'));
-    if (despertoOffline) notificar('Simon durmió mientras no estabas y ya despertó.');
-    else if (e.dormido) notificar('Simon sigue durmiendo.');
-    if (e.hallazgo) notificar('Simon encontró algo mientras no estabas. ¡Tócalo para recogerlo!');
-    if (h >= 24) notificar('Cortex pasó a preguntar por ti. ¡Te extrañó!');
-  }
-  function checkNotis() {
-    if (!e.intro) return;
-    const t = ahora();
-    misionesHoy(); if (e.misAviso) { e.misAviso = 0; notificar('Cortex tiene misiones nuevas para ti.'); pintar(); }
-    if (infoRegalo() && e.nRegalo !== hoy()) { e.nRegalo = hoy(); notificar('Tienes un regalo diario por reclamar.'); }
-    if (e.hambre < 25 && t - e.nHam > 6 * 3600000) { e.nHam = t; notificar('Simon tiene mucha hambre.'); }
-    if (e.feliz < 25 && t - e.nFel > 6 * 3600000) { e.nFel = t; notificar('Simon está triste. Necesita mimos o jugar.'); }
-    { const c = clima(), mojado = ['lluvia', 'tormenta', 'nieve', 'arcoiris'];
-      if (c !== e.nClima) {
-        const antes = e.nClima; e.nClima = c;
-        if (c === 'lluvia') notificar('Empezó a llover.'); else if (c === 'tormenta') notificar('Empezó una tormenta. Simon tendrá miedo.'); else if (c === 'nieve') notificar('¡Empezó a nevar!'); else if (c === 'arcoiris') notificar('Salió un arcoíris.');
-        else if (mojado.includes(antes)) notificar(antes === 'lluvia' ? 'Dejó de llover.' : antes === 'tormenta' ? 'Pasó la tormenta.' : antes === 'nieve' ? 'Dejó de nevar.' : 'Se fue el arcoíris.');
-      } }
-    pintarNotis();
-  }
-  /* ===================== AVISOS DEL SISTEMA (PWA hoy, APK después) ===================== */
-  // Un solo punto de salida: en la APK (Capacitor) se programan con LocalNotifications y suenan con la app cerrada;
-  // en el navegador salen solo si la app sigue viva en segundo plano (no hay servidor de push).
-  const ntNativo = () => { try { return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications || null; } catch (_) { return null; } };
-  let ntTimers = [], ntSig = '';
-  function ntPendientes() {
-    const L = [], now = Date.now(), H = 3600000;
-    const add = (id, ms, body, tag) => { if (ms > now + 20000) L.push({ id, ts: Math.round(ms), body, tag: tag || 'simon-' + id }); };
-    if (e.dormido) add(1, now + Math.max(0, (100 - e.energia) / rDormir()) * H, 'Simon despertó. ¡Ya descansó!');
-    else {
-      if (e.hambre > 25) add(2, now + (e.hambre - 25) / BAJA.hambre * H, 'Simon tiene hambre. ¿Un keke?');
-      if (e.feliz > 25) add(3, now + (e.feliz - 25) / BAJA.feliz * H, 'Simon está triste. Necesita mimos o jugar.');
-      if (e.energia > 20) add(4, now + (e.energia - 20) / BAJA.energia * H, 'Simon tiene poca energía. Déjalo dormir o dale algo de comer.');
-    }
-    try { const I = mercInfo(); if (I.est === 'espera' || I.est === 'aviso') add(5, now + (I.llega - ahora()), 'Cortex llegó de comerciante. Se queda 15 minutos.'); } catch (_) {}
-    try { if (!infoRegalo()) { const d = new Date(ahora()); d.setDate(d.getDate() + 1); d.setHours(10, 0, 0, 0); add(6, now + (d.getTime() - ahora()), 'Tienes un regalo diario por reclamar.'); } } catch (_) {}
-    if (e.est) add(7, now + (e.est.fin - Date.now()), e.est.fase === 'estudio' ? '¡Sesión terminada! Toca descansar.' : 'Se acabó el descanso: a estudiar.', 'simon-est');
-    return L;
-  }
-  function ntMostrar(n) {
-    try {
-      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-        const o = { body: n.body, icon: 'icon-192.png', tag: n.tag };
-        if (navigator.serviceWorker && navigator.serviceWorker.ready) navigator.serviceWorker.ready.then(r => r.showNotification('Simon', o)).catch(() => { new Notification('Simon', o); }); else new Notification('Simon', o);
-      }
-    } catch (_) {}
-  }
-  function notifSync(forzar) {
-    if (admin || reseteando) return;
-    const L = e.notifOn ? ntPendientes() : [], sig = L.map(n => n.id + ':' + Math.round(n.ts / 60000)).join('|');
-    if (!forzar && sig === ntSig) return;
-    ntSig = sig;
-    const LN = ntNativo();
-    if (LN) {
-      try {
-        LN.getPending().then(p => (p && p.notifications && p.notifications.length ? LN.cancel({ notifications: p.notifications.map(x => ({ id: x.id })) }) : null)).catch(() => {}).then(() => {
-          if (L.length) LN.schedule({ notifications: L.map(n => ({ id: n.id, title: 'Simon', body: n.body, schedule: { at: new Date(n.ts), allowWhileIdle: true } })) }).catch(() => {});
-        });
-      } catch (_) {}
-      return;
-    }
-    ntTimers.forEach(clearTimeout); ntTimers = [];
-    L.forEach(n => { if (n.ts - Date.now() < 2147000000) ntTimers.push(setTimeout(() => ntMostrar(n), n.ts - Date.now())); });
-  }
-  function notifToggle() {
-    if (e.notifOn) { e.notifOn = 0; notifSync(true); guardar(); sfx.click(); toast('Avisos al teléfono apagados'); render(); return; }
-    const ok = () => { e.notifOn = 1; notifSync(true); guardar(); sfx.compra(); toast('¡Avisos al teléfono activados!'); render(); };
-    const no = () => { sfx.no(); toast('Sin permiso: actívalo en los ajustes del ' + (ntNativo() ? 'teléfono' : 'navegador')); };
-    const LN = ntNativo();
-    if (LN) { try { LN.requestPermissions().then(r => (r && r.display === 'granted') ? ok() : no()).catch(no); } catch (_) { no(); } return; }
-    if (!('Notification' in window)) { sfx.no(); toast('Este navegador no permite avisos'); return; }
-    if (Notification.permission === 'granted') { ok(); return; }
-    if (Notification.permission === 'denied') { no(); return; }
-    try { Notification.requestPermission().then(p => p === 'granted' ? ok() : no()); } catch (_) { no(); }
-  }
-  function iconoNot() {
-    const g = Grid(11, 11), m = ['.....k.....', '...kkwkk...', '..kwwwwwk..', '..kwwwwwk..', '..kwwwwwk..', '.kwwwwwwwk.', '.kwwwwwwwk.', 'kkkkkkkkkkk', '....kyk....', '.....k.....', '...........'];
-    m.forEach((f, y) => [...f].forEach((ch, x) => { if (ch === 'w') g.set(x, y, '#e8ecff'); else if (ch === 'k') g.set(x, y, '#232b63'); else if (ch === 'y') g.set(x, y, '#ffd84a'); }));
-    return g;
-  }
-  $('b-noti').onclick = () => menuAbrir('notis', () => {
-    notiNuevas = (e.notis || []).filter(x => !x.l).length;
-    (e.notis || []).forEach(x => x.l = 1);
-    pintarNotis(); guardar(); abrir('notis');
-  });
+  // (Lógica, configuración y textos movidos a notificaciones.js para fácil edición)
+
   /* ===================== RESFRIADO (suave) ===================== */
   const ABRIGOS = ['bufanda', 'bufanda_dorada', 'capa_roja', 'capa_azul', 'sud_navidad']; // (MED_PRECIO definido en config.js)
   const abrigado = () => Object.values(e.ropa).some(k => k && ABRIGOS.includes(k));
@@ -4731,11 +4624,7 @@
     cerrar(); guardar(); sfx.respuesta(); decir('Sí. (a estudiar)', e.traductor ? 'Vamos a concentrarnos.' : null);
     estPintar(); estTick();
   }
-  function estAviso(t) {
-    try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') { const o = { body: t, icon: 'icon-192.png', tag: 'simon-est' }; if (navigator.serviceWorker && navigator.serviceWorker.ready) navigator.serviceWorker.ready.then(r => r.showNotification('Simon', o)).catch(() => { new Notification('Simon', o); }); else new Notification('Simon', o); } } catch (_) {}
-    try { if (navigator.vibrate) navigator.vibrate([250, 120, 250]); } catch (_) {}
-    seq([784, 988, 1175, 1568], .13, 'sine', .07);
-  }
+  // (estAviso definido en notificaciones.js)
   function estFin() {
     let s = e.est; const now = Date.now(); if (!s) return;
     while (s && now >= s.fin) {
