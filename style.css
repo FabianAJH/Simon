@@ -59,7 +59,7 @@
   /* ---- escena ---- */
   .escena { flex:1; min-height:0; position:relative; overflow:hidden; background:var(--noche); }
   #sc { position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); display:block;
-    image-rendering:pixelated; image-rendering:crisp-edges; image-rendering:pixelated; }
+    image-rendering:pixelated; image-rendering:crisp-edges; image-rendering:pixelated; will-change:transform; }
   /* globo de diálogo sobre la cabeza de Simon: esquinas redondeadas en pixel, contorno con drop-shadow y colita hacia su cabeza */
   #burbuja { display:none; position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:3;
     min-width:84px; max-width:84%; box-sizing:border-box; text-align:center; color:var(--tinta);
@@ -95,7 +95,7 @@
   @keyframes latido { 50% { filter:brightness(1.12); } }
 
   /* ---- fichas del HUD ---- */
-  .izq { display:flex; align-items:center; gap:4px; min-width:0; }
+  .fila-top .izq { display:flex; align-items:center; gap:4px; min-width:0; }
   .chip { display:inline-flex; align-items:center; gap:4px; background:var(--noche); border:3px solid var(--linea); padding:4px 5px; font-size:8px; color:#fff; cursor:pointer; }
   .chip canvas { image-rendering:pixelated; }
   #ic-fue { width:18px; height:22px; margin:-3px 0; } #chip-fue.apagada { color:#8a90b8; }
@@ -202,9 +202,9 @@
   #edicion.on { display:block; }
   #ed-bd { display:grid; grid-template-columns:repeat(auto-fill, minmax(56px, 1fr)); gap:8px; overflow-y:auto; overflow-x:hidden; margin-bottom:10px; min-height:8px; max-height:34vh; align-content:flex-start; }
   #ed-bd > button { background:#e8ecff; border:0; padding:5px; box-shadow:0 0 0 3px var(--noche); position:relative; touch-action:pan-y; } #ed-bd canvas { display:block; image-rendering:pixelated; max-height:34px; max-width:44px; object-fit:contain; }
-  #ed-buscar, .th-buscar { font:inherit; font-size:8px; width:100%; box-sizing:border-box; padding:9px 10px; margin-bottom:8px; border:0; background:var(--noche); color:#fff; box-shadow:0 0 0 2px var(--linea); outline:none; border-radius:0; }
-  #ed-buscar::placeholder, .th-buscar::placeholder { color:#6a74b0; }
-  #ed-buscar:focus, .th-buscar:focus { box-shadow:0 0 0 2px #ffd84a; }
+  #ed-buscar, #vs-buscar, .th-buscar, .vs-buscar { font:inherit; font-size:8px; width:100%; box-sizing:border-box; padding:9px 10px; margin-bottom:8px; border:0; background:var(--noche); color:#fff; box-shadow:0 0 0 2px var(--linea); outline:none; border-radius:0; }
+  #ed-buscar::placeholder, #vs-buscar::placeholder, .th-buscar::placeholder, .vs-buscar::placeholder { color:#6a74b0; }
+  #ed-buscar:focus, #vs-buscar:focus, .th-buscar:focus, .vs-buscar:focus { box-shadow:0 0 0 2px #ffd84a; }
   .buscar-wrap { position:relative; width:100%; margin-bottom:8px; }
   .buscar-wrap input { margin-bottom:0 !important; padding-right:26px !important; }
   .buscar-x { position:absolute; right:6px; top:50%; transform:translateY(-50%); width:16px; height:16px; border:0; border-radius:50%; background:rgba(106,116,176,.35); color:#fff; font:inherit; font-size:7px; line-height:16px; text-align:center; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
@@ -261,8 +261,10 @@
   .fila-top .der2 { display:flex; gap:8px; align-items:center; flex:none; }
   .noti { padding:8px 10px; margin-bottom:6px; background:var(--noche); border-left:4px solid var(--linea); font-size:8px; line-height:1.7; } .noti.nueva { border-left-color:#ffd84a; background:#2a3380; } .noti .nh { font-size:6px; color:#aab4ff; margin-top:2px; }
   .ibtn:active { background:var(--panel2); }
-  .flecha { position:absolute; top:8px; z-index:5; width:38px; padding:6px 0 5px; display:flex; flex-direction:column; align-items:center; gap:3px; background:rgba(20,26,60,.84); border:3px solid var(--linea); color:#fff; font:inherit; font-size:6px; }
-  .flecha canvas { width:24px; height:33px; image-rendering:pixelated; }
+  .flecha { position:absolute; top:8px; z-index:5; width:38px; min-width:38px; max-width:38px; padding:6px 0 5px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:rgba(20,26,60,.84); border:3px solid var(--linea); color:#fff; font:inherit; font-size:6px; box-sizing:border-box; flex:none; }
+  .flecha canvas { width:24px; height:33px; image-rendering:pixelated; flex:none; }
+  .flecha span { font-size:6px; line-height:1; text-align:center; }
+  .flecha span:empty { display:none; }
   .flecha.izq { left:6px; } .flecha.der { right:6px; } .flecha.bloq { opacity:.5; } .flecha.oculto { display:none; }
   .flecha:active { background:var(--panel2); }
   #lugar-tag { position:absolute; left:50%; transform:translateX(-50%); top:8px; white-space:nowrap; z-index:5; font-size:7px; background:rgba(20,26,60,.8); color:#ffd84a; padding:5px 7px; pointer-events:none; display:flex; align-items:center; gap:5px; }
@@ -556,7 +558,7 @@
   /* ---- HUD compacto RPG ---- */
   .hud { padding:8px 10px 10px; background:var(--noche); }
   .fila-top { margin-bottom:0; }
-  .izq { gap:12px; }
+  .fila-top .izq { gap:12px; }
   .med { --p:0%; position:relative; width:46px; height:46px; border-radius:50%; flex:none; cursor:pointer; background:conic-gradient(#ff6b8a var(--p), #2a2f6a 0); display:flex; align-items:center; justify-content:center; }
   .med.max { background:#ffd84a; }
   .medi { width:36px; height:36px; border-radius:50%; background:#3a47a8; display:flex; align-items:center; justify-content:center; border:2px solid var(--noche); }
@@ -565,7 +567,7 @@
   .med.sube { animation:pulso2 .5s steps(2) 2; } @keyframes pulso2 { 50% { filter:brightness(1.6); } }
   .stats { gap:7px; align-items:flex-end; }
   .stat { flex-direction:column; gap:3px; }
-  .izq { flex:1; } .stats { flex:1; min-width:0; } .stat { flex:1; min-width:0; } .stat .hp { width:100%; height:12px; flex:none; } .stat .sic { width:16px; height:16px; }
+  .fila-top .izq { flex:1; } .stats { flex:1; min-width:0; } .stat { flex:1; min-width:0; } .stat .hp { width:100%; height:12px; flex:none; } .stat .sic { width:16px; height:16px; }
   .fila-top .der2 { gap:7px; }
   .der2 .chip { height:38px; }
 

@@ -577,7 +577,7 @@ function registrarComida({ id, nombre, precio = 15, nivel = 1, hambre = 10, ener
     puf_dorado: [R.dorado, '#6a4a08', '#fff6b0']
   };
   function pufGrid(k) { const [ra, ol, hi] = PUF[k], g = Grid(24, 17); capa(g, ol, L => sombrear(L, elipse(12, 9, 11, 8), 12, 9, 11, 8, ra)); g.rect(7, 3, 10, 1, hi); return g; }
-  const Jt = (k, n, p, nv, extra) => Object.assign({ tipo: 'cuarto', slot: 'juguete', n, p, nv, grid: juguetes[k] }, extra);
+  const Jt = (k, n, p, nv, extra) => Object.assign({ tipo: 'cuarto', slot: 'juguete', luz: true, n, p, nv, grid: juguetes[k] }, extra);
   const Pf = (k, n, p, nv) => ({ tipo: 'cuarto', slot: 'deco', n, p, nv, grid: () => pufGrid(k) });
   Object.assign(ITEMS, {
     juguete_pelota: Jt('pelota', 'PELOTA ROJA', 0, 1),

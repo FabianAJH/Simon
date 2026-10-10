@@ -1,4 +1,4 @@
-const CACHE = 'simon-v446';
+const CACHE = 'simon-v466';
 const ARCHIVOS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ARCHIVOS = [
   './items.js',
   './dialogos.js',
   './notificaciones.js',
+  './codigos.js',
   './minijuegos.js',
   './game.js',
   './manifest.json',

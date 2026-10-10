@@ -23,7 +23,91 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
   const CLAVE_BK = 'simon-v1-bk';
   const ESQUEMA = 1;
   let guardaCount = 0;
-  const VERSION_JUEGO = 'Beta v,400';
+    const VERSION_JUEGO = 'Beta v,466';
+
+  /* === Sistema de Blindaje Criptográfico y Anti-Manipulación del Guardado === */
+  const SALT_SECRET = 'simon_anti_cheat_vault_9z7q_2026';
+  function _sumaHex(t) { return hashStr(t).toString(16); }
+  const _b64e = t => (typeof btoa === 'function' ? btoa(unescape(encodeURIComponent(t))) : (typeof Buffer !== 'undefined' ? Buffer.from(t, 'utf8').toString('base64') : ''));
+  const _b64d = t => (typeof atob === 'function' ? decodeURIComponent(escape(atob(t))) : (typeof Buffer !== 'undefined' ? Buffer.from(t, 'base64').toString('utf8') : ''));
+
+  function _cifrarCadena(txt, salt) {
+    const key = _sumaHex(salt + SALT_SECRET);
+    const klen = key.length;
+    let res = '';
+    for (let i = 0; i < txt.length; i++) {
+      const c = txt.charCodeAt(i);
+      const k = key.charCodeAt(i % klen);
+      const v = (c ^ k) ^ ((i * 13) & 0xff);
+      res += String.fromCharCode(v);
+    }
+    return _b64e(res);
+  }
+
+  function _descifrarCadena(b64, salt) {
+    const raw = _b64d(b64);
+    const key = _sumaHex(salt + SALT_SECRET);
+    const klen = key.length;
+    let res = '';
+    for (let i = 0; i < raw.length; i++) {
+      const c = raw.charCodeAt(i);
+      const k = key.charCodeAt(i % klen);
+      const v = (c ^ ((i * 13) & 0xff)) ^ k;
+      res += String.fromCharCode(v);
+    }
+    return res;
+  }
+
+  function empaquetarSave(obj) {
+    try {
+      const json = JSON.stringify(obj);
+      const salt = _sumaHex(String(Date.now()) + Math.random().toString(36).slice(2, 8));
+      const cifrado = _cifrarCadena(json, salt);
+      const firma = _sumaHex('simon_sig|' + salt + '|' + cifrado + '|' + SALT_SECRET);
+      return 'SX1.' + salt + '.' + cifrado + '.' + firma;
+    } catch (err) {
+      console.warn('[Seguridad] Error al empaquetar guardado:', err);
+      return JSON.stringify(obj);
+    }
+  }
+
+  function desempaquetarSave(str) {
+    if (!str || typeof str !== 'string') return null;
+    const s = str.trim();
+    // 1. Retrocompatibilidad total con partidas previas en JSON plano
+    if (s.startsWith('{') && s.endsWith('}')) {
+      try {
+        const d = JSON.parse(s);
+        return (d && typeof d === 'object') ? d : null;
+      } catch (_) {
+        return null;
+      }
+    }
+    // 2. Formato blindado: SX1.<salt>.<cifrado>.<firma>
+    const partes = s.split('.');
+    if (partes.length === 4 && partes[0] === 'SX1') {
+      const [, salt, cifrado, firma] = partes;
+      const firmaEsperada = _sumaHex('simon_sig|' + salt + '|' + cifrado + '|' + SALT_SECRET);
+      if (firma !== firmaEsperada) {
+        console.warn('[Seguridad] Firma inválida o manipulación detectada en el guardado.');
+        return null;
+      }
+      try {
+        const json = _descifrarCadena(cifrado, salt);
+        const d = JSON.parse(json);
+        return (d && typeof d === 'object') ? d : null;
+      } catch (err) {
+        console.warn('[Seguridad] Error al descifrar guardado:', err);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.empaquetarSave = empaquetarSave;
+    window.desempaquetarSave = desempaquetarSave;
+  }
 
   /* === IndexedDB helper (respaldo silencioso) === */
   const IDB_NAME = 'simon-idb', IDB_STORE = 'save';
@@ -94,6 +178,7 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     if (!d.jardin || typeof d.jardin !== 'object' || !Array.isArray(d.jardin.plots)) d.jardin = { plots: [] };
     if (!d.semillas || typeof d.semillas !== 'object' || Array.isArray(d.semillas)) d.semillas = {};
     if (!d.macetaVida || typeof d.macetaVida !== 'object' || Array.isArray(d.macetaVida)) d.macetaVida = {};
+    if (d.estAmb === 'tormenta' || d.estAmb === 'cafe') d.estAmb = '';
     return d;
   }
   // (MAX definido en config.js)
@@ -124,7 +209,16 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     intro: false, traductor: false, proxVisita: 0, ultTip: -1, logros: {}, merc: null, avisoMerc: false, planta: null, hallazgo: null, proxHallazgo: Date.now() + 180000, dibujos: {},
     jardin: { plots: [] }, semillas: {}, macetaVida: {}
   });
-  function _leerLS(clave) { try { const d = JSON.parse(localStorage.getItem(clave)); return d && typeof d.hambre === 'number' ? d : null; } catch (_) { return null; } }
+  function _leerLS(clave) {
+    try {
+      const raw = localStorage.getItem(clave);
+      if (!raw) return null;
+      const d = desempaquetarSave(raw);
+      return d && typeof d.hambre === 'number' ? d : null;
+    } catch (_) {
+      return null;
+    }
+  }
   function _aplicarSave(d) {
     try {
       const horas = (typeof d.t === 'number' && !isNaN(d.t) && d.t > 0 && d.t <= Date.now()) ? Math.min(87600, (Date.now() - d.t) / 3600000) : 0, b = BASE();
@@ -177,7 +271,7 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
       // Intento 2: backup rotativo
       if (!d) { d = _leerLS(CLAVE_BK); if (d) console.log('[Simon] Recuperado desde backup localStorage'); }
       // Intento 3: IndexedDB (si ya se cargó el dato async)
-      if (!d && _idbPend) { try { const p = JSON.parse(_idbPend); if (p && typeof p.hambre === 'number') { d = p; console.log('[Simon] Recuperado desde IndexedDB'); } } catch (_) {} }
+      if (!d && _idbPend) { try { const p = desempaquetarSave(_idbPend); if (p && typeof p.hambre === 'number') { d = p; console.log('[Simon] Recuperado desde IndexedDB'); } } catch (_) {} }
       if (d) { _aplicarSave(d); return; }
     } catch (err) {
       console.warn('[Simon] Error durante cargar():', err);
@@ -191,10 +285,14 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     if (admin || reseteando) return;
     e.t = Date.now();
     const prueba = vSnap ? e.ropa : null; if (prueba) e.ropa = vSnap;   // mientras se prueba ropa, lo guardado sigue siendo el atuendo de antes
-    const json = JSON.stringify(e);
-    try { localStorage.setItem(CLAVE, json); } catch (_) {}
+    const paquete = empaquetarSave(e);
+    try { localStorage.setItem(CLAVE, paquete); } catch (_) {}
     // Backup rotativo cada 10 guardados
-    if (++guardaCount >= 10) { guardaCount = 0; try { localStorage.setItem(CLAVE_BK, json); } catch (_) {} idbSet(json); }
+    if (++guardaCount >= 10) {
+      guardaCount = 0;
+      try { localStorage.setItem(CLAVE_BK, paquete); } catch (_) {}
+      idbSet(paquete);
+    }
     if (prueba) e.ropa = prueba;
   }
   var vSnap = null, vF = 'todo';
@@ -1099,7 +1197,7 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     else {
       const pn = esNoche(); cieloParque(cl, pn);
       ctx.drawImage(sprite('parque' + LW + 'x' + LH + cl, () => parqueGrid(LW, LH, RY, cl), pn ? .55 : 0), 0, 0);
-      if (!act || act.tipo !== 'pelota') { const jk = juguetePuesto(), tj = sprite('tj_' + jk, () => ITEMS[jk].grid(), 0); ctx.drawImage(tj, SX + SW + 6, SY + SH - 4 - tj.height); }
+      if ((typeof jugFis === 'undefined' || (!jugFis.activo && !jugFis.arr)) && (!act || act.tipo !== 'pelota')) { const jk = juguetePuesto(), tj = sprite('tj_' + jk, () => ITEMS[jk].grid(), 0); ctx.drawImage(tj, SX + SW + 6, SY + SH - 4 - tj.height); }
     }
   }
   // navegación: flechas laterales, fundido y mapa
@@ -1211,7 +1309,7 @@ function hashStr(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h
     if (!puedeMoverse()) return;
     const h = HABS[i]; if (!h) return;
     if (nivel() < h.nv) { sfx.no(); irA(() => { vistaBloq = h.id; mostrarHabLetrero(h); }); return; }
-    sfx.click(); irA(() => { vistaBloq = null; ocultarHabLetrero(); e.hab = h.id; guardar(); }); if (h.id === 'cocina' && !e.cocVisto) { e.cocVisto = 1; setTimeout(introCocina, 1100); } if (h.id === 'estudio' && !e.estVisto) { e.estVisto = 1; introPend = Date.now() + 60000; setTimeout(introEstudio, 1100); } if (h.id === 'juegos' && !e.arcVisto) { e.arcVisto = 1; setTimeout(() => toast('Toca la máquina arcade para jugar'), 900); } if (h.id === 'jardin' && !e.jardinVisto) { e.jardinVisto = 1; setTimeout(() => toast('Toca una parcela vacía para sembrar una semilla'), 900); }
+    sfx.click(); irA(() => { vistaBloq = null; ocultarHabLetrero(); e.hab = h.id; guardar(); }); if (h.id === 'cocina' && !e.cocVisto) { e.cocVisto = 1; setTimeout(introCocina, 1100); } if (h.id === 'estudio' && !e.estVisto) { e.estVisto = 1; } if (h.id === 'juegos' && !e.arcVisto) { e.arcVisto = 1; setTimeout(() => toast('Toca la máquina arcade para jugar'), 900); } if (h.id === 'jardin' && !e.jardinVisto) { e.jardinVisto = 1; setTimeout(() => toast('Toca una parcela vacía para sembrar una semilla'), 900); }
   }
   function irLugar(id) {
     const l = LUGARES.find(x => x.id === id); if (!l || nivel() < l.nv) return;

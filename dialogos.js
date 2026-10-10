@@ -755,7 +755,7 @@ const DIALOGOS_SECRETOS = {
 // 13. RECUERDOS DE CORTEX AL SUBIR DE NIVEL (Niveles 2 al 25)
 // ==========================================================================
 const LV_MEM = {
-  2:  'Nivel 2. ¿Recuerdas cuando te encontré? Estabas junto a la basura, porque nadie te quería. Yo sí te quise desde tu primer «sí».',
+  2:  'Nivel 2. ¿Recuerdas cuando te encontré? Estabas en la basura, porque nadie te quería. Pero yo sí.',
   3:  'Lo primero que te di fue un keke. Casi me muerdes la mano. Con cariño, claro.',
   4:  'Intenté enseñarte a decir «no». Tardaste un día entero y dijiste «sí».',
   5:  'Te di la corona porque eres mi mejor amigo. Verte usarla me llena de orgullo.',

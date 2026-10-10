@@ -86,10 +86,10 @@ const CONFIG = {
 
   // 7. MINIJUEGOS
   minijuegos: {
-    atrapaElKeke: { costoEnergia: 2, nivelDesbloqueo: 2,  multiplicadorMonedas: 2 },
-    memoria:      { costoEnergia: 2, nivelDesbloqueo: 5,  divisorPuntos: 20 },
-    correSimon:   { costoEnergia: 2, nivelDesbloqueo: 8,  multiplicadorMonedas: 3 },
-    bailaSimon:   { costoEnergia: 5, nivelDesbloqueo: 12, divisorPuntos: 18 }
+    atrapaElKeke: { costoEnergia: 5, nivelDesbloqueo: 1,  multiplicadorMonedas: 2 },
+    memoria:      { costoEnergia: 5, nivelDesbloqueo: 1,  divisorPuntos: 20 },
+    correSimon:   { costoEnergia: 5, nivelDesbloqueo: 1,  multiplicadorMonedas: 3 },
+    bailaSimon:   { costoEnergia: 5, nivelDesbloqueo: 1,  divisorPuntos: 18 }
   },
 
   // 8. JARDÍN Y CULTIVOS

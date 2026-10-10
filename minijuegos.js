@@ -56,7 +56,9 @@
   /* ---- la escena: tabla de cortar a la izquierda, estufa a la derecha, plato abajo ---- */
   const CGW = 132, CGH = 168;
   const CG_BOARD = { x: 3, y: 36, w: 55, h: 60 }, CG_STOVE = { x: 62, y: 36, w: 67, h: 84 };
-  const CG_BURN = [{ x: 80, y: 56, h: 1.35 }, { x: 111, y: 56, h: 1.35 }, { x: 80, y: 98, h: .75 }, { x: 111, y: 98, h: .75 }];
+  const CG_BURN = [{ x: 80, y: 56, h: 1.35 }, { x: 111, y: 56, h: 1.35 }, { x: 80, y: 98, h: 1.35 }, { x: 111, y: 98, h: .75 }];
+  const cgBurnActivo = i => i === 0 || (i === 2 && !!(typeof e !== 'undefined' && e && e.tiene && e.tiene.sarten2));
+  const cgBurnActivos = () => (typeof e !== 'undefined' && e && e.tiene && e.tiene.sarten2) ? [CG_BURN[0], CG_BURN[2]] : [CG_BURN[0]];
   const CG_PLATE = { x: 66, y: 146, rx: 34, ry: 15 };
   const CG_SWEET = [.5, .72];
   let introPend = 0; const ipf = () => introPend > Date.now();   // Cortex está por llegar a explicar algo: nada de menús ni toques a objetos
@@ -91,7 +93,7 @@
     const mod = CG_MODO[r.id] || {}, piezas = []; let n = 0;
     Object.keys(r.ing).sort((a, b) => tut ? (mod[b] || 'c').length - (mod[a] || 'c').length : 0).forEach(k => { for (let i = 0; i < r.ing[k]; i++) piezas.push(cgNueva(k, mod[k] || 'c', n++)); });
     const veces = e.st.ckN || 0; e.st.ckN = veces + 1; guardar();
-    cg = { r, mod, piezas, extra: {}, id: n, pans: e.tiene.sarten2 ? [{ id: 0, x: 96, y: 62, wig: 0, hop: 0 }, { id: 1, x: 96, y: 96, wig: 0, hop: 0 }] : [{ id: 0, x: 96, y: 77, wig: 0, hop: 0 }], ptr: null, drag: null, knife: null, t: 0, ult: performance.now(), msgs: [], part: [], hist: [], flipT: 0, fin: 0, board: null, listoCortar: 0, tut: !!tut, tutI: 2, ayuda: !!tut || veces < 5, volt: 0, limite: tut ? 0 : Math.round((40 + 22 * piezas.length) * (veces < 5 ? 1.3 : 1)), cxT: '' };
+    cg = { r, mod, piezas, extra: {}, id: n, pans: e.tiene.sarten2 ? [{ id: 0, x: 96, y: 62, wig: 0, hop: 0 }, { id: 1, x: 96, y: 96, wig: 0, hop: 0 }] : [{ id: 0, x: 96, y: 77, wig: 0, hop: 0 }], ptr: null, drag: null, knife: null, t: 0, ult: performance.now(), msgs: [], part: [], hist: [], flipT: 0, fin: 0, board: null, listoCortar: 0, tut: !!tut, tutI: 2, ayuda: !!tut || veces < 5, volt: 0, limite: tut ? 0 : Math.round((40 + 22 * piezas.length) * (veces < 5 ? 1.3 : 1)), cxT: '', lastTxt: '', lastPanTap: 0 };
     cg.left = cg.limite; $('cg-h').classList.toggle('on', !!cg.limite); $('cg-hb').style.width = '100%'; $('cg-hb').style.background = '#5ac870';
     document.body.classList.add('cocinando'); $('cg').classList.add('on'); $('cg-t').textContent = r.n; cgLayout();
     sfx.click(); cancelAnimationFrame(cgRaf); cgRaf = requestAnimationFrame(cgLoop);
@@ -115,7 +117,7 @@
   function cgPos(ev) { const r = $('cgc').getBoundingClientRect(); return { x: (ev.clientX - r.left) / r.width * CGW, y: (ev.clientY - r.top) / r.height * CGH }; }
   const cgDist = (a, b, c, d) => Math.hypot(a - c, b - d);
   const cgPanDe = p => cg.pans.find(q => q.id === (p.pn || 0)) || cg.pans[0];
-  const cgEnFuego = pn => { let m = 0; CG_BURN.forEach(b => { if (cgDist(pn.x, pn.y, b.x, b.y) <= 9.5) m = b.h; }); return m; };
+  const cgEnFuego = pn => { let m = 0; CG_BURN.forEach((b, i) => { if (cgBurnActivo(i) && cgDist(pn.x, pn.y, b.x, b.y) <= 9.5) m = b.h; }); return m; };
   function cgSlot(p) {   // posición de las piezas que no están en mano
     if (p.loc === 'cesta') { const L = cg.piezas.filter(q => q.loc === 'cesta'), i = L.indexOf(p), n = Math.max(L.length, 1); return { x: CGW / 2 + (i - (n - 1) / 2) * 20, y: 10 }; }
     if (p.loc === 'sarten') { const pn = cgPanDe(p), L = cg.piezas.filter(q => q.loc === 'sarten' && cgPanDe(q) === pn), i = L.indexOf(p); return { x: pn.x + pn.wig + (L.length > 1 ? (i ? 7 : -7) : 0), y: pn.y - p.salto - pn.hop }; }
@@ -125,9 +127,9 @@
     return { x: p.x, y: p.y };
   }
   function cgListaPlato(p) {
-    if (p.quemada) return 'X';
-    if (p.modo.includes('c') && !p.corte) return 'X';
-    if (p.modo.includes('f') && (p.cook[0] < .25 || p.cook[1] < .25)) return 'X';
+    if (p.quemada) return '¡QUEMADO! TÍRALO';
+    if (p.modo.includes('c') && !p.corte) return '¡FALTA CORTAR! 🔪';
+    if (p.modo.includes('f') && (p.cook[0] < .25 || p.cook[1] < .25)) return '¡FALTA COCINAR! 🔥';
     return null;
   }
   function cgDown(ev) {
@@ -143,23 +145,52 @@
     }
     // 2) la sartén (aro o mango)
     for (let i = cg.pans.length - 1; i >= 0; i--) { const pn = cg.pans[i];
-      if (cgDist(m.x, m.y, pn.x, pn.y) <= 16 || (m.x > pn.x + 12 && m.x < pn.x + 38 && Math.abs(m.y - pn.y) < 6)) { cg.drag = { pan: true, pi: i, ox: pn.x - m.x, oy: pn.y - m.y }; cg.hist = []; return; } }
-    // 3) el cuchillo sobre la tabla
+      if (cgDist(m.x, m.y, pn.x, pn.y) <= 16 || (m.x > pn.x + 12 && m.x < pn.x + 38 && Math.abs(m.y - pn.y) < 7)) {
+        cg.drag = { pan: true, pi: i, ox: pn.x - m.x, oy: pn.y - m.y, sx: m.x, sy: m.y, t0: performance.now(), mov: false };
+        cg.hist = [{ x: m.x, y: m.y, t: performance.now() }];
+        return;
+      }
+    }
+    // 3) el corte sobre la tabla (permite iniciar el trazo sobre toda el área de corte)
     const tb = cg.piezas.find(p => p.loc === 'tabla' && !p.corte);
-    if (tb && m.x >= CG_BOARD.x && m.x <= CG_BOARD.x + CG_BOARD.w && m.y >= CG_BOARD.y && m.y <= CG_BOARD.y + CG_BOARD.h) { cg.knife = { x0: m.x, y0: m.y, x: m.x, y: m.y, t0: performance.now(), tr: [[m.x, m.y]] }; return; }
+    if (tb && m.x >= CG_BOARD.x - 4 && m.x <= CG_BOARD.x + CG_BOARD.w + 6 && m.y >= CG_BOARD.y - 4 && m.y <= CG_BOARD.y + CG_BOARD.h + 6) {
+      cg.knife = { x0: m.x, y0: m.y, x: m.x, y: m.y, t0: performance.now(), tr: [[m.x, m.y]] };
+      return;
+    }
     cg.ptr = null;
   }
   function cgMove(ev) {
     if (!cg || ev.pointerId !== cg.ptr) return; const m = cgPos(ev);
-    if (cg.knife) { cg.knife.x = m.x; cg.knife.y = m.y; cg.knife.tr.push([m.x, m.y]); if (cg.knife.tr.length > 14) cg.knife.tr.shift(); return; }
+    if (cg.knife) {
+      cg.knife.x = m.x; cg.knife.y = m.y; cg.knife.tr.push([m.x, m.y]);
+      if (cg.knife.tr.length > 24) cg.knife.tr.shift();
+      return;
+    }
     const d = cg.drag; if (!d) return;
     if (d.pan) {
-      const pn = cg.pans[d.pi]; pn.x = Math.max(78, Math.min(114, m.x + d.ox)); pn.y = Math.max(54, Math.min(102, m.y + d.oy));
-      const h = cg.hist, now = performance.now(); h.push({ x: m.x, t: now }); while (h.length && now - h[0].t > 700) h.shift();
-      // sacudida: 3+ cambios de dirección con amplitud suficiente en menos de 0.7 s
-      let rev = 0, dir = 0, ref = h.length ? h[0].x : 0;
-      for (let i = 1; i < h.length; i++) { const dx = h[i].x - ref; if (Math.abs(dx) >= 3) { const nd = dx > 0 ? 1 : -1; if (dir && nd !== dir) rev++; dir = nd; ref = h[i].x; } }
-      if (rev >= 3 && now - cg.flipT > 800) { cgVoltear(pn); cg.hist = []; cg.flipT = now; }
+      const pn = cg.pans[d.pi];
+      pn.x = Math.max(78, Math.min(114, m.x + d.ox));
+      pn.y = Math.max(54, Math.min(102, m.y + d.oy));
+      if (Math.hypot(m.x - d.sx, m.y - d.sy) > 3) d.mov = true;
+      const h = cg.hist, now = performance.now();
+      h.push({ x: m.x, y: m.y, t: now });
+      while (h.length && now - h[0].t > 700) h.shift();
+      // sacudida / agite: 2+ cambios de dirección en X o Y, o vaivén rápido
+      let revX = 0, dirX = 0, refX = h.length ? h[0].x : 0;
+      let revY = 0, dirY = 0, refY = h.length ? h[0].y : 0;
+      for (let i = 1; i < h.length; i++) {
+        const dx = h[i].x - refX;
+        if (Math.abs(dx) >= 2.5) { const nd = dx > 0 ? 1 : -1; if (dirX && nd !== dirX) revX++; dirX = nd; refX = h[i].x; }
+        const dy = h[i].y - refY;
+        if (Math.abs(dy) >= 2.5) { const nd = dy > 0 ? 1 : -1; if (dirY && nd !== dirY) revY++; dirY = nd; refY = h[i].y; }
+      }
+      const distStart = Math.hypot(m.x - (h.length ? h[0].x : m.x), m.y - (h.length ? h[0].y : m.y));
+      const flick = h.length >= 3 && distStart > 10 && (now - h[0].t < 350);
+      if ((revX >= 2 || revY >= 2 || (revX >= 1 && revY >= 1) || (flick && (revX >= 1 || revY >= 1 || distStart > 14))) && now - cg.flipT > 600) {
+        cgVoltear(pn);
+        cg.hist = [];
+        cg.flipT = now;
+      }
       return;
     }
     const p = d.p; p.x = m.x; p.y = m.y - 4; if (Math.hypot(m.x - d.sx, m.y - d.sy) > 2) d.mov = true;
@@ -167,22 +198,50 @@
   function cgUp(ev) {
     if (!cg || ev.pointerId !== cg.ptr) return; const m = cgPos(ev); cg.ptr = null; cg.idle = 0;
     if (cg.knife) { const k = cg.knife; cg.knife = null; cgCorte(k); return; }
-    const d = cg.drag; cg.drag = null; if (!d || d.pan) return;
+    const d = cg.drag; cg.drag = null; if (!d) return;
+    if (d.pan) {
+      const pn = cg.pans[d.pi];
+      // 1. Snap magnético a la parrilla activa más cercana al soltar (a distancia <= 15px)
+      let bestB = null, minD = 99;
+      cgBurnActivos().forEach(b => {
+        const dist = cgDist(pn.x, pn.y, b.x, b.y);
+        if (dist <= 15 && dist < minD) { minD = dist; bestB = b; }
+      });
+      if (bestB) {
+        pn.x = bestB.x; pn.y = bestB.y;
+        seq([660, 880], .025, 'sine', .05);
+        cgPart(pn.x, pn.y, '#ff9a4a', 4, -.4);
+      }
+      // 2. Alternativa accesible: toque o doble toque rápido para voltear si toca agitar
+      const ahora = performance.now();
+      const distMov = Math.hypot(m.x - (d.sx || m.x), m.y - (d.sy || m.y));
+      const sug = cgSug();
+      if (sug && sug.t === 'agitar' && sug.pi === pn.id) {
+        if (distMov < 6 && (ahora - (cg.lastPanTap || 0) < 450 || ahora - d.t0 < 220)) {
+          cgVoltear(pn);
+          cg.hist = [];
+          cg.flipT = ahora;
+        }
+      }
+      cg.lastPanTap = ahora;
+      return;
+    }
     const p = d.p; let err = null;
     let panD = null, pdm = 99; cg.pans.forEach(q => { const d2 = cgDist(m.x, m.y - 4, q.x, q.y); if (d2 <= 17 && d2 < pdm) { pdm = d2; panD = q; } }); const enSarten = !!panD, enTabla = m.x >= CG_BOARD.x && m.x <= CG_BOARD.x + CG_BOARD.w && m.y >= CG_BOARD.y && m.y <= CG_BOARD.y + CG_BOARD.h;
     const enPlato = ((m.x - CG_PLATE.x) / (CG_PLATE.rx + 4)) ** 2 + ((m.y - CG_PLATE.y) / (CG_PLATE.ry + 6)) ** 2 <= 1;
     if (enPlato) { err = cgListaPlato(p); if (!err) { p.loc = 'plato'; sfx.click(); seq([660, 880], .05, 'triangle', .06); cgPart(p.x, p.y, '#ffe45a', 3, -.4); cgCheck(); cgAyuda(); return; } }
     else if (enSarten) {
-      if (!p.modo.includes('f')) err = 'X';
-      else if (p.modo.includes('c') && !p.corte) err = 'X';
-      else if (p.quemada) err = 'X';
-      else if (cg.piezas.filter(q => q.loc === 'sarten' && cgPanDe(q) === panD).length >= 2 && !(d.de === 'sarten' && cgPanDe(p) === panD)) err = 'X';
+      if (!p.modo.includes('f')) err = '¡NO VA A LA SARTÉN!';
+      else if (p.modo.includes('c') && !p.corte) err = '¡CÓRTALO PRIMERO! 🔪';
+      else if (p.quemada) err = '¡QUEMADO! TÍRALO';
+      else if (cg.piezas.filter(q => q.loc === 'sarten' && cgPanDe(q) === panD).length >= 2 && !(d.de === 'sarten' && cgPanDe(p) === panD)) err = 'SARTÉN LLENA';
       else { p.loc = 'sarten'; p.pn = panD.id; sfx.click(); cgAyuda(); return; }
     } else if (enTabla) {
       const otra = cg.piezas.find(q => q.loc === 'tabla' || q.loc === 'tablaL');
-      if (d.de === 'sarten') err = 'X';
-      else if (!p.modo.includes('c') || p.corte && d.de !== 'tabla' && d.de !== 'tablaL') err = p.corte ? 'X' : 'X';
-      else if (otra && otra !== p) err = 'X';
+      if (d.de === 'sarten') err = 'YA EN COCCIÓN';
+      else if (!p.modo.includes('c')) err = '¡NO SE CORTA! AL FUEGO 🔥';
+      else if (p.corte && d.de !== 'tabla' && d.de !== 'tablaL') err = 'YA ESTÁ CORTADO';
+      else if (otra && otra !== p) err = 'TABLA OCUPADA';
       else { cgATabla(p); sfx.click(); cgAyuda(); return; }
     }
     if (err) { cgMsg(err, Math.max(24, Math.min(CGW - 24, m.x)), m.y - 8, '#ffb0b8'); sfx.no(); }
@@ -193,12 +252,45 @@
   const CG_GUIA = [-8, 0, 8];
   function cgCorte(k) {
     const p = cg.piezas.find(q => q.loc === 'tabla' && !q.corte); if (!p) return;
-    const dx = Math.abs(k.x - k.x0), dy = k.y - k.y0, a = Math.min(k.y0, k.y), b = Math.max(k.y0, k.y), cy = CG_BOARD.y + 30;
-    if (Math.abs(dy) < 16 || dx > 14 || a > cy - 3 || b < cy + 3) { cgMsg('X', k.x, k.y, '#ffb0b8'); return; }
-    const xm = (k.x0 + k.x) / 2, i = p.cuts.length, rel = xm - cg.tx, obj = CG_GUIA[i], err = Math.abs(rel - obj);
-    const q = err <= 2.2 ? 1 : err <= 4.5 ? .7 : .3;
+    const cy = CG_BOARD.y + 30;
+    const i = p.cuts.length, obj = CG_GUIA[Math.min(2, i)];
+    const targetX = cg.tx + obj;
+
+    // 1) Buscamos el punto de corte real en el trazo cruzando la línea horizontal central del alimento (cy)
+    let xm = null, minDiff = 999;
+    if (k.tr && k.tr.length >= 2) {
+      for (let j = 0; j < k.tr.length - 1; j++) {
+        const p1 = k.tr[j], p2 = k.tr[j + 1];
+        const yMin = Math.min(p1[1], p2[1]), yMax = Math.max(p1[1], p2[1]);
+        if (yMin <= cy + 3 && yMax >= cy - 3) {
+          const dy = p2[1] - p1[1];
+          const t = Math.abs(dy) > 0.001 ? Math.max(0, Math.min(1, (cy - p1[1]) / dy)) : 0.5;
+          const crossX = p1[0] + (p2[0] - p1[0]) * t;
+          const diff = Math.abs(crossX - targetX);
+          if (diff < minDiff) { minDiff = diff; xm = crossX; }
+        }
+      }
+    }
+    if (xm == null) xm = (k.x0 + k.x) / 2;
+
+    // 2) Verificamos que haya sido un trazo vertical con suficiente recorrido sobre el alimento
+    const allY = (k.tr && k.tr.length) ? k.tr.map(pt => pt[1]) : [k.y0, k.y];
+    const topY = Math.min(...allY), botY = Math.max(...allY);
+    const recorridoY = botY - topY;
+
+    if (recorridoY < 13 || topY > cy - 2 || botY < cy + 2) {
+      cgMsg('X', k.x, k.y, '#ffb0b8'); sfx.no(); return;
+    }
+
+    const rel = xm - cg.tx, err = Math.abs(rel - obj);
+    if (err > 6.5) {
+      cgMsg('TORCIDO', xm, cy - 20, '#ff9aa4');
+      sfx.no(); return;
+    }
+
+    const q = err <= 2.2 ? 1 : err <= 4.2 ? .7 : .35;
     p.cuts.push(rel); p.cq.push(q); (p.cutT = p.cutT || []).push(cg.t); cg.chop = { x: xm, t: cg.t };
-    { const col = cgCol(p.k); for (let i = 0; i < 9; i++) cg.part.push({ x: xm + (Math.random() - .5) * 4, y: cy - 2, vx: (Math.random() - .5) * 1.6, vy: -.4 - Math.random() * .9, g: .07, c: i % 3 ? col : '#ffffff', v: 0 }); }
+    { const col = cgCol(p.k); for (let j = 0; j < 9; j++) cg.part.push({ x: xm + (Math.random() - .5) * 4, y: cy - 2, vx: (Math.random() - .5) * 1.6, vy: -.4 - Math.random() * .9, g: .07, c: j % 3 ? col : '#ffffff', v: 0 }); }
     seq([220, 110], .025, 'square', .08);
     cgMsg(q === 1 ? '¡PERFECTO!' : q > .5 ? '¡BIEN!' : 'TORCIDO', xm, cy - 20, q === 1 ? '#8aff9a' : q > .5 ? '#ffe45a' : '#ff9aa4');
     seq(q === 1 ? [988, 1319] : q > .5 ? [784, 988] : [300], .04, 'square', .06); cgPart(xm, cy, '#ffffff', 3, -.2);
@@ -259,7 +351,14 @@
     p = P.find(q => q.loc === 'tabla' && !q.corte); if (p) return { t: 'corte', p };
     p = en.find(q => !q.quemada && q.cook[0] >= .45 && q.cook[1] >= .45); if (p) return { t: 'mover', p, a: 'plato' };
     for (const pn of PN) if (en.some(q => cgPanDe(q) === pn && q.cook[q.lado] >= .5 && q.cook[1 - q.lado] < .3)) return { t: 'agitar', pi: pn.id };
-    for (const pn of PN) if (n(pn) && !cgEnFuego(pn)) { let b = CG_BURN[0]; CG_BURN.forEach(q => { if (cgDist(pn.x, pn.y, q.x, q.y) < cgDist(pn.x, pn.y, b.x, b.y)) b = q; }); return { t: 'fuego', b, pi: pn.id }; }
+    for (const pn of PN) if (n(pn) && !cgEnFuego(pn)) {
+      const activos = cgBurnActivos();
+      const ocupados = PN.filter(q => q !== pn && cgEnFuego(q)).map(q => activos.find(b => cgDist(q.x, q.y, b.x, b.y) <= 9.5));
+      const libres = activos.filter(b => !ocupados.includes(b));
+      let b = libres[0] || activos[0];
+      libres.forEach(q => { if (cgDist(pn.x, pn.y, q.x, q.y) < cgDist(pn.x, pn.y, b.x, b.y)) b = q; });
+      return { t: 'fuego', b, pi: pn.id };
+    }
     const libre = PN.filter(q => n(q) < 2).sort((x, y) => (!!cgEnFuego(y) - !!cgEnFuego(x)) || n(y) - n(x))[0];
     p = P.find(q => q.loc === 'tablaL' && q.modo.includes('f')); if (p && libre) return { t: 'mover', p, a: 'sarten', pi: libre.id };
     p = P.find(q => q.loc === 'tablaL' && !q.modo.includes('f')); if (p) return { t: 'mover', p, a: 'plato' };
@@ -282,13 +381,38 @@
     // estufa
     const S = CG_STOVE; R(S.x - 1, S.y - 1, S.w + 2, S.h + 2, '#3a424c'); R(S.x, S.y, S.w, S.h, '#aab4be'); R(S.x, S.y, S.w, 1, '#e0e8ee'); R(S.x + 3, S.y + 3, S.w - 6, S.h - 6, '#23252d'); R(S.x + 3, S.y + 3, S.w - 6, 1, '#3a3d48');
     const fl = cg ? Math.sin(cg.t * 9) : 0;
-    CG_BURN.forEach(b => {
-      circ(b.x, b.y, 11, '#14141a'); circ(b.x, b.y, 9, b.h > 1 ? '#7a2a22' : '#6a4a22'); circ(b.x, b.y, 6, '#23252d');
-      c.strokeStyle = b.h > 1 ? '#ff6a40' : '#ffb040'; c.lineWidth = 1; c.beginPath(); c.arc(b.x, b.y, 8, 0, 7); c.stroke(); circ(b.x, b.y, 2, '#3a3d48');
-      const n = b.h > 1 ? 12 : 8, bajo = cg.pans.some(q => cgDist(q.x, q.y, b.x, b.y) <= 9.5);
-      for (let i = 0; i < n; i++) { const a = i / n * 6.283 + cg.t * .6, h = (bajo ? 3.2 : 1.6) * (b.h > 1 ? 1.2 : .8) + Math.sin(cg.t * 11 + i * 2) * .8; R(b.x + Math.cos(a) * 9 - 1, b.y + Math.sin(a) * 9 - 1, 2, 2, i % 2 ? '#ffd84a' : '#ff7a2a'); if (bajo) { circ(b.x + Math.cos(a) * (9 + h * .3), b.y + Math.sin(a) * (9 + h * .3), .9, '#fff2a0'); } }
+    CG_BURN.forEach((b, idx) => {
+      const enc = cgBurnActivo(idx);
+      circ(b.x, b.y, 11, '#14141a');
+      if (enc) {
+        // Parrilla encendida (con fuego y chispas activas)
+        circ(b.x, b.y, 9, b.h > 1 ? '#7a2a22' : '#6a4a22');
+        circ(b.x, b.y, 6, '#23252d');
+        c.strokeStyle = b.h > 1 ? '#ff6a40' : '#ffb040'; c.lineWidth = 1;
+        c.beginPath(); c.arc(b.x, b.y, 8, 0, 7); c.stroke();
+        circ(b.x, b.y, 2, '#3a3d48');
+        const n = b.h > 1 ? 12 : 8, bajo = cg.pans.some(q => cgDist(q.x, q.y, b.x, b.y) <= 9.5);
+        for (let i = 0; i < n; i++) {
+          const a = i / n * 6.283 + cg.t * .6, h = (bajo ? 3.2 : 1.6) * (b.h > 1 ? 1.2 : .8) + Math.sin(cg.t * 11 + i * 2) * .8;
+          R(b.x + Math.cos(a) * 9 - 1, b.y + Math.sin(a) * 9 - 1, 2, 2, i % 2 ? '#ffd84a' : '#ff7a2a');
+          if (bajo) { circ(b.x + Math.cos(a) * (9 + h * .3), b.y + Math.sin(a) * (9 + h * .3), .9, '#fff2a0'); }
+        }
+      } else {
+        // Parrilla apagada (rejilla de hierro fría sin fuego)
+        circ(b.x, b.y, 9, '#262832');
+        circ(b.x, b.y, 6, '#181a22');
+        c.strokeStyle = '#3a3e4c'; c.lineWidth = 1;
+        c.beginPath(); c.arc(b.x, b.y, 8, 0, 7); c.stroke();
+        circ(b.x, b.y, 2.5, '#2a2d38');
+        R(b.x - 7, b.y, 14, 1, '#323642');
+        R(b.x, b.y - 7, 1, 14, '#323642');
+      }
     });
-    [0, 1, 2, 3].forEach(i => { circ(S.x + 11 + i * 15, S.y + S.h - 1, 2.5, '#4a525c'); R(S.x + 11 + i * 15, S.y + S.h - 4, 1, 2, '#e8e8e8'); });
+    [0, 1, 2, 3].forEach(i => {
+      const act = cgBurnActivo(i);
+      circ(S.x + 11 + i * 15, S.y + S.h - 1, 2.5, act ? '#5a6270' : '#353a42');
+      R(S.x + 11 + i * 15, S.y + S.h - 4, 1, 2, act ? '#ff9a4a' : '#7a828e');
+    });
     // plato
     const Pl = CG_PLATE; c.fillStyle = 'rgba(0,0,0,.18)'; c.beginPath(); c.ellipse(Pl.x + 2, Pl.y + 3, Pl.rx, Pl.ry, 0, 0, 7); c.fill();
     c.fillStyle = '#c8c4bc'; c.beginPath(); c.ellipse(Pl.x, Pl.y, Pl.rx, Pl.ry, 0, 0, 7); c.fill(); c.fillStyle = '#f6f4f0'; c.beginPath(); c.ellipse(Pl.x, Pl.y - .5, Pl.rx - 1, Pl.ry - 1, 0, 0, 7); c.fill(); c.fillStyle = '#e4e0d8'; c.beginPath(); c.ellipse(Pl.x, Pl.y, Pl.rx - 7, Pl.ry - 4, 0, 0, 7); c.fill();
@@ -325,30 +449,252 @@
         [0, 1].forEach(j => { const bx = s.x - 6, by = s.y - 15 + j * 3, v = Math.min(1, p.cook[j]); R(bx - 1, by - 1, 14, 3, '#000'); R(bx, by, 12, 1, '#55505a'); R(bx + 12 * CG_SWEET[0], by, 12 * (CG_SWEET[1] - CG_SWEET[0]), 1, '#3a8a4a'); R(bx, by, Math.round(12 * v), 1, v > CG_SWEET[1] ? '#ff5a4a' : v >= CG_SWEET[0] ? '#8aff9a' : '#ffd84a'); if (j === p.lado) R(bx - 3, by, 1, 1, '#ffffff'); });
       }
     });
-    // el cuchillo
+    // el cuchillo / rastro de corte
     const kn = cg.knife;
-    if (kn) { kn.tr.forEach((t, i) => { c.fillStyle = `rgba(255,255,255,${i / kn.tr.length * .5})`; c.fillRect(Math.round(t[0]), Math.round(t[1]), 1, 1); }); R(kn.x - 1, kn.y - 4, 2, 8, '#e8eef4'); R(kn.x - 1, kn.y - 4, 1, 8, '#ffffff'); R(kn.x - 1, kn.y + 4, 2, 4, '#5a3a1a'); }
-    else { R(B.x + B.w - 9, B.y + B.h - 24, 2, 11, '#e8eef4'); R(B.x + B.w - 9, B.y + B.h - 13, 2, 5, '#5a3a1a'); }
+    if (kn) {
+      kn.tr.forEach((t, i) => { c.fillStyle = `rgba(255,255,255,${i / kn.tr.length * .6})`; c.fillRect(Math.round(t[0]), Math.round(t[1]), 1.5, 1.5); });
+      R(kn.x - 1, kn.y - 7, 3, 10, '#e8eef4');
+      R(kn.x - 1, kn.y - 7, 1, 10, '#ffffff');
+      R(kn.x - 1, kn.y + 3, 3, 4, '#5a3a1a');
+    } else {
+      // Solo dibuja cuchillo en la tabla si NO hay alimento esperando corte en la tabla
+      if (!cg.piezas.some(p => p.loc === 'tabla')) {
+        R(B.x + B.w - 9, B.y + B.h - 24, 2, 11, '#e8eef4');
+        R(B.x + B.w - 9, B.y + B.h - 13, 2, 5, '#5a3a1a');
+      }
+    }
 
-    // ---- guía visual: insignias, destinos que brillan y una mano que enseña ----
-    const ico = (kind, x, y) => { if (kind === 'k') { R(x, y, 2, 8, '#ffffff'); R(x + 2, y, 2, 6, '#b8c4d0'); R(x, y + 8, 4, 3, '#7a4a22'); } else if (kind === 'f') { R(x + 2, y, 2, 2, '#ffd84a'); R(x, y + 2, 6, 6, '#ff8a2a'); R(x + 2, y + 4, 2, 4, '#ffe45a'); R(x, y + 8, 6, 2, '#ff5a2a'); } else { R(x, y + 4, 4, 2, '#ffffff'); R(x + 2, y + 2, 2, 6, '#ffffff'); } };
-    const badge = (p, x, y) => { const L = []; if (p.modo.includes('c') && !p.corte) L.push('k'); if (p.modo.includes('f')) { if (L.length) L.push('>'); L.push('f'); } const w = L.length * 7 - 1; L.forEach((q, i) => ico(q, Math.round(x - w / 2) + i * 7, y)); };
-    cg.piezas.forEach(p => { if (p.loc === 'cesta') { const s = cgSlot(p); badge(p, s.x, 20); } else if (p.loc === 'tablaL' && p.modo.includes('f')) { const s = cgSlot(p); ico('f', s.x - 3, s.y + 9); } });
-    const pul = .5 + .5 * Math.sin(cg.t * 5), sug = cg.ayuda ? cgSug() : (cg.piezas.find(q => q.quemada) ? { t: 'tirar', p: cg.piezas.find(q => q.quemada) } : null);
+    // ---- guía visual: insignias enmarcadas, líneas de corte y destinos interactivos ----
+    const pul = .5 + .5 * Math.sin(cg.t * 5);
+    const sug = cg.ayuda ? cgSug() : (cg.piezas.find(q => q.quemada) ? { t: 'tirar', p: cg.piezas.find(q => q.quemada) } : null);
+    const badge = (p, x, y) => {
+      const needsC = p.modo.includes('c') && !p.corte;
+      const needsF = p.modo.includes('f');
+      if (!needsC && !needsF) return;
+      const w = (needsC && needsF) ? 22 : 13, h = 9;
+      const bx = Math.round(x - w / 2), by = Math.round(y);
+      // Placa tipo tag con fondo oscuro y borde nítido
+      R(bx, by, w, h, 'rgba(16, 18, 28, 0.95)');
+      c.strokeStyle = needsC ? (needsF ? '#ffd84a' : '#8aff9a') : '#ff7a2a';
+      c.lineWidth = 1;
+      c.strokeRect(bx - 0.5, by - 0.5, w + 1, h + 1);
+
+      if (needsC && needsF) {
+        // Cuchillo (Paso 1 prioritario)
+        const kx = bx + 2;
+        R(kx, by + 1, 2, 4, '#e8eef4'); R(kx, by + 1, 1, 4, '#ffffff');
+        R(kx, by + 5, 2, 2, '#5a3a1a');
+        // Indicador '1º'
+        R(kx - 1, by + 1, 1, 4, '#8aff9a');
+        // Flecha '>'
+        R(bx + 8, by + 3, 3, 1, '#a0b0c4');
+        R(bx + 10, by + 2, 1, 3, '#a0b0c4');
+        // Fuego (Paso 2)
+        const fx = bx + 14;
+        R(fx + 1, by + 1, 2, 2, '#ffd84a');
+        R(fx, by + 2, 4, 3, '#ff8a2a');
+        R(fx + 1, by + 3, 2, 2, '#ffe45a');
+        R(fx, by + 5, 4, 2, '#ff4a2a');
+      } else if (needsC) {
+        const kx = bx + 5;
+        R(kx, by + 1, 2, 4, '#e8eef4'); R(kx, by + 1, 1, 4, '#ffffff');
+        R(kx, by + 5, 2, 2, '#5a3a1a');
+      } else {
+        const fx = bx + 4;
+        R(fx + 1, by + 1, 2, 2, '#ffd84a');
+        R(fx, by + 2, 4, 3, '#ff8a2a');
+        R(fx + 1, by + 3, 2, 2, '#ffe45a');
+        R(fx, by + 5, 4, 2, '#ff4a2a');
+      }
+    };
+
+    if (cg.ayuda) {
+      cg.piezas.forEach(p => {
+        if (p.loc === 'cesta') {
+          const s = cgSlot(p);
+          // Línea punteada de corte sobre el propio sprite del alimento para que salte a la vista
+          if (p.modo.includes('c') && !p.corte) {
+            for (let dy = -5; dy <= 5; dy += 3) {
+              R(s.x, s.y + dy, 1, 2, '#ffffff');
+              R(s.x, s.y + dy + 1, 1, 1, '#14141a');
+            }
+          }
+          // Badge tag enmarcado justo bajo el alimento
+          badge(p, s.x, 20);
+
+          // Flecha animada '▼' rebotando sobre el ingrediente que toca mover ahora
+          if (sug && sug.p === p && !cg.drag) {
+            const bo = Math.round(Math.sin(cg.t * 8) * 1.5);
+            R(s.x - 2, s.y - 12 + bo, 5, 2, '#ffd84a');
+            R(s.x - 1, s.y - 10 + bo, 3, 2, '#ffd84a');
+            R(s.x, s.y - 8 + bo, 1, 2, '#ffd84a');
+            c.strokeStyle = 'rgba(255,216,74,' + (.5 + .5 * pul) + ')';
+            c.lineWidth = 1; c.beginPath(); c.arc(s.x, s.y, 9.5, 0, 7); c.stroke();
+          }
+        } else if (p.loc === 'tablaL' && p.modo.includes('f')) {
+          const s = cgSlot(p);
+          // Badge de fuego para pieza ya cortada en la tabla
+          R(s.x - 6, s.y + 7, 12, 8, 'rgba(16, 18, 28, 0.95)');
+          c.strokeStyle = '#ff7a2a'; c.lineWidth = 1; c.strokeRect(s.x - 6.5, s.y + 6.5, 13, 9);
+          const fx = s.x - 2, by = s.y + 8;
+          R(fx + 1, by + 1, 2, 2, '#ffd84a'); R(fx, by + 2, 4, 3, '#ff8a2a'); R(fx + 1, by + 3, 2, 2, '#ffe45a'); R(fx, by + 5, 4, 2, '#ff4a2a');
+        }
+      });
+    }
+
+    // Actualiza texto de ayuda en el encabezado superior (solo durante los primeros 5 cocinados)
+    if (cg.ayuda && sug) {
+      let sugTxt = '';
+      if (sug.t === 'fuego') sugTxt = 'Mueve la sartén al fuego 🔥';
+      else if (sug.t === 'agitar') sugTxt = '¡Sacude la sartén para voltear! 🔄';
+      else if (sug.t === 'corte') sugTxt = 'Desliza tu dedo hacia abajo para cortar 👆';
+      else if (sug.t === 'tirar') sugTxt = 'Se quemó, tócalo para tirarlo';
+      else if (sug.t === 'mover') {
+        sugTxt = sug.a === 'tabla' ? 'Lleva el ingrediente a la tabla' : (sug.a === 'sarten' ? 'Ponlo en la sartén' : '¡Listo! Llévalo al plato');
+      }
+      const fullT = cg.r.n + (sugTxt ? ' • ' + sugTxt : '');
+      if (cg.lastTxt !== fullT) { cg.lastTxt = fullT; const el = $('cg-t'); if (el) el.textContent = fullT; }
+    } else if (!cg.ayuda) {
+      if (cg.lastTxt !== cg.r.n) { cg.lastTxt = cg.r.n; const el = $('cg-t'); if (el) el.textContent = cg.r.n; }
+    }
+
     const ring = (kind, col) => { c.strokeStyle = col; c.lineWidth = 1; c.globalAlpha = .35 + .5 * pul;
       if (kind === 'tabla') c.strokeRect(B.x - 2.5, B.y - 2.5, B.w + 5, B.h + 5); else if (kind === 'plato') { c.beginPath(); c.ellipse(Pl.x, Pl.y, Pl.rx + 3, Pl.ry + 3, 0, 0, 7); c.stroke(); } else if (kind === 'sarten') { c.beginPath(); c.arc(pn.x, pn.y, 17.5, 0, 7); c.stroke(); } else { c.beginPath(); c.arc(kind.x, kind.y, 12.5, 0, 7); c.stroke(); } c.globalAlpha = 1; };
     const mano = (x0, y0, x1, y1, col) => {
       for (let i = 1; i < 8; i++) R(x0 + (x1 - x0) * i / 8, y0 + (y1 - y0) * i / 8, 1, 1, 'rgba(255,255,255,.55)');
       const T = (cg.t * .8) % 1.5, u = Math.min(1, T / 1.1), e2 = u * u * (3 - 2 * u), hx = x0 + (x1 - x0) * e2, hy = y0 + (y1 - y0) * e2;
       circ(hx + 1, hy + 2, 4.5, 'rgba(0,0,0,.3)'); circ(hx, hy, 4.5, '#ffffff'); circ(hx, hy, 3, col || '#ffd84a'); if (u < .08 || u >= 1) { c.strokeStyle = '#fff'; c.beginPath(); c.arc(hx, hy, 6 + (T % .2) * 20, 0, 7); c.stroke(); } };
+
+    // Si el jugador está arrastrando una pieza, ilumina el destino correspondiente si la ayuda está activa
+    if (cg.ayuda && cg.drag && cg.drag.p) {
+      const dp = cg.drag.p;
+      if (dp.modo.includes('c') && !dp.corte) {
+        // Va a la tabla de cortar
+        c.strokeStyle = '#8aff9a'; c.lineWidth = 2; c.strokeRect(B.x - 2, B.y - 2, B.w + 4, B.h + 4);
+        c.fillStyle = 'rgba(16, 20, 32, 0.92)'; c.fillRect(B.x + 5, B.y + B.h / 2 - 6, B.w - 10, 12);
+        c.strokeStyle = '#8aff9a'; c.lineWidth = 1; c.strokeRect(B.x + 5, B.y + B.h / 2 - 6, B.w - 10, 12);
+        c.fillStyle = '#8aff9a'; c.font = '6px monospace'; c.textAlign = 'center';
+        c.fillText('¡A LA TABLA! 🔪', B.x + B.w / 2, B.y + B.h / 2 + 2);
+      } else if (dp.modo.includes('f') && (!dp.modo.includes('c') || dp.corte)) {
+        // Va a la sartén
+        const ptarget = cgPanDe(dp) || cg.pans[0];
+        c.strokeStyle = '#ff9a4a'; c.lineWidth = 2; c.beginPath(); c.arc(ptarget.x, ptarget.y, 19, 0, 7); c.stroke();
+        c.fillStyle = 'rgba(16, 20, 32, 0.92)'; c.fillRect(ptarget.x - 26, ptarget.y - 6, 52, 12);
+        c.strokeStyle = '#ff9a4a'; c.lineWidth = 1; c.strokeRect(ptarget.x - 26, ptarget.y - 6, 52, 12);
+        c.fillStyle = '#ffd84a'; c.font = '6px monospace'; c.textAlign = 'center';
+        c.fillText('¡A LA SARTÉN! 🔥', ptarget.x, ptarget.y + 2);
+      } else if (cgListaPlato(dp) === null) {
+        // Va al plato
+        c.strokeStyle = '#8aff9a'; c.lineWidth = 2; c.beginPath(); c.ellipse(Pl.x, Pl.y, Pl.rx + 4, Pl.ry + 4, 0, 0, 7); c.stroke();
+        c.fillStyle = 'rgba(16, 20, 32, 0.92)'; c.fillRect(Pl.x - 24, Pl.y - 6, 48, 12);
+        c.strokeStyle = '#8aff9a'; c.lineWidth = 1; c.strokeRect(Pl.x - 24, Pl.y - 6, 48, 12);
+        c.fillStyle = '#8aff9a'; c.font = '6px monospace'; c.textAlign = 'center';
+        c.fillText('¡AL PLATO! 🍽️', Pl.x, Pl.y + 2);
+      }
+    }
+
     if (sug && !cg.drag && !cg.knife) {
       pn = cg.pans.find(q => q.id === sug.pi) || cg.pans[0];
-      if (sug.t === 'tirar') { const s = cgSlot(sug.p); c.globalAlpha = .5 + .5 * pul; R(s.x - 6, s.y - 6, 12, 12, 'rgba(255,40,50,.35)'); c.globalAlpha = 1; if (cg.ayuda) mano(s.x + 6, s.y + 8, s.x, s.y, '#ff5a6a'); }
-      else if (sug.t === 'corte') { const g = CG_GUIA[Math.min(2, sug.p.cuts.length)], T = (cg.t * 1.1) % 1.4, u = Math.min(1, T / .9); const hx = cg.tx + g, hy = cy - 22 + 44 * u; ring('tabla', '#ffffff'); circ(hx, hy, 4, '#ffffff'); circ(hx, hy, 2.5, '#ffd84a'); for (let i = 0; i < 3; i++) R(hx - 1, cy - 30 - i * 3 + (u * 6 | 0), 3, 1, 'rgba(255,255,255,.7)'); }
-      else if (sug.t === 'agitar') { const hx = pn.x + 28 + pn.wig * 2.2, hy = pn.y, ay = pn.y < 72 ? pn.y + 24 : pn.y - 24, o = pn.wig * 1.2; c.globalAlpha = .6 + .4 * pul; R(pn.x - 11 + o, ay, 22, 2, '#ffffff'); [-1, 1].forEach(d => { for (let k = 0; k < 4; k++) R(pn.x + d * (11 + 3 - k) + o - (d < 0 ? 0 : 1), ay - 3 + k + 0, 1, 8 - 2 * k < 2 ? 2 : 8 - 2 * k, '#ffffff'); }); c.globalAlpha = 1; circ(hx + 1, hy + 2, 5, 'rgba(0,0,0,.3)'); circ(hx, hy, 5, '#ffffff'); circ(hx, hy, 3.5, '#9ad8ff'); c.strokeStyle = '#9ad8ff'; c.lineWidth = 1; c.beginPath(); c.arc(pn.x, pn.y, 19 + pul * 2, 0, 7); c.stroke(); }
-      else if (sug.t === 'fuego') { ring(sug.b, '#ff9a4a'); if (cg.idle > 1) mano(pn.x + 24, pn.y, sug.b.x + 24, sug.b.y, '#ff9a4a'); }
-      else if (sug.t === 'mover') { const s = cgSlot(sug.p), T = sug.a; if (sug.p.loc === 'sarten') pn = cgPanDe(sug.p); ring(T, T === 'plato' ? '#8aff9a' : '#ffffff'); const dst = T === 'tabla' ? { x: B.x + B.w / 2, y: B.y + 30 } : T === 'plato' ? { x: Pl.x, y: Pl.y } : { x: pn.x, y: pn.y }; if (sug.p.loc === 'sarten') { c.globalAlpha = .4 + .5 * pul; c.strokeStyle = '#8aff9a'; c.beginPath(); c.arc(s.x, s.y, 8, 0, 7); c.stroke(); c.globalAlpha = 1; }
-        if (cg.idle > .8 || sug.p.loc === 'sarten') mano(s.x, s.y, dst.x, dst.y, T === 'plato' ? '#8aff9a' : '#ffd84a'); else { c.globalAlpha = .4 + .5 * pul; c.strokeStyle = '#ffd84a'; c.beginPath(); c.arc(s.x, s.y, 9, 0, 7); c.stroke(); c.globalAlpha = 1; } }
+      if (sug.t === 'tirar') {
+        const s = cgSlot(sug.p); c.globalAlpha = .5 + .5 * pul; R(s.x - 6, s.y - 6, 12, 12, 'rgba(255,40,50,.35)'); c.globalAlpha = 1; mano(s.x + 6, s.y + 8, s.x, s.y, '#ff5a6a');
+      }
+      else if (sug.t === 'corte') {
+        const g = CG_GUIA[Math.min(2, sug.p.cuts.length)], gx = cg.tx + g;
+        ring('tabla', '#ffffff');
+        // Línea guía vertical punteada con contraste
+        for (let y = cy - 20; y <= cy + 20; y += 4) {
+          R(gx, y, 1, 2, (y % 8 === 0) ? '#ffffff' : '#ffd84a');
+        }
+        // Flechitas indicando sentido hacia abajo
+        [-11, 0, 11].forEach(dy => {
+          const arrY = cy + dy + Math.round(Math.sin(cg.t * 8) * 1.5);
+          R(gx - 1, arrY, 3, 1, '#ffd84a');
+          R(gx, arrY + 1, 1, 1, '#ffd84a');
+        });
+        // Dedo animado deslizando de arriba hacia abajo
+        const T = (cg.t * 1.25) % 1.5, u = Math.min(1, T / 1.05);
+        const e2 = u * u * (3 - 2 * u), fy = cy - 22 + e2 * 44;
+        if (fy > cy - 22) {
+          c.fillStyle = 'rgba(255,255,255,.45)';
+          c.fillRect(gx, cy - 22, 1, Math.round(fy - (cy - 22)));
+        }
+        circ(gx + 1, fy + 2, 4.5, 'rgba(0,0,0,.35)');
+        circ(gx, fy, 4.5, '#ffffff');
+        circ(gx, fy, 3, '#ffd84a');
+        if (u < .1 || u >= 1) {
+          c.strokeStyle = '#fff'; c.beginPath(); c.arc(gx, cy - 22, 3 + (T % .2) * 15, 0, 7); c.stroke();
+        }
+        // Badge visual explicativo bajo la tabla
+        c.fillStyle = 'rgba(20,20,26,.88)'; c.fillRect(4, 98, 53, 10);
+        c.strokeStyle = '#ffffff'; c.lineWidth = 1; c.strokeRect(4, 98, 53, 10);
+        c.fillStyle = '#ffd84a'; c.font = '6px monospace'; c.textAlign = 'center';
+        c.fillText('👆 DESLIZA', 30, 105);
+      }
+      else if (sug.t === 'agitar') {
+        const hx = pn.x + 24, hy = pn.y;
+        const shkX = Math.sin(cg.t * 16) * 5, shkY = Math.cos(cg.t * 12) * 3;
+        // Icono animado de voltear sobre la comida
+        const ang = cg.t * 6;
+        c.strokeStyle = '#ffffff'; c.lineWidth = 1.5; c.beginPath(); c.arc(pn.x, pn.y, 7.5, ang, ang + 4.2); c.stroke();
+        const tipX = pn.x + Math.cos(ang + 4.2) * 7.5, tipY = pn.y + Math.sin(ang + 4.2) * 7.5;
+        c.fillStyle = '#8aff9a'; c.beginPath(); c.arc(tipX, tipY, 2, 0, 7); c.fill();
+        // Aro pulsante azul en la sartén
+        c.strokeStyle = 'rgba(154,216,255,' + (.5 + .5 * pul) + ')'; c.lineWidth = 1.5;
+        c.beginPath(); c.arc(pn.x, pn.y, 18 + pul * 2, 0, 7); c.stroke();
+        // Flechas de vaivén en el mango
+        R(hx - 8 + shkX, hy - 7, 16, 1, '#8ad8ff');
+        R(hx - 8 + shkX, hy - 9, 2, 5, '#8ad8ff');
+        R(hx + 6 + shkX, hy - 9, 2, 5, '#8ad8ff');
+        R(hx + 11, hy - 6 + shkY, 1, 12, '#8ad8ff');
+        R(hx + 9, hy - 6 + shkY, 5, 2, '#8ad8ff');
+        R(hx + 9, hy + 4 + shkY, 5, 2, '#8ad8ff');
+        // Mano sacudiendo el mango
+        const mx = hx + shkX, my = hy + shkY;
+        circ(mx + 1, my + 2, 5, 'rgba(0,0,0,.35)');
+        circ(mx, my, 5, '#ffffff');
+        circ(mx, my, 3.5, '#9ad8ff');
+        // Badge visual explicativo
+        c.fillStyle = 'rgba(20,20,26,.88)'; c.fillRect(64, 122, 65, 10);
+        c.strokeStyle = '#8ad8ff'; c.lineWidth = 1; c.strokeRect(64, 122, 65, 10);
+        c.fillStyle = '#ffffff'; c.font = '6px monospace'; c.textAlign = 'center';
+        c.fillText('🔄 ¡SACUDE!', 96, 129);
+      }
+      else if (sug.t === 'fuego') {
+        const b = sug.b;
+        // Quemador destino brillando con aros de fuego y partículas
+        c.strokeStyle = '#ff5a2a'; c.lineWidth = 1.5; c.beginPath(); c.arc(b.x, b.y, 12 + pul * 3, 0, 7); c.stroke();
+        c.strokeStyle = '#ffd84a'; c.lineWidth = 1; c.beginPath(); c.arc(b.x, b.y, 8 + pul * 1.5, 0, 7); c.stroke();
+        c.fillStyle = 'rgba(255,120,40,.22)'; c.beginPath(); c.arc(b.x, b.y, 11, 0, 7); c.fill();
+        for (let i = 0; i < 3; i++) {
+          const fa = i * 2.1 + cg.t * 3;
+          R(b.x + Math.cos(fa) * 6, b.y + Math.sin(fa) * 6 - ((cg.t * 14 + i * 4) % 7), 1.5, 1.5, i % 2 ? '#ffd84a' : '#ff7a2a');
+        }
+        // Sartén brillando en naranja
+        c.strokeStyle = '#ff9a4a'; c.lineWidth = 1.5; c.beginPath(); c.arc(pn.x, pn.y, 17.5 + pul * 2, 0, 7); c.stroke();
+        // Trayectoria animada de la sartén al quemador
+        const pasos = 6;
+        for (let i = 1; i < pasos; i++) {
+          const u = i / pasos, px = pn.x + (b.x - pn.x) * u, py = pn.y + (b.y - pn.y) * u;
+          R(px, py, 1.5, 1.5, 'rgba(255,216,74,.6)');
+        }
+        const arrU = (cg.t * 1.4) % 1, ax = pn.x + (b.x - pn.x) * arrU, ay = pn.y + (b.y - pn.y) * arrU;
+        c.fillStyle = '#ff7a2a'; c.beginPath(); c.arc(ax, ay, 2, 0, 7); c.fill();
+        // Mano animada arrastrando la sartén por el mango hacia el fuego
+        mano(pn.x + 22, pn.y, b.x + 22, b.y, '#ff9a4a');
+        // Badge explicativo
+        c.fillStyle = 'rgba(20,20,26,.88)'; c.fillRect(66, 122, 62, 10);
+        c.strokeStyle = '#ff7a2a'; c.lineWidth = 1; c.strokeRect(66, 122, 62, 10);
+        c.fillStyle = '#ffd84a'; c.font = '6px monospace'; c.textAlign = 'center';
+        c.fillText('🔥 AL FUEGO', 97, 129);
+      }
+      else if (sug.t === 'mover') {
+        const s = cgSlot(sug.p), T = sug.a;
+        if (sug.p.loc === 'sarten') pn = cgPanDe(sug.p);
+        ring(T, T === 'plato' ? '#8aff9a' : '#ffffff');
+        const dst = T === 'tabla' ? { x: B.x + B.w / 2, y: B.y + 30 } : T === 'plato' ? { x: Pl.x, y: Pl.y } : { x: pn.x, y: pn.y };
+        if (sug.p.loc === 'sarten') { c.globalAlpha = .4 + .5 * pul; c.strokeStyle = '#8aff9a'; c.beginPath(); c.arc(s.x, s.y, 8, 0, 7); c.stroke(); c.globalAlpha = 1; }
+        mano(s.x, s.y, dst.x, dst.y, T === 'plato' ? '#8aff9a' : '#ffd84a');
+      }
     }
     // partículas y mensajes
     cg.part.forEach(p => { c.globalAlpha = 1 - p.v; R(p.x, p.y, 2, 2, p.c); c.globalAlpha = 1; });
@@ -751,7 +1097,7 @@
       `<div class="card"><div class="pv"><canvas data-prev="mj_mem"></canvas></div><div class="cn">MEMORIA CON CORTEX</div>${nivel() >= MEM_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.mem.rec}</div><button class="bt ok" data-a="mem_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${MEM_NV}</div>`}</div>` +
       `<div class="card"><div class="pv"><canvas data-prev="mj_run"></canvas></div><div class="cn">CORRE, SIMON</div>${nivel() >= RUN_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.run.rec}</div><button class="bt ok" data-a="run_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RUN_NV}</div>`}</div>` +
       `<div class="card"><div class="pv"><canvas data-prev="mj_rt"></canvas></div><div class="cn">BAILA CON SIMON</div>${nivel() >= RT_NV ? `<div style="font-size:6px;color:#4a5090;line-height:1.6">RÉCORD: ${e.rt.rec}</div><button class="bt ok" data-a="rt_jugar">JUGAR</button>` : `<div class="est bloq">CARIÑO NV${RT_NV}</div>`}</div></div>` +
-      `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff;margin-top:12px">Cada juego gasta ${MJ_COSTO} de energía (baile: 5).</div>`;
+      `<div class="centro" style="font-size:7px;line-height:1.9;color:#aab4ff;margin-top:12px">Cada juego gasta ${MJ_COSTO} de energía.</div>`;
   }
   let mj = null;
   const mjCv = $('mj-cv'), mjX = mjCv.getContext('2d'); mjCv.height = MJH;
@@ -1149,7 +1495,7 @@
     if (!mem || mem.fin) return; if (mem.perdio) memDi('Casi lo logras, Simon. ¡Otra vez!'); mem.fin = true; mem.to.forEach(clearTimeout); mem.lock = true;
     const base = Math.floor(mem.pts / MEM_DIV), bonoNv = base > 0 ? bonoNivelJuego() : 0, gana = base + bonoNv;
     e.st.mem++;
-    e.feliz = clamp(e.feliz + Math.min(25, 8 + Math.floor(mem.pts / 20))); e.hambre = clamp(e.hambre - 2);
+    e.feliz = clamp(e.feliz + Math.min(25, 8 + Math.floor(mem.pts / 20))); e.hambre = clamp(e.hambre - 3);
     const antes = e.mem.rec; let nuevo = false; if (mem.pts > antes) { e.mem.rec = mem.pts; nuevo = antes > 0; }
     if (gana) ganar(gana, 0, true); ganar(0, 3 + Math.min(6, Math.floor(mem.pts / 40)));
     mision('jugar'); revisar(); pintar(); guardar();
